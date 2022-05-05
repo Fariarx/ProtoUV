@@ -1,8 +1,8 @@
 export const colors = {
-	greyscale:{
-		mega:'#15191a',
+	background:{
+		dark:'#15191a',
 		heavy:'#1f2427',
-		gray:'#444444',
+		common:'#444444',
 		white: '#fff'
 	},
 	interact:{
@@ -10,4 +10,8 @@ export const colors = {
 		warning:'#ffbd39',
 		danger:'#fb594f'
 	},
+};
+
+export const UpdateScheme = () => {
+	document.body.style.background = colors.background.common;
 };

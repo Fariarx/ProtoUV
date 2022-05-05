@@ -6,15 +6,15 @@ import {
 } from '@mui/material';
 import { BsCircleFill } from '@react-icons/all-files/bs/BsCircleFill';
 import { colors } from './Shared/Colors';
-import { Bridge } from './Shared/Globals';
+import { AppName, Bridge } from './Shared/Globals';
 import { FlexBoxRow } from './Shared/Styled/FlexBox';
 
 export const Header = () => (
 	<Box onDoubleClick={Bridge.window.maximize}
 		sx={{
 			width: '100%',
-			height: '36px',
-			background: colors.greyscale.mega,
+			height: '28px',
+			background: colors.background.dark,
 			display: 'flex',
 			flexDirection: 'row',
 			justifyContent: 'flex-end',
@@ -29,11 +29,12 @@ export const Header = () => (
 				<Typography variant={'subtitle2'} sx={{
 					flex:'auto',
 					marginLeft: '12px',
-					color: colors.greyscale.white,
+					color: colors.background.white,
 					alignSelf:'center',
+					justifySelf: 'center',
 					textShadow: '1px 1px 2px ' + colors.interact.touch
 				}}>
-        UV Proto
+					{AppName}
 				</Typography>
 			</FlexBoxRow>
 		</Box>

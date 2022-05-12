@@ -1,4 +1,7 @@
-export const colors = {
+const _colors = {
+	typography:{
+		background:'#aaaaaa'
+	},
 	background:{
 		dark:'#15191a',
 		heavy:'#1f2427',
@@ -10,8 +13,17 @@ export const colors = {
 		warning:'#ffbd39',
 		danger:'#fb594f'
 	},
+	scene:{
+		colorBackgroundScene:'#2f2f2f',
+		colorBackgroundSceneBottom:'#6c6c6c',
+		colorBackground:'#1d1d1d',
+		color1:'#2a2a2a',
+		workingPlaneLimitColor:'#d4605a',
+		workingPlaneColor:'#68798d',
+	}
 };
 
+export const colors = _colors;
 export const UpdateScheme = () => {
 	document.body.style.background = colors.background.common;
 };

@@ -1,0 +1,19 @@
+{
+  "Workspace": {
+    "sizeX": 82.62,
+    "sizeY": 130.56,
+    "height": 155
+  },
+  "Resolution": {
+    "X": 1620,
+    "Y": 2560
+  },
+  "PrintSettings": {
+    "LayerHeight": 0.05,
+    "BottomLayers": 6,
+    "ExposureTime": 4.5,
+    "BottomExposureTime": 60,
+    "LiftingHeight": 3.5,
+    "LiftingSpeed": 90
+  }
+}

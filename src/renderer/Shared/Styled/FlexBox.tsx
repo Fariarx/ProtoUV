@@ -8,5 +8,7 @@ export const FlexBoxRow = styled(Box)({
 });
 export const FlexBoxColumn = styled(Box)({
 	display	: 'flex',
-	flexDirection: 'column'
+	flexDirection: 'column',
+	width: '100%',
+	height: '100%'
 });

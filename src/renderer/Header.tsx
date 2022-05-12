@@ -38,12 +38,15 @@ export const Header = () => (
 				</Typography>
 			</FlexBoxRow>
 		</Box>
-		<ButtonGroup size="small" aria-label="small button group">
+		<ButtonGroup >
 			<IconButtonSmall onClick={Bridge.window.maximize}>
 				<BsCircleFill color={colors.interact.touch} />
 			</IconButtonSmall>
 			<IconButtonSmall onClick={Bridge.window.minimize}>
 				<BsCircleFill color={colors.interact.warning} />
+			</IconButtonSmall>
+			<IconButtonSmall onClick={Bridge.window.maximize}>
+				<BsCircleFill color={colors.interact.touch} />
 			</IconButtonSmall>
 			<IconButtonSmall onClick={Bridge.window.close}>
 				<BsCircleFill color={colors.interact.danger} />

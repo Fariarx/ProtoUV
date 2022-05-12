@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
 const body = {
-	window:{
+	window: {
 		maximize: () => {
 			ipcRenderer.send('electron.maximize');
 		},
@@ -10,6 +10,9 @@ const body = {
 		},
 		close: () => {
 			ipcRenderer.send('electron.closeWindow');
+		},
+		userData: () => {
+			return ipcRenderer.sendSync('electron.userData');
 		},
 	}
 };

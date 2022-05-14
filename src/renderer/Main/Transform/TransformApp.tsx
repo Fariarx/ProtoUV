@@ -35,7 +35,7 @@ export const TransformApp = () => {
 			display: 'flex',
 			flexWrap: 'wrap',
 			position: 'absolute',
-			top: Margins.sum(APP_HEADER_HEIGHT, Margins.eight),
+			top: '20%',
 			left: Margins.twelve
 		}}
 	>

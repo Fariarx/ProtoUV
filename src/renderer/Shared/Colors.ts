@@ -16,7 +16,7 @@ export const colors = {
 		danger:'#fb594f'
 	},
 	instruments:{
-		main: '#18590c',
+		main: '#16520b',
 	},
 	scene:{
 		colorBackgroundScene:'#2f2f2f',

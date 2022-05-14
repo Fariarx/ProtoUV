@@ -13,38 +13,38 @@ import { OutlineEffect } from 'three/examples/jsm/effects/OutlineEffect';
 import { Camera } from 'three/src/cameras/Camera';
 import { colors } from '../../Shared/Colors';
 import { SceneMaterial, SceneMaterials } from '../../Shared/Globals';
-import { SceneObject } from './SceneObject';
+import { SceneObject } from './Entities/SceneObject';
 
-export class Store {
-	public static instance: Store;
+export class SceneStore {
+	public static instance: SceneStore;
 
-	renderer: WebGLRenderer = new WebGLRenderer({
+	public renderer: WebGLRenderer = new WebGLRenderer({
 		antialias: true,
 		alpha:true,
 	});
-	outlineEffectRenderer: OutlineEffect = new OutlineEffect( this.renderer, {
+	public outlineEffectRenderer: OutlineEffect = new OutlineEffect( this.renderer, {
 		defaultThickness:0.001
 	});
-	materialForPlaneShadow: Material = new ShadowMaterial({
+	public materialForPlaneShadow: Material = new ShadowMaterial({
 		color: '#444444',
 		side: FrontSide,
 	});
-	materialForPlane: Material = new MeshBasicMaterial({
+	public materialForPlane: Material = new MeshBasicMaterial({
 		color: colors.scene.workingPlaneColor,
 		side: FrontSide
 	});
-	materialForPlaneLimit: Material = new MeshBasicMaterial({
+	public materialForPlaneLimit: Material = new MeshBasicMaterial({
 		color: colors.scene.workingPlaneLimitColor,
 		side: FrontSide
 	});
-	materialForObjects: SceneMaterial = SceneMaterials.default;
-	perspectiveCamera = new PerspectiveCamera(
+	public materialForObjects: SceneMaterial = SceneMaterials.default;
+	public perspectiveCamera = new PerspectiveCamera(
 		40,
 		window.innerWidth / window.innerHeight,
 		0.01,
 		1000
 	);
-	orthographicCamera = new OrthographicCamera(
+	public orthographicCamera = new OrthographicCamera(
 		window.innerWidth / - 2,
 		window.innerWidth / 2,
 		window.innerHeight / 2,
@@ -53,10 +53,10 @@ export class Store {
 		1000,
 	);
 
-	activeCamera: Camera = this.perspectiveCamera;
-	scene: Scene = new Scene();
-	decorations: Group = new Group();
-	objects: SceneObject[] = [];
+	public activeCamera: Camera = this.perspectiveCamera;
+	public scene: Scene = new Scene();
+	public decorations: Group = new Group();
+	public objects: SceneObject[] = [];
 
 	constructor() {
 	}

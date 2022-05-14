@@ -1,4 +1,7 @@
-import { BoxHelper, BufferGeometry, Mesh, Vector3 } from 'three';
+import { Box3, BoxHelper, BufferGeometry, Matrix4, Mesh, Vector3 } from 'three';
+import { Dispatch, EventEnum } from '../../../Shared/Events';
+import { MoveObject } from '../../../Shared/Scene/MoveObject';
+import { Store } from '../StoreScene';
 
 export class SceneObject {
 	name: string;
@@ -8,13 +11,14 @@ export class SceneObject {
 	max: Vector3;
 	center: Vector3;
 	size: Vector3 = new Vector3();
+	sceneStore: Store;
 	scaleFactor: number;
 	isSelected: boolean;
 
 	private _wasSelected: boolean;
 	private _offsetY = 0;
 
-	constructor(geometry: BufferGeometry, name: string, objs: SceneObject[], selected = false) {
+	constructor(geometry: BufferGeometry, name: string, objs: SceneObject[], sceneStore: Store, selected = false) {
 		let index = 0;
 		let sceneName = index + ' : ' + name;
 
@@ -24,6 +28,7 @@ export class SceneObject {
 		}
 
 		this.name = sceneName;
+		this.sceneStore = sceneStore;
 
 		this.mesh = new Mesh(geometry, sceneStore.materialForObjects.normal);
 		this.bbox = new BoxHelper(this.mesh, 0xffff00);
@@ -86,57 +91,12 @@ export class SceneObject {
 	}
 
 	UpdateSize() {
-		new THREE.Box3().setFromObject(this.mesh).getSize(this.size);
+		new Box3().setFromObject(this.mesh).getSize(this.size);
 	}
 
 	UpdateGeometryCenter() {
-		this.mesh.geometry.applyMatrix4(new THREE.Matrix4().makeTranslation(-this.center.x, -this.center.y, -this.center.z));
+		this.mesh.geometry.applyMatrix4(new Matrix4().makeTranslation(-this.center.x, -this.center.y, -this.center.z));
 		this.Update();
-	}
-
-	SetSupportsOffsetY() {
-		if(!this._offsetY)
-		{
-			this._offsetY = toUnits((sceneStore.ini.supportDescription as SupportDescription).modelOffsetY);
-
-			AppEvents.Dispatch(EventEnum.TRANSFORM_OBJECT, {
-				from: this.mesh.position.clone(),
-				to: this.mesh.position.clone().setY(this._offsetY + (this.size.y / 2)),
-				sceneObject: this as SceneObject,
-				instrument: TransformInstrumentEnum.Move
-			} as MoveObject);
-		}
-	}
-
-	UpdateSupportsOffsetY() {
-		if(this.supports.length)
-		{
-			if(!this._offsetY)
-			{
-				this._offsetY = (sceneStore.ini.supportDescription as SupportDescription).modelOffsetY;
-
-				AppEvents.Dispatch(EventEnum.TRANSFORM_OBJECT, {
-					from: this.mesh.position.clone(),
-					to: this.mesh.position.clone().setY(this._offsetY + (this.size.y / 2)),
-					sceneObject: this as SceneObject,
-					instrument: TransformInstrumentEnum.Move
-				} as MoveObject);
-			}
-		}
-		else
-		{
-			if(this._offsetY)
-			{
-				this._offsetY = 0;
-
-				AppEvents.Dispatch(EventEnum.TRANSFORM_OBJECT, {
-					from: this.mesh.position.clone(),
-					to: this.mesh.position.clone().setY( this.size.y / 2 ),
-					sceneObject: this as SceneObject,
-					instrument: TransformInstrumentEnum.Move
-				} as MoveObject);
-			}
-		}
 	}
 
 	AddToScene(scene: THREE.Scene, withBoxHelper?: boolean) {
@@ -150,7 +110,7 @@ export class SceneObject {
 	AlignToPlaneY() {
 		this.Update();
 
-		AppEvents.Dispatch(EventEnum.TRANSFORM_OBJECT, {
+		Dispatch(EventEnum.TRANSFORM_OBJECT, {
 			from: this.mesh.position.clone(),
 			to: this.mesh.position.clone().setY(this.size.y / 2),
 			sceneObject: this as SceneObject,
@@ -161,7 +121,7 @@ export class SceneObject {
 	AlignToPlaneXZ(gridVec: Vector3) {
 		this.Update();
 
-		AppEvents.Dispatch(EventEnum.TRANSFORM_OBJECT, {
+		Dispatch(EventEnum.TRANSFORM_OBJECT, {
 			from: this.mesh.position.clone(),
 			to: this.mesh.position.clone().setX(gridVec.x / 2).setZ(gridVec.z / 2),
 			sceneObject: this as SceneObject,
@@ -202,7 +162,7 @@ export class SceneObject {
 	}
 
 	static UpdateObjs(objs: SceneObject[]) {
-		objs.every(function (element, index) {
+		objs.every(function (element) {
 			element.Update();
 		});
 	}
@@ -221,7 +181,7 @@ export class SceneObject {
 	}
 
 	static GetMeshesFromObjs(objs: SceneObject[]): THREE.Mesh[] {
-		const arr: THREE.Mesh[] = objs.map(function (element, index) {
+		const arr: THREE.Mesh[] = objs.map(function (element) {
 			return element.mesh;
 		});
 
@@ -231,7 +191,7 @@ export class SceneObject {
 	static GetByName(objs: SceneObject[], name: string): SceneObject | null {
 		let _element: SceneObject | null = null;
 
-		objs.every(function (element, index) {
+		objs.every(function (element) {
 			if (element.name === name) {
 				_element = element;
 				return false;
@@ -244,7 +204,7 @@ export class SceneObject {
 	}
 
 	static CalculateGroupMaxSize(objs: SceneObject[]): Vector3 {
-		let deltaSize;
+		let deltaSize: Vector3 = new Vector3();
 
 		objs.every(function (element, index) {
 			const size = element.size;
@@ -262,7 +222,7 @@ export class SceneObject {
 	}
 
 	static CalculateGroupCenter(objs: SceneObject[]): Vector3 {
-		let delta;
+		let delta: Vector3 = new Vector3();
 
 		objs.every(function (element, index) {
 			const position = element.mesh.position;
@@ -293,13 +253,5 @@ export class SceneObject {
 		});
 
 		return geometry;
-	}
-
-	static UpdateSupportRender(objs: SceneObject[], value: boolean) {
-		objs.every(function (element, index) {
-			element.supports.forEach((support)=>{
-				value ? support.setFullRenderMode() : support.setPrerenderMode();
-			});
-		});
 	}
 }

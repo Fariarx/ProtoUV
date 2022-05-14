@@ -1,10 +1,11 @@
 import { Box, Fade, Typography } from '@mui/material';
 import { observer } from 'mobx-react';
+import { AppStore } from '../../AppStore';
 import { colors } from '../../Shared/Colors';
-import { Log } from './Store';
 
 export const ConsoleApp = observer(()=> {
-	return <Fade in={Log.isVisible}>
+
+	return <Fade in={AppStore.log.isVisible}>
 		<Box sx={{
 			width:'60%',
 			height:'15%',
@@ -14,7 +15,7 @@ export const ConsoleApp = observer(()=> {
 			color: colors.typography.background,
 			margin: '12px'
 		}}>
-			{Log.list.map(x => <Typography key={x.time} variant={'body2'}>
+			{AppStore.log.list.map(x => <Typography key={x.time} variant={'body2'}>
 				{x.time} {'>'} {x.text}
 			</Typography>)}
 		</Box>

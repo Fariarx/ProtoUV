@@ -2,33 +2,7 @@ import fs from 'fs';
 import * as path from 'path';
 import { Config } from '../../../Shared/Config';
 import { Bridge } from '../../../Shared/Globals';
-import { Log } from '../../Console/Store';
-
-export type Workspace = {
-    sizeX: number;
-    sizeY: number;
-    height: number;
-};
-
-export type Resolution = {
-    X: number;
-    Y: number;
-};
-
-export type PrintSettings = {
-    LayerHeight: number;
-    BottomLayers: number;
-    ExposureTime: number;
-    BottomExposureTime: number;
-    LiftingHeight: number;
-    LiftingSpeed: number;
-};
-
-export interface PrinterConfig {
-    Resolution: Resolution;
-    Workspace: Workspace;
-    PrintSettings: PrintSettings;
-}
+import { Log } from '../../Console/StoreConsole';
 
 export class Printer {
 	name:string;
@@ -73,11 +47,14 @@ export class Printer {
 		}
 	}
 
-	static defaultConfigName = 'Voxelab Proxima_6_0';
+	static DEFAULT_CONFIG_NAME = 'Voxelab Proxima_6_0';
+	static CHANGED_DIR = '/ChangedConfigsV';
+	static CONFIG_DIR = './src/Engine/App/Configs/Default/';
 
 	static LoadDefaultConfigFromFile = function () {
 		try {
-			return new Printer(path.basename('Voxelab Proxima 6.json'), JSON.parse(fs.readFileSync('./src/Engine/App/Configs/Default/'+Printer.defaultConfigName+'.json', 'utf8')));
+			return new Printer(path.basename('Voxelab Proxima 6.json'),
+				JSON.parse(fs.readFileSync(Printer.CONFIG_DIR +Printer.DEFAULT_CONFIG_NAME+'.json', 'utf8')));
 		}
 		catch (e) {
 			Log.Add('Error read config: ' + e);
@@ -87,11 +64,14 @@ export class Printer {
 	};
 	static SaveToFile = function (config: Printer) {
 		try {
-			if (!fs.existsSync(Bridge.window.userData() + '/ChangedConfigsV' + Config.versionPrinterConfigs)) {
-				fs.mkdirSync(Bridge.window.userData() + '/ChangedConfigsV' + Config.versionPrinterConfigs);
+			const dir = Bridge.window.userData() + Printer.CHANGED_DIR + Config.versionPrinterConfigs;
+			if (!fs.existsSync(dir)) {
+				fs.mkdirSync(dir);
 			}
 
-			fs.writeFileSync(Bridge.window.userData() + '/ChangedConfigsV' + Config.versionPrinterConfigs + '/' + config.name + '.json', JSON.stringify(config),{ encoding:'utf8',flag:'w' });
+			fs.writeFileSync(Bridge.window.userData() + Printer.CHANGED_DIR +
+        Config.versionPrinterConfigs + '/' + config.name + '.json',
+			JSON.stringify(config),{ encoding:'utf8',flag:'w' });
 			return true;
 		}
 		catch (e) {
@@ -105,9 +85,10 @@ export class Printer {
 			let config: PrinterConfig;
 
 			try {
-				config = JSON.parse(fs.readFileSync(Bridge.window.userData() + '/ChangedConfigsV' + Config.versionPrinterConfigs + '/' + modelName + '.json', 'utf8'));
+				config = JSON.parse(fs.readFileSync(Bridge.window.userData() + Printer.CHANGED_DIR
+          + Config.versionPrinterConfigs + '/' + modelName + '.json', 'utf8'));
 			} catch (e) {
-				config  = JSON.parse(fs.readFileSync('./src/Engine/App/Configs/Default/' + modelName + '.json', 'utf8'));
+				config  = JSON.parse(fs.readFileSync(Printer.CONFIG_DIR + modelName + '.json', 'utf8'));
 			}
 
 			const obj = new Printer(path.basename(modelName), config);
@@ -126,11 +107,12 @@ export class Printer {
 		let files: string[] = [];
 
 		try {
-			if (fs.existsSync(Bridge.window.userData() + '/ChangedConfigsV' + Config.versionPrinterConfigs)) {
-				files = [...fs.readdirSync(Bridge.window.userData() + '/ChangedConfigsV' + Config.versionPrinterConfigs)];
+			const dir = Bridge.window.userData() + Printer.CHANGED_DIR + Config.versionPrinterConfigs;
+			if (fs.existsSync(dir)) {
+				files = [...fs.readdirSync(dir)];
 			}
-			if (fs.existsSync('./src/Engine/App/Configs/Default')) {
-				files = [...fs.readdirSync('./src/Engine/App/Configs/Default'), ...files];
+			if (fs.existsSync(Printer.CONFIG_DIR)) {
+				files = [...fs.readdirSync(Printer.CONFIG_DIR), ...files];
 			}
 
 			files = files.filter(function(item, pos) {
@@ -156,3 +138,26 @@ export class Printer {
 		return files;
 	};
 }
+
+export interface PrinterConfig {
+  Resolution: Resolution;
+  Workspace: Workspace;
+  PrintSettings: PrintSettings;
+}
+export type Workspace = {
+  sizeX: number;
+  sizeY: number;
+  height: number;
+};
+export type Resolution = {
+  X: number;
+  Y: number;
+};
+export type PrintSettings = {
+  LayerHeight: number;
+  BottomLayers: number;
+  ExposureTime: number;
+  BottomExposureTime: number;
+  LiftingHeight: number;
+  LiftingSpeed: number;
+};

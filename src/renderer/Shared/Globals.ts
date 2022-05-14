@@ -4,11 +4,6 @@ import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial';
 export const Bridge = window.electron.ipcRenderer;
 export const AppName = 'ProtoUV';
 
-export type SceneMaterial = {
-  normal: Material;
-  select: Material;
-};
-
 export const MaterialForSupports = {
 	normal: new MeshLambertMaterial({ transparent: true, opacity: 0.6, color: '#5bc3fc' }),
 	preview: new MeshLambertMaterial({ transparent: true, opacity: 0.2, color: '#80caff' })
@@ -18,6 +13,11 @@ export const matLine = new LineMaterial({
 	color: 0xa1a1a1,
 	linewidth: 3
 });
+
+export type SceneMaterial = {
+  normal: Material;
+  select: Material;
+};
 
 export const SceneMaterials = {
 	transparent: {

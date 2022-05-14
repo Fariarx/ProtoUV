@@ -1,9 +1,8 @@
+import './AppStore';
 import '@fontsource/roboto/300.css';
 import { Box } from '@mui/material';
 import { Route, MemoryRouter as Router, Routes } from 'react-router-dom';
 import { Header } from './Header';
-import { ConsoleApp } from './Main/Console/App';
-import { Log } from './Main/Console/Store';
 import { UpdateScheme, colors } from './Shared/Colors';
 
 UpdateScheme();

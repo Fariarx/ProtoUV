@@ -3,7 +3,7 @@ import { makeAutoObservable } from 'mobx';
 const LOG_LIMIT_COUNT = 50;
 const OPEN_TIMEOUT = 30000;
 
-export class Store {
+export class ConsoleStore {
 	private _isVisible = true;
 
 	get isVisible(): boolean {
@@ -47,5 +47,3 @@ export class Store {
 		}
 	};
 }
-
-export const Log = new Store();

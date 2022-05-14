@@ -45,9 +45,6 @@ export const Header = () => (
 			<IconButtonSmall onClick={Bridge.window.minimize}>
 				<BsCircleFill color={colors.interact.warning} />
 			</IconButtonSmall>
-			<IconButtonSmall onClick={Bridge.window.maximize}>
-				<BsCircleFill color={colors.interact.touch} />
-			</IconButtonSmall>
 			<IconButtonSmall onClick={Bridge.window.close}>
 				<BsCircleFill color={colors.interact.danger} />
 			</IconButtonSmall>

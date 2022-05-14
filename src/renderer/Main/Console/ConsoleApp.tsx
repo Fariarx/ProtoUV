@@ -13,7 +13,8 @@ export const ConsoleApp = observer(()=> {
 			bottom: 0,
 			overflow: 'hidden',
 			color: colors.typography.background,
-			margin: '12px'
+			margin: '12px',
+			fontVariant: 'unicase'
 		}}>
 			{AppStore.log.list.map(x => <Typography key={x.time} variant={'body2'}>
 				{x.time} {'>'} {x.text}

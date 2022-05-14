@@ -28,7 +28,7 @@ export class ConsoleStore {
 			.replace(/\..+/, '')
 			.split(' ')[1];
 		const log = {
-			text: text,
+			text: text.toLowerCase(),
 			time: date
 		};
 

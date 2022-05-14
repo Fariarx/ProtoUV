@@ -2,7 +2,10 @@ import './AppStore';
 import '@fontsource/roboto/300.css';
 import { Box } from '@mui/material';
 import { Route, MemoryRouter as Router, Routes } from 'react-router-dom';
+import { Log } from './AppStore';
 import { Header } from './Header';
+import { ConsoleApp } from './Main/Console/ConsoleApp';
+import { TransformApp } from './Main/Transform/TransformApp';
 import { UpdateScheme, colors } from './Shared/Colors';
 
 UpdateScheme();
@@ -16,6 +19,7 @@ const Main = () => <>
 	}}>
 	</Box>
 	<ConsoleApp/>
+	<TransformApp/>
 </>;
 
 export const App = () => <Router>

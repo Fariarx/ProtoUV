@@ -1,9 +1,13 @@
 import {
-	Divider,
 	Paper, ToggleButton,
-	ToggleButtonGroup, styled
+	ToggleButtonGroup,
 } from '@mui/material';
+import { BsArrowsMove } from '@react-icons/all-files/bs/BsArrowsMove';
+import { FiCode } from '@react-icons/all-files/fi/FiCode';
+import { Md3DRotation } from '@react-icons/all-files/md/Md3DRotation';
 import React from 'react';
+import { APP_HEADER_HEIGHT } from '../../Header';
+import { colors } from '../../Shared/Colors';
 import { Margins } from '../../Shared/Styled/Margins';
 
 export const TransformApp = () => {
@@ -25,62 +29,36 @@ export const TransformApp = () => {
 	};
 
 	return  <Paper
-		elevation={0}
+		elevation={12}
+		variant="outlined"
 		sx={{
 			display: 'flex',
-			border: (theme) => `1px solid ${theme.palette.divider}`,
 			flexWrap: 'wrap',
 			position: 'absolute',
-			top: Margins._4
+			top: Margins.sum(APP_HEADER_HEIGHT, Margins.eight),
+			left: Margins.twelve
 		}}
 	>
-		<StyledToggleButtonGroup
-			size="small"
+		<ToggleButtonGroup
+			size="medium"
 			value={alignment}
 			exclusive
+			orientation="vertical"
 			onChange={handleAlignment}
-			aria-label="text alignment"
+			aria-label="Instrument window"
+			sx={{
+				backgroundColor: colors.instruments.main,
+			}}
 		>
 			<ToggleButton value="left" aria-label="left aligned">
+				<BsArrowsMove transform={'scale(1.5)'}/>
 			</ToggleButton>
 			<ToggleButton value="center" aria-label="centered">
+				<Md3DRotation transform={'scale(1.5)'}/>
 			</ToggleButton>
 			<ToggleButton value="right" aria-label="right aligned">
+				<FiCode transform={'scale(1.5)'}/>
 			</ToggleButton>
-			<ToggleButton value="justify" aria-label="justified" disabled>
-			</ToggleButton>
-		</StyledToggleButtonGroup>
-		<Divider flexItem orientation="vertical" sx={{ mx: 0.5, my: 1 }} />
-		<StyledToggleButtonGroup
-			size="small"
-			value={formats}
-			onChange={handleFormat}
-			aria-label="text formatting"
-		>
-			<ToggleButton value="bold" aria-label="bold">
-			</ToggleButton>
-			<ToggleButton value="italic" aria-label="italic">
-			</ToggleButton>
-			<ToggleButton value="underlined" aria-label="underlined">
-			</ToggleButton>
-			<ToggleButton value="color" aria-label="color" disabled>
-			</ToggleButton>
-		</StyledToggleButtonGroup>
+		</ToggleButtonGroup>
 	</Paper>;
 };
-
-const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
-	'& .MuiToggleButtonGroup-grouped': {
-		margin: theme.spacing(0.5),
-		border: 0,
-		'&.Mui-disabled': {
-			border: 0,
-		},
-		'&:not(:first-of-type)': {
-			borderRadius: theme.shape.borderRadius,
-		},
-		'&:first-of-type': {
-			borderRadius: theme.shape.borderRadius,
-		},
-	},
-}));

@@ -9,11 +9,13 @@ import { colors } from './Shared/Colors';
 import { AppName, Bridge } from './Shared/Globals';
 import { FlexBoxRow } from './Shared/Styled/FlexBox';
 
+export const APP_HEADER_HEIGHT = '28px';
+
 export const Header = () => (
 	<Box onDoubleClick={Bridge.window.maximize}
 		sx={{
 			width: '100%',
-			height: '28px',
+			height: APP_HEADER_HEIGHT,
 			background: colors.background.dark,
 			display: 'flex',
 			flexDirection: 'row',

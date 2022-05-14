@@ -1,7 +1,8 @@
 export const Margins = {
 	four: '4px',
-	six: '6px',
+	eight: '8px',
 	twelve: '12px',
 	sixteen: '16px',
-	twentyFour: '24px'
+	twentyFour: '24px',
+	sum: (a: string, b: string) => parseInt(a) + parseInt(b) + 'px'
 };

@@ -1,4 +1,6 @@
-const _colors = {
+import { createTheme } from '@mui/material';
+
+export const colors = {
 	typography:{
 		background:'#aaaaaa'
 	},
@@ -13,6 +15,9 @@ const _colors = {
 		warning:'#ffbd39',
 		danger:'#fb594f'
 	},
+	instruments:{
+		main: '#18590c',
+	},
 	scene:{
 		colorBackgroundScene:'#2f2f2f',
 		colorBackgroundSceneBottom:'#6c6c6c',
@@ -23,7 +28,12 @@ const _colors = {
 	}
 };
 
-export const colors = _colors;
+export const darkTheme = createTheme({
+	palette: {
+		mode: 'dark',
+	},
+});
+
 export const UpdateScheme = () => {
 	document.body.style.background = colors.background.common;
 };

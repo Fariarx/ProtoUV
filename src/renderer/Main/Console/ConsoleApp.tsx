@@ -2,6 +2,7 @@ import { Box, Fade, Typography } from '@mui/material';
 import { observer } from 'mobx-react';
 import { AppStore } from '../../AppStore';
 import { colors } from '../../Shared/Colors';
+import { Margins } from '../../Shared/Styled/Margins';
 
 export const ConsoleApp = observer(()=> {
 
@@ -13,7 +14,7 @@ export const ConsoleApp = observer(()=> {
 			bottom: 0,
 			overflow: 'hidden',
 			color: colors.typography.background,
-			margin: '12px',
+			margin: Margins.twelve,
 			fontVariant: 'unicase'
 		}}>
 			{AppStore.log.list.map(x => <Typography key={x.time} variant={'body2'}>

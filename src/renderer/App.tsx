@@ -19,7 +19,7 @@ const Main = () => <>
 	}}>
 	</Box>
 	<ConsoleApp/>
-	<TransformApp/>
+  <TransformApp/>
 </>;
 
 export const App = () => <Router>

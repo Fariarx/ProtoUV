@@ -3,6 +3,7 @@ import { observer } from 'mobx-react';
 import { AppStore } from '../../AppStore';
 import { colors } from '../../Shared/Colors';
 import { Sizes } from '../../Shared/Styled/Sizes';
+import { linearGenerator } from '../../Shared/Tools';
 
 export const ConsoleApp = observer(()=> {
 
@@ -18,7 +19,7 @@ export const ConsoleApp = observer(()=> {
 			margin: Sizes.twelve,
 			fontVariant: 'unicase'
 		}}>
-			{AppStore.log.list.map(x => <Typography key={x.time} variant={'body2'}>
+			{AppStore.log.list.map(x => <Typography key={linearGenerator.next().value} variant={'body2'}>
 				{x.time} {'>'} {x.text}
 			</Typography>)}
 		</Box>

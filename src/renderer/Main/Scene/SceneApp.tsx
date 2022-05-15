@@ -1,26 +1,31 @@
-
-import { Box } from '@mui/material';
 import { observer } from 'mobx-react';
-import { Printer } from '../Printer/Configs/Printer';
-import { Configurator } from '../Printer/Configurator/App';
+import { Component } from 'react';
+import { AppStore, Log } from '../../AppStore';
 
-export const SceneApp = observer(() => {
-	return <Box>
-		{!sceneStore.printer && <Configurator setupConfiguration={(config: Printer)=>{
-			storeMain.set('printer', config.name);
+@observer
+export class SceneApp extends Component<any, any> {
+	mount: HTMLDivElement | null = null;
 
-			sceneStore.printerName = config.name;
-			sceneStore.printer = config;
+	constructor(props: {}) {
+		super(props);
+	}
 
-			Log('Configuration loaded!');
+	componentDidMount() {
+		AppStore.scene.initializer.setupCanvas(this.mount);
+	}
 
-			sceneStore.ini.updatePrinter();
-			sceneStore.ini.updateCameraLookPosition();
-			sceneStore.ini.animate();
+	componentWillUnmount() {
+		Log('SceneComponent end!');
+	}
 
-			this.setState({});
-		}}/>}
-
-		{this.props.children}
-	</Box>;
-});
+	render() {
+		return (
+			<div>
+				<div ref={ref => (this.mount = ref)} style={{
+					position: 'fixed'
+				}} />
+				{this.props.children}
+			</div>
+		);
+	}
+}

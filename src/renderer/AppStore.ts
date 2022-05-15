@@ -1,10 +1,11 @@
+import { TransformStore } from './Main/Components/TransformStore';
 import { ConsoleStore } from './Main/Console/ConsoleStore';
-//import { SceneStore } from './Main/Scene/Scene.store';
+import { SceneStore } from './Main/Scene/SceneStore';
 
 export abstract class AppStore {
-	//static scene = new SceneStore();
 	static log = new ConsoleStore();
+	static scene = new SceneStore();
+	static transform = new TransformStore();
 }
 
-export const Log: ConsoleStore = AppStore.log;
-// export const Scene: SceneStore = AppStore.scene;
+export const Log = AppStore.log.Add;

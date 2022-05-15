@@ -1,5 +1,5 @@
 import { List, ListItem, Paper, Typography } from '@mui/material';
-import { Android12Switch } from 'renderer/Shared/Styled/Android12Switch';
+import { SwitchAndroid } from 'renderer/Shared/Styled/SwitchAndroid';
 import { colors } from '../../Shared/Colors';
 import { Sizes } from '../../Shared/Styled/Sizes';
 
@@ -26,7 +26,7 @@ export const SelectedApp = () => {
 				}}>
           iogreioombtpvrlqorjvvrqmvqqv0-0qrmv0e.stl
 				</Typography>
-				<Android12Switch
+				<SwitchAndroid
 					edge="end"
 					inputProps={{
 						'aria-labelledby': 'switch-list-label-wifi',

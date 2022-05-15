@@ -2,13 +2,15 @@ import './AppStore';
 import '@fontsource/roboto/300.css';
 import { Box, Stack, ThemeProvider } from '@mui/material';
 import { Route, MemoryRouter as Router, Routes } from 'react-router-dom';
-import { Log } from './AppStore';
+import { AppStore, Log } from './AppStore';
 import { APP_HEADER_HEIGHT, Header } from './Header';
-import { CameraTypeApp } from './Main/Bars/CameraTypeApp';
-import { MenuApp } from './Main/Bars/MenuApp';
-import { SelectedApp } from './Main/Bars/SelectedApp';
-import { TransformApp } from './Main/Bars/TransformApp';
+import { CameraTypeApp } from './Main/Components/CameraTypeApp';
+import { DragAndDropApp } from './Main/Components/DragAndDropApp';
+import { MenuApp } from './Main/Components/MenuApp';
+import { SelectedApp } from './Main/Components/SelectedApp';
+import { TransformApp } from './Main/Components/TransformApp';
 import { ConsoleApp } from './Main/Console/ConsoleApp';
+import { SceneApp } from './Main/Scene/SceneApp';
 import { UpdateScheme, colors, darkTheme } from './Shared/Colors';
 import { Sizes } from './Shared/Styled/Sizes';
 
@@ -21,9 +23,10 @@ const Main = () => <ThemeProvider theme={darkTheme}>
 		height:'100%',
 		backgroundColor: colors.background.heavy,
 	}}>
+		<SceneApp/>
 	</Box>
 	<ConsoleApp/>
-	<TransformApp/>
+	<TransformApp store={AppStore.transform}/>
 	<Stack direction={'row'} spacing={Sizes.four} sx={{
 		position: 'absolute',
 		top: Sizes.sum(APP_HEADER_HEIGHT, Sizes.eight),
@@ -39,6 +42,7 @@ const Main = () => <ThemeProvider theme={darkTheme}>
 	}}>
 		<SelectedApp/>
 	</Stack>
+	<DragAndDropApp open={false}/>
 </ThemeProvider>;
 
 export const App = () => <Router>
@@ -47,5 +51,5 @@ export const App = () => <Router>
 	</Routes>
 </Router>;
 
-Log.Add('Application started');
+Log('Application started');
 

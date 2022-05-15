@@ -1,15 +1,20 @@
-import { DoubleSide, Material, MeshLambertMaterial, MeshPhongMaterial } from 'three';
+import { BufferGeometry, DoubleSide, Material, Mesh, MeshLambertMaterial, MeshPhongMaterial } from 'three';
+import { acceleratedRaycast, computeBoundsTree, disposeBoundsTree } from 'three-mesh-bvh';
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial';
 
 export const Bridge = window.electron.ipcRenderer;
 export const AppName = 'ProtoUV';
+
+BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
+BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;
+Mesh.prototype.raycast = acceleratedRaycast;
 
 export const MaterialForSupports = {
 	normal: new MeshLambertMaterial({ transparent: true, opacity: 0.6, color: '#5bc3fc' }),
 	preview: new MeshLambertMaterial({ transparent: true, opacity: 0.2, color: '#80caff' })
 };
 
-export const matLine = new LineMaterial({
+export const MatLine = new LineMaterial({
 	color: 0xa1a1a1,
 	linewidth: 3
 });

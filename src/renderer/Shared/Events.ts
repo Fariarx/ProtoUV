@@ -1,23 +1,16 @@
 import { Mesh } from 'three';
 import { SceneObject } from '../Main/Scene/Entities/SceneObject';
+import { AppEventEnum } from './Enum/AppEventEnum';
+import { TransformEnum } from './Enum/TransformEnum';
 import { MoveObject } from './Scene/MoveObject';
 
 type Message = {
-  name: EventEnum;
+  name: AppEventEnum;
   args: object | undefined;
   last: any;
 };
 
-export enum EventEnum {
-  SELECT_TRANSFORM_MODE,
-  SELECT_MENU_STEP,
-  ADD_OBJECT,
-  SELECTION_CHANGED,
-  TRANSFORM_OBJECT,
-  SELECT_SUPPORTS_MODE
-}
-
-export const Dispatch = (name: EventEnum, args?: object) => {
+export const Dispatch = (name: AppEventEnum, args?: object) => {
 	const message = {
 		name:name,
 		args:args ?? undefined
@@ -35,7 +28,7 @@ export const Dispatch = (name: EventEnum, args?: object) => {
 
 const Handler = (message: any) => {
 	switch (message.name) {
-		case EventEnum.SELECT_TRANSFORM_MODE:
+		case AppEventEnum.SELECT_TRANSFORM_MODE:
 			message.last = sceneStore.transformInstrumentState;
 
 			if (sceneStore.transformInstrumentState === message.args.value) {
@@ -44,7 +37,7 @@ const Handler = (message: any) => {
 				SceneUtils.instrumentStateChanged(message.args.value);
 			}
 			break;
-		case EventEnum.TRANSFORM_OBJECT:
+		case AppEventEnum.TRANSFORM_OBJECT:
 			const moveObject = message.args as MoveObject;
 			const mesh: Mesh = moveObject.sceneObject instanceof SceneObject ? moveObject.sceneObject.mesh : <Mesh>moveObject.sceneObject;
 			const sceneObj = SceneObject.SearchSceneObjByMesh(sceneStore.objects, mesh);
@@ -58,10 +51,10 @@ const Handler = (message: any) => {
 				}
 
 				switch (moveObject.instrument) {
-					case TransformInstrumentEnum.Move:
+					case TransformEnum.Move:
 						mesh.position.set(moveObject.to.x, moveObject.to.y, moveObject.to.z);
 						break;
-					case TransformInstrumentEnum.Rotate:
+					case TransformEnum.Rotate:
 						mesh.rotation.set(moveObject.to.x, moveObject.to.y, moveObject.to.z);
 
 						if(sceneObj)
@@ -79,7 +72,7 @@ const Handler = (message: any) => {
 							sceneObj.supports = [];
 						}
 						break;
-					case TransformInstrumentEnum.Scale:
+					case TransformEnum.Scale:
 						const minScale = Settings().scene.sharpness;
 
 						if(moveObject.to.x < minScale)
@@ -128,7 +121,7 @@ const Handler = (message: any) => {
 
 			SceneUtils.updateTransformTool();
 			break;
-		case EventEnum.ADD_OBJECT:
+		case AppEventEnum.ADD_OBJECT:
 			sceneStore.objects.push(message.args);
 			SceneUtils.selectionChanged();
 			SceneUtils.instrumentStateChanged();
@@ -138,9 +131,9 @@ const Handler = (message: any) => {
 };
 
 const eventList = new Array<Message>();
-const eventListeners: ((message: EventEnum, args?: object) => void)[] = [];
+const eventListeners: ((message: AppEventEnum, args?: object) => void)[] = [];
 
-export const AddListener = (listener: (message: EventEnum, args?: object) => void) => {
+export const AddListener = (listener: (message: AppEventEnum, args?: object) => void) => {
 	eventListeners.push(listener);
 	return listener;
 };

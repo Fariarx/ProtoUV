@@ -1,10 +1,17 @@
 import { ToggleButton } from '@mui/material';
 import { colors } from '../Colors';
 
-export const ButtonSetting: React.FunctionComponent  = (props) => {
+export const ButtonSetting = (props: {
+  onClick?: ()=>any;
+  selected?: boolean;
+  children?:
+    | React.ReactChild
+    | React.ReactChild[];
+}) => {
 	return <ToggleButton
 		value="check"
-		selected={false}
+		selected={props.selected ?? false}
+		onClick={props.onClick}
 		sx={{
 			backgroundColor: colors.background.common,
 			'& svg': {

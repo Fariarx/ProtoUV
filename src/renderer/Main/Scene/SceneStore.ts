@@ -10,14 +10,14 @@ import {
 	WebGLRenderer
 } from 'three';
 import { OutlineEffect } from 'three/examples/jsm/effects/OutlineEffect';
+import Stats from 'three/examples/jsm/libs/stats.module';
 import { Camera } from 'three/src/cameras/Camera';
 import { colors } from '../../Shared/Colors';
 import { SceneMaterial, SceneMaterials } from '../../Shared/Globals';
 import { SceneObject } from './Entities/SceneObject';
+import { SceneInitializer } from './SceneInitializer';
 
 export class SceneStore {
-	public static instance: SceneStore;
-
 	public renderer: WebGLRenderer = new WebGLRenderer({
 		antialias: true,
 		alpha:true,
@@ -55,9 +55,15 @@ export class SceneStore {
 
 	public activeCamera: Camera = this.perspectiveCamera;
 	public scene: Scene = new Scene();
+	public stats = Stats();
 	public decorations: Group = new Group();
 	public objects: SceneObject[] = [];
 
+	public initializer: SceneInitializer;
+
 	constructor() {
+		this.initializer = new SceneInitializer({
+			scene: this
+		});
 	}
 }

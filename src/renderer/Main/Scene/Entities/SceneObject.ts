@@ -1,7 +1,9 @@
 import { Box3, BoxHelper, BufferGeometry, Matrix4, Mesh, Vector3 } from 'three';
-import { Dispatch, EventEnum } from '../../../Shared/Events';
+import { AppEventEnum } from '../../../Shared/Enum/AppEventEnum';
+import { TransformEnum } from '../../../Shared/Enum/TransformEnum';
+import { Dispatch } from '../../../Shared/Events';
 import { MoveObject } from '../../../Shared/Scene/MoveObject';
-import { Store } from '../StoreScene';
+import { SceneStore } from '../SceneStore';
 
 export class SceneObject {
 	name: string;
@@ -11,14 +13,18 @@ export class SceneObject {
 	max: Vector3;
 	center: Vector3;
 	size: Vector3 = new Vector3();
-	sceneStore: Store;
+	sceneStore: SceneStore;
 	scaleFactor: number;
 	isSelected: boolean;
 
 	private _wasSelected: boolean;
-	private _offsetY = 0;
 
-	constructor(geometry: BufferGeometry, name: string, objs: SceneObject[], sceneStore: Store, selected = false) {
+	constructor(geometry: BufferGeometry,
+		name: string,
+		objs: SceneObject[],
+		sceneStore: SceneStore,
+		selected = false)
+	{
 		let index = 0;
 		let sceneName = index + ' : ' + name;
 
@@ -62,9 +68,9 @@ export class SceneObject {
 		}
 
 		if (this.isSelected) {
-			this.mesh.material = sceneStore.materialForObjects.select;
+			this.mesh.material = this.sceneStore.materialForObjects.select;
 		} else {
-			this.mesh.material = sceneStore.materialForObjects.normal;
+			this.mesh.material = this.sceneStore.materialForObjects.normal;
 		}
 
 		return {
@@ -110,22 +116,22 @@ export class SceneObject {
 	AlignToPlaneY() {
 		this.Update();
 
-		Dispatch(EventEnum.TRANSFORM_OBJECT, {
+		Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
 			from: this.mesh.position.clone(),
 			to: this.mesh.position.clone().setY(this.size.y / 2),
 			sceneObject: this as SceneObject,
-			instrument: TransformInstrumentEnum.Move
+			instrument: TransformEnum.Move
 		} as MoveObject);
 	}
 
 	AlignToPlaneXZ(gridVec: Vector3) {
 		this.Update();
 
-		Dispatch(EventEnum.TRANSFORM_OBJECT, {
+		Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
 			from: this.mesh.position.clone(),
 			to: this.mesh.position.clone().setX(gridVec.x / 2).setZ(gridVec.z / 2),
 			sceneObject: this as SceneObject,
-			instrument: TransformInstrumentEnum.Move
+			instrument: TransformEnum.Move
 		} as MoveObject);
 	}
 

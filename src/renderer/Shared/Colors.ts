@@ -12,11 +12,9 @@ export const colors = {
 	},
 	interact:{
 		touch:'#65e14d',
+		selected:'#4e8649',
 		warning:'#ffbd39',
-		danger:'#fb594f'
-	},
-	instruments:{
-		main: '#16520b',
+		danger:'#fb594f',
 	},
 	scene:{
 		colorBackgroundScene:'#2f2f2f',
@@ -35,5 +33,5 @@ export const darkTheme = createTheme({
 });
 
 export const UpdateScheme = () => {
-	document.body.style.background = colors.background.common;
+	document.body.style.background = colors.background.heavy;
 };

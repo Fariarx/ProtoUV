@@ -1,3 +1,4 @@
+
 import { Box } from '@mui/material';
 import { observer } from 'mobx-react';
 import { Printer } from '../Printer/Configs/Printer';

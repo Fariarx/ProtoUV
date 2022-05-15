@@ -1,4 +1,4 @@
-export const Margins = {
+export const Sizes = {
 	four: '4px',
 	eight: '8px',
 	twelve: '12px',

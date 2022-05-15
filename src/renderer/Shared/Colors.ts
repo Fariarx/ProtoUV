@@ -8,11 +8,11 @@ export const colors = {
 		dark:'#15191a',
 		heavy:'#1f2427',
 		common:'#444444',
+		commonLight:'#4f4e4e',
 		white: '#fff'
 	},
 	interact:{
-		touch:'#65e14d',
-		selected:'#4e8649',
+		touch:'#49a63b',
 		warning:'#ffbd39',
 		danger:'#fb594f',
 	},

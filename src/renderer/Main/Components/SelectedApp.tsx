@@ -16,7 +16,7 @@ export const SelectedApp = () => {
 				paddingRight:Sizes.eight,
 				paddingLeft:Sizes.eight,
 				'&:hover': {
-					bgcolor: colors.interact.selected
+					bgcolor: colors.interact.touch
 				},
 				userSelect:'none'
 			}}>

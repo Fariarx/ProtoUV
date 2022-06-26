@@ -1,6 +1,6 @@
-import { TransformStore } from './Main/Components/TransformStore';
-import { ConsoleStore } from './Main/Console/ConsoleStore';
-import { SceneStore } from './Main/Scene/SceneStore';
+import { TransformStore } from './Components/TransformStore';
+import { ConsoleStore } from './Console/ConsoleStore';
+import { SceneStore } from './Scene/SceneStore';
 
 export abstract class AppStore {
 	static log = new ConsoleStore();

@@ -247,7 +247,8 @@
     "react-router-dom": "^6.3.0",
     "styled-components": "^5.3.5",
     "three": "^0.140.0",
-    "three-mesh-bvh": "^0.5.10"
+    "three-mesh-bvh": "^0.5.10",
+    "ts-keycode-enum": "^1.0.6"
   },
   "devEngines": {
     "node": ">=14.x",

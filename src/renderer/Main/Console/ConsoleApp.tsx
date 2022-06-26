@@ -1,11 +1,11 @@
 import { Box, Fade, Typography } from '@mui/material';
 import { observer } from 'mobx-react';
-import { AppStore } from '../../AppStore';
 import { colors } from '../../Shared/Colors';
+import { linearGenerator } from '../../Shared/Libs/Tools';
 import { Sizes } from '../../Shared/Styled/Sizes';
-import { linearGenerator } from '../../Shared/Tools';
+import { AppStore } from '../AppStore';
 
-export const ConsoleApp = observer(()=> {
+export const ConsoleApp = observer((props: { marginLeft: string })=> {
 
 	return <Fade in={AppStore.log.isVisible}>
 		<Box sx={{
@@ -17,6 +17,7 @@ export const ConsoleApp = observer(()=> {
 			overflow: 'hidden',
 			color: colors.typography.background,
 			margin: Sizes.twelve,
+			marginLeft: props.marginLeft,
 			fontVariant: 'unicase'
 		}}>
 			{AppStore.log.list.map(x => <Typography key={linearGenerator.next().value} variant={'body2'}>

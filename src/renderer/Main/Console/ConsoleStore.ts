@@ -1,7 +1,7 @@
 import { makeAutoObservable } from 'mobx';
 
 const LOG_LIMIT_COUNT = 50;
-const OPEN_TIMEOUT = 30000;
+const OPEN_TIMEOUT = 30000 * 10;
 
 export class ConsoleStore {
 	private _isVisible = true;

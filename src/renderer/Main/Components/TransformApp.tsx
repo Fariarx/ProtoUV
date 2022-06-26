@@ -3,10 +3,10 @@ import { BsArrowsMove } from '@react-icons/all-files/bs/BsArrowsMove';
 import { FiCode } from '@react-icons/all-files/fi/FiCode';
 import { Md3DRotation } from '@react-icons/all-files/md/Md3DRotation';
 import { observer } from 'mobx-react';
-import { AppStore } from '../../AppStore';
 import { TransformEnum } from '../../Shared/Enum/TransformEnum';
 import { ButtonSetting } from '../../Shared/Styled/ButtonSetting';
 import { Sizes } from '../../Shared/Styled/Sizes';
+import { AppStore } from '../AppStore';
 import { TransformStore } from './TransformStore';
 
 export const TransformApp = observer((props: { store: TransformStore }) => {

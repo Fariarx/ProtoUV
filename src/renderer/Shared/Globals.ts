@@ -3,7 +3,7 @@ import { acceleratedRaycast, computeBoundsTree, disposeBoundsTree } from 'three-
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial';
 
 export const Bridge = window.electron.ipcRenderer;
-export const AppName = 'ProtoUV';
+export const AppName = 'protouv';
 
 BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
 BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;

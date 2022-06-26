@@ -5,14 +5,16 @@ export const colors = {
 		background:'#aaaaaa'
 	},
 	background:{
-		dark:'#15191a',
-		heavy:'#1f2427',
+		black:'#000',
+		dark:'#2d2d2d',
+		heavy:'#3B3F40',
 		common:'#444444',
-		commonLight:'#4f4e4e',
+		commonLight:'#565656',
+		superLight:'#cbcbcb',
 		white: '#fff'
 	},
 	interact:{
-		touch:'#49a63b',
+		touch:'#4168c0',
 		warning:'#ffbd39',
 		danger:'#fb594f',
 	},

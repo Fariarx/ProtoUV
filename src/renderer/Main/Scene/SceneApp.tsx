@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react';
 import { Component } from 'react';
-import { AppStore, Log } from '../../AppStore';
+import { Log } from '../AppStore';
 
 @observer
 export class SceneApp extends Component<any, any> {
@@ -11,7 +11,7 @@ export class SceneApp extends Component<any, any> {
 	}
 
 	componentDidMount() {
-		AppStore.scene.initializer.setupCanvas(this.mount);
+		// AppStore.scene.initializer.setupCanvas(this.mount);
 	}
 
 	componentWillUnmount() {

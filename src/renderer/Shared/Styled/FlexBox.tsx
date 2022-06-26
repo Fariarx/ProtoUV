@@ -1,5 +1,10 @@
 import { Box, styled } from '@mui/material';
 
+export const FlexBox = styled(Box)({
+	display: 'flex',
+	width: '100%',
+	height: '100%'
+});
 export const FlexBoxRow = styled(Box)({
 	display: 'flex',
 	flexDirection: 'row',
@@ -12,3 +17,7 @@ export const FlexBoxColumn = styled(Box)({
 	width: '100%',
 	height: '100%'
 });
+export const flexChildrenCenter = {
+	alignItems: 'center',
+	justifyContent: 'center'
+};

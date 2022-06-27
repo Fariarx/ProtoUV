@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react';
 import { Component } from 'react';
-import { Log } from '../AppStore';
+import { Log } from '../../AppStore';
 
 @observer
 export class SceneApp extends Component<any, any> {

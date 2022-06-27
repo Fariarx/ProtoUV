@@ -1,4 +1,4 @@
-import { AppStore } from '../AppStore';
+import { AppStore } from '../../AppStore';
 import { SceneStore } from './SceneStore';
 
 export class SceneInitializer {

@@ -10,7 +10,7 @@ export const colors = {
 		heavy:'#3B3F40',
 		common:'#444444',
 		commonLight:'#565656',
-		superLight:'#cbcbcb',
+		light:'#cbcbcb',
 		white: '#fff'
 	},
 	interact:{

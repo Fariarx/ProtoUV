@@ -1,4 +1,6 @@
 export const Sizes = {
+	one: '1px',
+	two: '2px',
 	four: '4px',
 	eight: '8px',
 	twelve: '12px',

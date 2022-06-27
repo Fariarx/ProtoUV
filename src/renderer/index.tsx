@@ -1,6 +1,6 @@
 import { createRoot } from 'react-dom/client';
 import { bridgeTypeOf } from '../main/preload';
-import { App } from './Main/App';
+import { App } from './App';
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);

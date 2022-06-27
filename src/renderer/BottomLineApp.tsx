@@ -7,6 +7,7 @@ export const BottomLineApp = () => {
 	return <FlexBoxRow sx={{
 		width: '100%',
 		height: Sizes.twentyFour,
+		background: colors.background.dark,
 		justifyContent: 'flex-end',
 	}}>
 		<Text>

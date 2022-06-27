@@ -73,7 +73,7 @@ export const HeaderApp = observer(() => {
 				marginBottom: Sizes.four,
 				color: colors.typography.background
 			}}>
-				<GoLogoGithub transform={'scale(2)'}/>
+				<GoLogoGithub transform={'scale(2.25)'}/>
 			</IconButtonSmall>
 			<ButtonGroup >
 				<IconButtonSmall onClick={Bridge.window.minimize} sx={{

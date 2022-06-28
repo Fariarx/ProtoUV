@@ -1,8 +1,8 @@
 {
   "Workspace": {
-    "sizeX": 82.62,
-    "sizeY": 130.56,
-    "height": 155
+    "SizeX": 82.62,
+    "SizeY": 130.56,
+    "Height": 155
   },
   "Resolution": {
     "X": 1620,
@@ -14,6 +14,7 @@
     "ExposureTime": 4.5,
     "BottomExposureTime": 60,
     "LiftingHeight": 3.5,
-    "LiftingSpeed": 90
+    "LiftingSpeed": 90,
+    "DelayTime": 0
   }
 }

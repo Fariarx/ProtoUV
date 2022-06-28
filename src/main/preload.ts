@@ -1,4 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron';
+import fs from 'fs';
+import * as path from 'path';
 
 const body = {
 	window: {
@@ -14,6 +16,8 @@ const body = {
 		userData: () => {
 			return ipcRenderer.sendSync('electron.userData');
 		},
+		fs: fs,
+		path: path
 	}
 };
 

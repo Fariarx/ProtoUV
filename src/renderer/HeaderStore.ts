@@ -1,9 +1,21 @@
-import { makeAutoObservable, runInAction } from 'mobx';
+import { runInAction } from 'mobx';
+import { AppStore } from './AppStore';
 import { SubscribersMouseClick } from './Shared/Libs/Listerners';
 
 export class HeaderStore {
-	constructor() {
-		makeAutoObservable(this);
+	public static instance: HeaderStore;
+
+	public static getInstance(): HeaderStore {
+		if (!HeaderStore.instance)
+		{
+			HeaderStore.instance = new HeaderStore();
+		}
+
+		return HeaderStore.instance;
+	}
+
+	private constructor() {
+		AppStore.header = this;
 		this.subscribers();
 	}
 

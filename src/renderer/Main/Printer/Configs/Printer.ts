@@ -1,8 +1,9 @@
-import fs from 'fs';
-import * as path from 'path';
+import { Log } from 'renderer/AppStore';
 import { Config } from '../../../Shared/Config';
 import { Bridge } from '../../../Shared/Globals';
-import { Log } from '../../Console/StoreConsole';
+
+const fs = Bridge.window.fs;
+const path = Bridge.window.path;
 
 export class Printer {
 	name:string;
@@ -23,9 +24,9 @@ export class Printer {
 
 		if(!_settings) {
 			this.Workspace = {
-				sizeX: 0,
-				sizeY: 0,
-				height: 0
+				SizeX: 0,
+				SizeY: 0,
+				Height: 0
 			};
 			this.Resolution = {
 				X: 0,
@@ -47,17 +48,17 @@ export class Printer {
 		}
 	}
 
-	static DEFAULT_CONFIG_NAME = 'Voxelab Proxima_6_0';
+	static DEFAULT_CONFIG_NAME = 'Voxelab Proxima 6';
 	static CHANGED_DIR = '/ChangedConfigsV';
-	static CONFIG_DIR = './src/Engine/App/Configs/Default/';
+	static CONFIG_DIR = './src/renderer/Main/Printer/Configs/Default/';
 
 	static LoadDefaultConfigFromFile = function () {
 		try {
-			return new Printer(path.basename('Voxelab Proxima 6.json'),
+			return new Printer(path.basename(Printer.DEFAULT_CONFIG_NAME + '.json'),
 				JSON.parse(fs.readFileSync(Printer.CONFIG_DIR +Printer.DEFAULT_CONFIG_NAME+'.json', 'utf8')));
 		}
 		catch (e) {
-			Log.Add('Error read config: ' + e);
+			Log('Error read config: ' + e);
 		}
 
 		return null;
@@ -75,7 +76,7 @@ export class Printer {
 			return true;
 		}
 		catch (e) {
-			Log.Add('Error save config to file: ' + e);
+			Log('Error save config to file: ' + e);
 			return false;
 		}
 	};
@@ -93,12 +94,12 @@ export class Printer {
 
 			const obj = new Printer(path.basename(modelName), config);
 
-			Log.Add('Printer \'' + modelName + '\' loaded.');
+			Log('Printer \'' + modelName + '\' loaded.');
 
 			return obj;
 		}
 		catch (e) {
-			Log.Add('Error read config: ' + e);
+			Log('Error read config: ' + e);
 		}
 
 		return null;
@@ -132,7 +133,7 @@ export class Printer {
 
 			return files;
 		} catch (e) {
-			Log.Add('Error read config files: ' + e);
+			Log('Error read config files: ' + e);
 		}
 
 		return files;
@@ -145,9 +146,9 @@ export interface PrinterConfig {
   PrintSettings: PrintSettings;
 }
 export type Workspace = {
-  sizeX: number;
-  sizeY: number;
-  height: number;
+  SizeX: number;
+  SizeY: number;
+  Height: number;
 };
 export type Resolution = {
   X: number;

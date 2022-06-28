@@ -1,24 +1,30 @@
-import { Box, Typography } from '@mui/material';
+import { Box, Divider, Typography } from '@mui/material';
 import { colors } from './Shared/Colors';
-import { FlexBoxRow } from './Shared/Styled/FlexBox';
+import { FlexBoxColumn, FlexBoxRow } from './Shared/Styled/FlexBox';
 import { Sizes } from './Shared/Styled/Sizes';
 
 export const BottomLineApp = () => {
-	return <FlexBoxRow sx={{
-		width: '100%',
+	return <FlexBoxColumn  sx={{
+		position: 'absolute',
 		height: Sizes.twentyFour,
-		background: colors.background.dark,
-		justifyContent: 'flex-end',
+		bottom: 0,
+		opacity: 0.5
 	}}>
-		<Text>
-			{'Project directory: '} {/*Директория первого файла*/}
-			<span style={{ fontWeight: 'bold' }}>*folder name*</span>
-		</Text>
-		<Text>
-			<span style={{ fontWeight: 'bold' }}>0</span>
-			{' file(-s)'}
-		</Text>
-	</FlexBoxRow>;
+		<Divider />
+		<FlexBoxRow sx={{
+			background: colors.background.dark,
+			justifyContent: 'flex-end',
+		}}>
+			<Text>
+				{'Project directory: '} {/*Директория первого файла*/}
+				<span style={{ fontWeight: 'bold' }}>*folder name*</span>
+			</Text>
+			<Text>
+				<span style={{ fontWeight: 'bold' }}>0</span>
+				{' file(-s)'}
+			</Text>
+		</FlexBoxRow>
+	</FlexBoxColumn>;
 };
 
 const Text = ({ children }: {

@@ -1,106 +1,95 @@
-import {
-	Box,
-	ButtonGroup,
-	IconButton,
-	MenuItem, Typography, styled
-} from '@mui/material';
-import { GoLogoGithub } from '@react-icons/all-files/go/GoLogoGithub';
+import { Box, ButtonGroup, IconButton, MenuItem, Typography, styled } from '@mui/material';
 import { VscChromeClose } from '@react-icons/all-files/vsc/VscChromeClose';
 import { VscChromeMaximize } from '@react-icons/all-files/vsc/VscChromeMaximize';
 import { VscChromeMinimize } from '@react-icons/all-files/vsc/VscChromeMinimize';
 import { observer } from 'mobx-react';
 import React from 'react';
+import { AppStore, Pages } from './AppStore';
 import { BindItem, HeaderStore } from './HeaderStore';
 import { colors } from './Shared/Colors';
-import { Bridge } from './Shared/Globals';
-import logo from './Shared/Image/uv32px.png';
+import {  Bridge } from './Shared/Globals';
+import logo from './Shared/Image/uv128.png';
 import { emptyFunc, linearGenerator } from './Shared/Libs/Tools';
-import { FlexBoxRow } from './Shared/Styled/FlexBox';
+import { FadeUnmount } from './Shared/Styled/FadeUnmount';
+import { FlexBoxRow, FlexBoxRowFit } from './Shared/Styled/FlexBox';
 import { Sizes } from './Shared/Styled/Sizes';
 import { StyledMenu } from './Shared/Styled/StyledMenu';
 
 export const APP_HEADER_HEIGHT = '26px';
 
 export const HeaderApp = observer(() => {
-	const store = new HeaderStore();
+	const store = HeaderStore.getInstance();
 
-	return (
-		<Box sx={{
-			width: '100%',
-			height: APP_HEADER_HEIGHT,
-			background: colors.background.dark,
-			display: 'flex',
-			flexDirection: 'row',
-			justifyContent: 'flex-end',
-			userSelect: 'none',
-		}}>
-			<img
-				src={logo}
-				style={{
-					width: Sizes.sixteen,
-					height: Sizes.sixteen,
-					marginTop: Sizes.four,
-					marginLeft: Sizes.four,
-					border: '1px solid',
-					borderRadius: '25%'
-				}}
-			/>
-			<FlexBoxRow sx={{ width: 'fit-content', marginLeft: Sizes.four }}>
-				<MenuHeaderItem name={'File'} store={store} binds={[{
-					name: 'Open',
-					func: emptyFunc
-				},{
-					name: 'Save',
-					func: emptyFunc
-				}]}/>
-				<MenuHeaderItem name={'Help'} store={store} binds={[{
-					name: 'About',
-					func: emptyFunc
-				}]}/>
-			</FlexBoxRow>
-			<FlexBoxRow
-				onDoubleClick={Bridge.window.maximize}
-				sx={{
-					width: '100%',
-					height: '100%',
-					'-webkit-app-region': 'drag',
-				}}>
-			</FlexBoxRow>
-			<IconButtonSmall sx={{
-				marginRight: Sizes.twentyFour,
-				borderRadius: Sizes.four,
-				marginTop: Sizes.four,
-				marginBottom: Sizes.four,
-				color: colors.typography.background
+	return <Box sx={{
+		width: '100%',
+		height: APP_HEADER_HEIGHT,
+		background: colors.background.dark,
+		display: 'flex',
+		flexDirection: 'row',
+		justifyContent: 'flex-end',
+		userSelect: 'none',
+	}}>
+		<FlexBoxRowFit>
+			<Typography variant={'subtitle2'} sx={{
+				marginTop: Sizes.two,
+				marginLeft: Sizes.eight,
+				color: colors.background.white,
+				textShadow: '1px 1px 2px ' + colors.interact.touch
 			}}>
-				<GoLogoGithub transform={'scale(2.25)'}/>
+        Proto
+			</Typography>
+			<LogoIcon/>
+		</FlexBoxRowFit>
+		<FadeUnmount in={AppStore.instance.state === Pages.Main}>
+			<FlexBoxRow sx={{ width: 'fit-content' }}>
+				<FlexBoxRow sx={{ width: 'fit-content', marginLeft: Sizes.four }}>
+					<MenuHeaderItem name={'File'} store={store} binds={[{
+						name: 'Open',
+						func: emptyFunc
+					},{
+						name: 'Save',
+						func: emptyFunc
+					}]}/>
+					<MenuHeaderItem name={'Help'} store={store} binds={[{
+						name: 'About',
+						func: emptyFunc
+					}]}/>
+				</FlexBoxRow>
+			</FlexBoxRow>
+		</FadeUnmount>
+		<FlexBoxRow
+			onDoubleClick={Bridge.window.maximize}
+			sx={{
+				width: '100%',
+				height: '100%',
+				'-webkit-app-region': 'drag',
+			}}>
+		</FlexBoxRow>
+		<ButtonGroup >
+			<IconButtonSmall onClick={Bridge.window.minimize} sx={{
+				borderRadius: 0,
+				width: Sizes.multiply(Sizes.twentyFour, 1.5)
+			}}>
+				<VscChromeMinimize color={colors.typography.background} transform={'scale(0.8)'}/>
 			</IconButtonSmall>
-			<ButtonGroup >
-				<IconButtonSmall onClick={Bridge.window.minimize} sx={{
-					borderRadius: 0,
-					width: Sizes.multiply(Sizes.twentyFour, 1.5)
-				}}>
-					<VscChromeMinimize color={colors.typography.background} transform={'scale(0.8)'}/>
-				</IconButtonSmall>
-				<IconButtonSmall onClick={Bridge.window.maximize} sx={{
-					borderRadius: 0,
-					width: Sizes.multiply(Sizes.twentyFour, 1.5)
-				}}>
-					<VscChromeMaximize color={colors.typography.background} transform={'scale(0.8)'}/>
-				</IconButtonSmall>
-				<IconButtonSmall onClick={Bridge.window.close} sx={{
-					'&:hover':{
-						backgroundColor: colors.interact.danger,
-						color: colors.background.white
-					},
-					borderRadius: 0,
-					width: Sizes.multiply(Sizes.twentyFour, 1.5)
-				}}>
-					<VscChromeClose color={colors.typography.background} transform={'scale(0.8)'}/>
-				</IconButtonSmall>
-			</ButtonGroup>
-		</Box>
-	);
+			<IconButtonSmall onClick={Bridge.window.maximize} sx={{
+				borderRadius: 0,
+				width: Sizes.multiply(Sizes.twentyFour, 1.5)
+			}}>
+				<VscChromeMaximize color={colors.typography.background} transform={'scale(0.8)'}/>
+			</IconButtonSmall>
+			<IconButtonSmall onClick={Bridge.window.close} sx={{
+				'&:hover':{
+					backgroundColor: colors.interact.danger,
+					color: colors.background.white
+				},
+				borderRadius: 0,
+				width: Sizes.multiply(Sizes.twentyFour, 1.5)
+			}}>
+				<VscChromeClose color={colors.typography.background} transform={'scale(0.8)'}/>
+			</IconButtonSmall>
+		</ButtonGroup>
+	</Box>;
 });
 
 const MenuHeaderItem = observer((props: {name: string, store: HeaderStore, binds: BindItem[]}) => {
@@ -137,7 +126,7 @@ const MenuHeaderItem = observer((props: {name: string, store: HeaderStore, binds
 				}}/>
 			</Typography>
 		</FlexBoxRow>
-		<StyledMenu autoFocus
+		<StyledMenu disableAutoFocusItem
 			variant={'menu'}
 			open={isOpen && Boolean(anchorEl) && props.binds.length !== 0}
 			anchorEl={anchorEl} >
@@ -153,3 +142,15 @@ const MenuHeaderItem = observer((props: {name: string, store: HeaderStore, binds
 const IconButtonSmall = styled(IconButton)({
 	width: '28px'
 });
+
+const LogoIcon = () => <img
+	src={logo}
+	style={{
+		width: Sizes.sixteen,
+		height: Sizes.sixteen,
+		marginTop: Sizes.four,
+		marginLeft: Sizes.four,
+		border: '1px solid ' + colors.background.commonLight,
+		borderRadius: '30%'
+	}}
+/>;

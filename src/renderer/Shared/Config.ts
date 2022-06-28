@@ -7,7 +7,7 @@ export const Config = {
 		},
 		scene:{
 			transformAlignToPlane: true,
-			setStartupPerspectiveCamera: true,
+			setStartupPerspectiveCamera: false,
 			sharpness:.0001
 		},
 		workerCount: 10,

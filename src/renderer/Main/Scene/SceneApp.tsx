@@ -1,17 +1,15 @@
-import { observer } from 'mobx-react';
 import { Component } from 'react';
-import { Log } from '../../AppStore';
+import { AppStore, Log } from '../../AppStore';
 
-@observer
 export class SceneApp extends Component<any, any> {
 	mount: HTMLDivElement | null = null;
 
-	constructor(props: {}) {
+	public constructor(props: {}) {
 		super(props);
 	}
 
 	componentDidMount() {
-		// AppStore.scene.initializer.setupCanvas(this.mount);
+		AppStore.inits.push(() => AppStore.scene.setupCanvas(this.mount));
 	}
 
 	componentWillUnmount() {
@@ -20,10 +18,14 @@ export class SceneApp extends Component<any, any> {
 
 	render() {
 		return (
-			<div>
-				<div ref={ref => (this.mount = ref)} style={{
-					position: 'fixed'
-				}} />
+			<div style={{
+				width: '100%',
+				height: '100%'
+			}}>
+				<div style={{
+					width: '100%',
+					height: '100%'
+				}} ref={ref => (this.mount = ref)}/>
 				{this.props.children}
 			</div>
 		);

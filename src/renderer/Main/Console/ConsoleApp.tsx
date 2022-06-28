@@ -7,7 +7,7 @@ import { Sizes } from '../../Shared/Styled/Sizes';
 
 export const ConsoleApp = observer(() => {
 
-	return <Fade in={AppStore.log.isVisible}>
+	return <Fade in={AppStore.console.isVisible}>
 		<Box sx={{
 			width:'60%',
 			height: 'fit-content',
@@ -18,10 +18,10 @@ export const ConsoleApp = observer(() => {
 			color: colors.typography.background,
 			margin: Sizes.twelve,
 			marginLeft: Sizes.twelve,
-			marginBottom: Sizes.sum(Sizes.twentyFour, Sizes.twelve),
+			marginBottom: Sizes.sum(Sizes.twentyFour, Sizes.eight),
 			fontVariant: 'unicase'
 		}}>
-			{AppStore.log.list.map(x => <Typography key={linearGenerator.next().value} variant={'body2'}>
+			{AppStore.console.list.map(x => <Typography key={linearGenerator.next().value} variant={'body2'}>
 				{x.time} {'>'} {x.text}
 			</Typography>)}
 		</Box>

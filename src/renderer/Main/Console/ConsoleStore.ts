@@ -1,7 +1,7 @@
 import { makeAutoObservable } from 'mobx';
 
 const LOG_LIMIT_COUNT = 50;
-const OPEN_TIMEOUT = 30000 * 10;
+const OPEN_TIMEOUT = undefined;
 
 export class ConsoleStore {
 	private _isVisible = true;
@@ -32,13 +32,17 @@ export class ConsoleStore {
 			time: date
 		};
 
-		if(this.timerHide)
+		if (this.timerHide)
 		{
 			clearTimeout(this.timerHide);
 			this.timerHide = undefined;
 		}
-		this.timerHide = setTimeout(() =>
-			this._isVisible = false, OPEN_TIMEOUT);
+
+		if (OPEN_TIMEOUT)
+		{
+			this.timerHide = setTimeout(() =>
+				this._isVisible = false, OPEN_TIMEOUT);
+		}
 
 		this.list.unshift(log);
 

@@ -1,5 +1,7 @@
-export const Config = {
-	version: 7,
+import { Restore } from './Libs/Restore';
+
+export const _default = {
+	version: 1,
 	versionPrinterConfigs: 3,
 	settings: {
 		ui: {
@@ -15,7 +17,11 @@ export const Config = {
 	}
 };
 
-export const StoreConfig = {
+const storage = new Restore({
 	configName: 'main',
-	defaults: Config
-};
+	defaults: _default
+});
+
+export const saveConfig = () => storage.fullSave();
+export const config = storage.get('settings') as typeof _default.settings;
+

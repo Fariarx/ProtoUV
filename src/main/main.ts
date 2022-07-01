@@ -1,4 +1,4 @@
-import electron, { BrowserWindow, app, ipcMain, shell } from 'electron';
+import electron, { BrowserWindow, app, dialog, ipcMain, shell } from 'electron';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import path from 'path';
@@ -35,6 +35,15 @@ ipcMain.on('electron.closeWindow', () => {
 	const _window = BrowserWindow.getFocusedWindow();
 	// eslint-disable-next-line no-unused-expressions
 	_window && _window.close();
+});
+ipcMain.on('electron.openFileDialog', (event) => {
+	if (mainWindow) {
+		dialog.showOpenDialog(mainWindow, {
+			properties: ['openFile']
+		}).then(result => {
+			event.returnValue = result;
+		});
+	}
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -87,6 +96,7 @@ const createWindow = async () => {
 			preload: app.isPackaged
 				? path.join(__dirname, 'preload.js')
 				: path.join(__dirname, '../../.erb/dll/preload.js'),
+			webSecurity: false
 		},
 		titleBarStyle: 'hidden',
 	});

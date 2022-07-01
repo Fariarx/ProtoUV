@@ -6,8 +6,10 @@ export const DragAndDropApp = ({ open } : { open:boolean }) => {
 	return <Modal
 		open={open}
 		closeAfterTransition
+		disableAutoFocus
 		sx={{
-			userSelect:'none'
+			userSelect:'none',
+			pointerEvents: 'none'
 		}}
 	>
 		<Fade in={open}>

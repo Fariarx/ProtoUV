@@ -5,7 +5,7 @@ import { colors } from '../../Shared/Colors';
 import { linearGenerator } from '../../Shared/Libs/Tools';
 import { Sizes } from '../../Shared/Styled/Sizes';
 
-export const ConsoleApp = observer(() => {
+export const ConsoleApp = observer((props: {mt?: string, mb?: string}) => {
 
 	return <Fade in={AppStore.console.isVisible}>
 		<Box sx={{
@@ -19,7 +19,8 @@ export const ConsoleApp = observer(() => {
 			margin: Sizes.twelve,
 			marginLeft: Sizes.twelve,
 			marginBottom: Sizes.sum(Sizes.twentyFour, Sizes.eight),
-			fontVariant: 'unicase'
+			fontVariant: 'unicase',
+			...props
 		}}>
 			{AppStore.console.list.map(x => <Typography key={linearGenerator.next().value} variant={'body2'}>
 				{x.time} {'>'} {x.text}

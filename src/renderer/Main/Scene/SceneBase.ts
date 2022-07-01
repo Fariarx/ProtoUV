@@ -13,9 +13,10 @@ import { TransformControls } from 'three/examples/jsm/controls/TransformControls
 import { OutlineEffect } from 'three/examples/jsm/effects/OutlineEffect';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial';
-import { Camera } from 'three/src/cameras/Camera';
 import { colors } from '../../Shared/Colors';
-import { SceneMaterial, SceneMaterials } from '../../Shared/Globals';
+import { config } from '../../Shared/Config';
+import { MaterialForScene, materialsForScene } from '../../Shared/Globals';
+import { Printer } from '../Printer/Configs/Printer';
 import { SceneObject } from './Entities/SceneObject';
 
 export abstract class SceneBase {
@@ -38,24 +39,27 @@ export abstract class SceneBase {
 		color: colors.scene.workingPlaneLimitColor,
 		side: FrontSide
 	});
-	public materialForObjects: SceneMaterial = SceneMaterials.default;
+	public materialForObjects: MaterialForScene = materialsForScene.default;
 	public perspectiveCamera = new PerspectiveCamera(
 		40,
 		window.innerWidth / window.innerHeight,
 		0.01,
 		1000
 	);
-	public activeCamera: Camera = this.perspectiveCamera;
 	public orthographicCamera = new OrthographicCamera(
 		window.innerWidth / - 2,
 		window.innerWidth / 2,
 		window.innerHeight / 2,
 		window.innerHeight / - 2,
-		0.01,
+		0.0001,
 		1000,
 	);
+	public activeCamera: OrthographicCamera | PerspectiveCamera = this.perspectiveCamera;
 
 	public stats = Stats();
+
+	public printerName: string = config.printerName;
+	public printer?: Printer;
 
 	public scene: Scene = new Scene();
 	public objects: SceneObject[] = [];

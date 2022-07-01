@@ -14,7 +14,8 @@ export const colors = {
 		white: '#fff'
 	},
 	interact:{
-		touch:'#4168c0',
+		neutral:'#4168c0',
+		touch:'#61b6f8',
 		warning:'#ffbd39',
 		danger:'#fb594f',
 	},
@@ -23,14 +24,20 @@ export const colors = {
 		colorBackgroundSceneBottom:'#6c6c6c',
 		colorBackground:'#1d1d1d',
 		color1:'#2a2a2a',
-		workingPlaneLimitColor:'#d4605a',
-		workingPlaneColor:'#68798d',
+		workingPlaneLimitColor:'#a96e69',
+		workingPlaneColor:'#6d7075',
+	},
+	logo: {
+		main: '#5e48ff'
 	}
 };
 
 export const darkTheme = createTheme({
 	palette: {
 		mode: 'dark',
+		primary: {
+			main: colors.interact.touch
+		}
 	},
 	components: {
 		MuiCssBaseline: {

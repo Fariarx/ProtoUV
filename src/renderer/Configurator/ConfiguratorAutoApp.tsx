@@ -1,22 +1,40 @@
-import { Autocomplete, IconButton, InputAdornment, Link, TextField } from '@mui/material';
+import { Autocomplete, Box, IconButton, InputAdornment, Link, TextField } from '@mui/material';
 import { MdNavigateNext } from '@react-icons/all-files/md/MdNavigateNext';
 import { observer } from 'mobx-react';
 import { useState } from 'react';
-import { AppStore, Pages } from '../../../AppStore';
-import { HeaderApp } from '../../../HeaderApp';
-import { colors } from '../../../Shared/Colors';
-import { FlexBoxColumn, FlexBoxColumnFit, flexChildrenCenter } from '../../../Shared/Styled/FlexBox';
-import { Sizes } from '../../../Shared/Styled/Sizes';
-import { Printer } from '../Configs/Printer';
+import { AppStore, Log, Pages } from '../AppStore';
+import { Printer } from '../Main/Printer/Configs/Printer';
+import { colors } from '../Shared/Colors';
+import { config, saveConfig } from '../Shared/Config';
+import { FlexBoxColumn, FlexBoxColumnFit, flexChildrenCenter } from '../Shared/Styled/FlexBox';
+import { Sizes } from '../Shared/Styled/Sizes';
 
-export const AutoConfiguratorApp = observer(() => {
+export const ConfiguratorAutoApp = observer(() => {
 	const configs = Printer.ParseConfigFileNames();
 	const [hasFocus, setterFocus] = useState(true);
-	const [printer, setterPrinter] = useState('');
-	const isValidPrinter = () => configs.includes(printer);
+	const [printerName, setterPrinterName] = useState('');
+	const isValidPrinter = () => configs?.default.includes(printerName) || configs?.changed.includes(printerName);
+	if (!configs)
+	{
+		Log('Error to parse configs');
+		return <Box/>;
+	}
+
+	const save = () => {
+		const printer = Printer.LoadConfigFromFile(printerName);
+		if (!printer)
+		{
+			Log('Config parse error');
+		}
+		else {
+			AppStore.sceneStore.printer = printer;
+			AppStore.sceneStore.printerName = config.printerName = printer.name;
+			AppStore.setState(Pages.Main);
+			saveConfig();
+		}
+	};
 
 	return <FlexBoxColumn>
-		<HeaderApp />
 		<FlexBoxColumn sx={{
 			width: 'unset',
 			height: 'unset',
@@ -31,8 +49,10 @@ export const AutoConfiguratorApp = observer(() => {
 				marginBottom: Sizes.twentyFour,
 			}}>
 				<Autocomplete
-					options={configs}
-					onInputChange={(_, x) => setterPrinter(x)}
+					options={[...configs.default, ...configs.changed.map(x => x)].filter(function(elem, index, self) {
+						return index === self.indexOf(elem);
+					})}
+					onInputChange={(_, x) => setterPrinterName(x)}
 					sx={{
 						width: '100%',
 						borderRadius: Sizes.eight
@@ -47,7 +67,7 @@ export const AutoConfiguratorApp = observer(() => {
 								error={!isValidPrinter() && !hasFocus}
 								helperText={<>
                   Please select your printer or{' '}
-									<Link sx={{ cursor: 'pointer' }} onClick={() => AppStore.instance.state = Pages.ConfiguratorManually}>
+									<Link sx={{ cursor: 'pointer' }} onClick={() => AppStore.setState(Pages.ConfiguratorManually)}>
                     create a new configuration
 									</Link>
 								</>}
@@ -59,7 +79,7 @@ export const AutoConfiguratorApp = observer(() => {
 									...params.InputProps,
 									endAdornment: (
 										<InputAdornment position={'start'}>
-											{isValidPrinter() && <IconButton>
+											{isValidPrinter() && <IconButton onClick={save}>
 												<MdNavigateNext color={colors.background.white}/>
 											</IconButton>}
 										</InputAdornment>
@@ -74,3 +94,4 @@ export const AutoConfiguratorApp = observer(() => {
 		</FlexBoxColumn>
 	</FlexBoxColumn>;
 });
+

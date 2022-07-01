@@ -7,10 +7,10 @@ import React from 'react';
 import { AppStore, Pages } from './AppStore';
 import { BindItem, HeaderStore } from './HeaderStore';
 import { colors } from './Shared/Colors';
-import {  Bridge } from './Shared/Globals';
-import logo from './Shared/Image/uv128.png';
+import {  bridge } from './Shared/Globals';
+import logo1 from './Shared/Image/uv128_v1.png';
 import { emptyFunc, linearGenerator } from './Shared/Libs/Tools';
-import { FadeUnmount } from './Shared/Styled/FadeUnmount';
+import { AnimationGrow } from './Shared/Styled/Animation';
 import { FlexBoxRow, FlexBoxRowFit } from './Shared/Styled/FlexBox';
 import { Sizes } from './Shared/Styled/Sizes';
 import { StyledMenu } from './Shared/Styled/StyledMenu';
@@ -34,31 +34,35 @@ export const HeaderApp = observer(() => {
 				marginTop: Sizes.two,
 				marginLeft: Sizes.eight,
 				color: colors.background.white,
-				textShadow: '1px 1px 2px ' + colors.interact.touch
+				textShadow: '1px 1px 2px ' + colors.logo.main
 			}}>
         Proto
 			</Typography>
 			<LogoIcon/>
 		</FlexBoxRowFit>
-		<FadeUnmount in={AppStore.instance.state === Pages.Main}>
+		<AnimationGrow in={AppStore.getInstance().getState() === Pages.Main}>
 			<FlexBoxRow sx={{ width: 'fit-content' }}>
-				<FlexBoxRow sx={{ width: 'fit-content', marginLeft: Sizes.four }}>
+				<FlexBoxRow sx={{ width: 'fit-content', marginLeft: Sizes.eight }}>
 					<MenuHeaderItem name={'File'} store={store} binds={[{
 						name: 'Open',
-						func: emptyFunc
+						func: () => { bridge.openFileDialog().filePaths.forEach((filePath: string) =>
+							AppStore.sceneStore.handleLoadFile(filePath)); }
 					},{
 						name: 'Save',
 						func: emptyFunc
 					}]}/>
 					<MenuHeaderItem name={'Help'} store={store} binds={[{
+						name: 'Open settings folder',
+						func: () => bridge.shell.openPath(bridge.userData())
+					}, {
 						name: 'About',
 						func: emptyFunc
 					}]}/>
 				</FlexBoxRow>
 			</FlexBoxRow>
-		</FadeUnmount>
+		</AnimationGrow>
 		<FlexBoxRow
-			onDoubleClick={Bridge.window.maximize}
+			onDoubleClick={bridge.maximize}
 			sx={{
 				width: '100%',
 				height: '100%',
@@ -66,19 +70,19 @@ export const HeaderApp = observer(() => {
 			}}>
 		</FlexBoxRow>
 		<ButtonGroup >
-			<IconButtonSmall onClick={Bridge.window.minimize} sx={{
+			<IconButtonSmall onClick={bridge.minimize} sx={{
 				borderRadius: 0,
 				width: Sizes.multiply(Sizes.twentyFour, 1.5)
 			}}>
 				<VscChromeMinimize color={colors.typography.background} transform={'scale(0.8)'}/>
 			</IconButtonSmall>
-			<IconButtonSmall onClick={Bridge.window.maximize} sx={{
+			<IconButtonSmall onClick={bridge.maximize} sx={{
 				borderRadius: 0,
 				width: Sizes.multiply(Sizes.twentyFour, 1.5)
 			}}>
 				<VscChromeMaximize color={colors.typography.background} transform={'scale(0.8)'}/>
 			</IconButtonSmall>
-			<IconButtonSmall onClick={Bridge.window.close} sx={{
+			<IconButtonSmall onClick={bridge.close} sx={{
 				'&:hover':{
 					backgroundColor: colors.interact.danger,
 					color: colors.background.white
@@ -99,13 +103,14 @@ const MenuHeaderItem = observer((props: {name: string, store: HeaderStore, binds
 	const menuItem = store.setupMenuItemBinds(name, props.binds);
 	const isOpen = menuItem?.isOpen;
 
-	return <>
+	return <Box>
 		<FlexBoxRow ref={setAnchorEl} onClick={() => store.setMenuItemOpen(name)} sx={{
 			paddingLeft: Sizes.eight,
 			paddingRight: Sizes.eight,
-			bgcolor: isOpen ? colors.interact.touch : 'unset',
+			marginTop: '-1px',
+			bgcolor: isOpen ? colors.interact.neutral : 'unset',
 			'&:hover': {
-				bgcolor: isOpen ? colors.interact.touch : colors.background.commonLight
+				bgcolor: isOpen ? colors.interact.neutral : colors.background.commonLight
 			}
 		}} >
 			<Typography variant={'body2'} sx={{
@@ -136,7 +141,7 @@ const MenuHeaderItem = observer((props: {name: string, store: HeaderStore, binds
 				{x.name}
 			</MenuItem>)}
 		</StyledMenu>
-	</>;
+	</Box>;
 });
 
 const IconButtonSmall = styled(IconButton)({
@@ -144,13 +149,10 @@ const IconButtonSmall = styled(IconButton)({
 });
 
 const LogoIcon = () => <img
-	src={logo}
+	src={logo1}
 	style={{
-		width: Sizes.sixteen,
-		height: Sizes.sixteen,
-		marginTop: Sizes.four,
-		marginLeft: Sizes.four,
-		border: '1px solid ' + colors.background.commonLight,
-		borderRadius: '30%'
+		width: '18px',
+		height: '18px',
+		marginTop: '4px',
 	}}
 />;

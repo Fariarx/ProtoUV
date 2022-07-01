@@ -1,20 +1,12 @@
-import { Mesh } from 'three';
-import { SceneObject } from '../Main/Scene/Entities/SceneObject';
-import { AppEventEnum } from './Enum/AppEventEnum';
-import { TransformEnum } from './Enum/TransformEnum';
-import { MoveObject } from './Scene/MoveObject';
+import { runInAction } from 'mobx';
+import { AppStore } from '../AppStore';
+import { AppEvent, AppEventArguments, AppEventEnum } from './Libs/Types';
 
-type Message = {
-  name: AppEventEnum;
-  args: object | undefined;
-  last: any;
-};
-
-export const Dispatch = (name: AppEventEnum, args?: object) => {
+export const Dispatch = (name: AppEventEnum, args: typeof AppEventArguments) => {
 	const message = {
-		name:name,
-		args:args ?? undefined
-	} as Message;
+		name: name,
+		args: args ?? undefined
+	} as AppEvent;
 
 	for(let index = 0; index < eventListeners.length; index++)
 	{
@@ -27,111 +19,15 @@ export const Dispatch = (name: AppEventEnum, args?: object) => {
 };
 
 const Handler = (message: any) => {
+
 	switch (message.name) {
-		case AppEventEnum.SELECT_TRANSFORM_MODE:
-			message.last = sceneStore.transformInstrumentState;
-
-			if (sceneStore.transformInstrumentState === message.args.value) {
-				SceneUtils.instrumentStateChanged();
-			} else {
-				SceneUtils.instrumentStateChanged(message.args.value);
-			}
-			break;
-		case AppEventEnum.TRANSFORM_OBJECT:
-			const moveObject = message.args as MoveObject;
-			const mesh: Mesh = moveObject.sceneObject instanceof SceneObject ? moveObject.sceneObject.mesh : <Mesh>moveObject.sceneObject;
-			const sceneObj = SceneObject.SearchSceneObjByMesh(sceneStore.objects, mesh);
-
-			moveObject.to = moveObject.to.clone();
-			moveObject.from = moveObject.from.clone();
-
-			if(!moveObject.actionBreak) {
-				if(!moveObject.instrument) {
-					moveObject.instrument = sceneStore.transformInstrumentState;
-				}
-
-				switch (moveObject.instrument) {
-					case TransformEnum.Move:
-						mesh.position.set(moveObject.to.x, moveObject.to.y, moveObject.to.z);
-						break;
-					case TransformEnum.Rotate:
-						mesh.rotation.set(moveObject.to.x, moveObject.to.y, moveObject.to.z);
-
-						if(sceneObj)
-						{
-							message.args.deletedSupports = {
-								sceneObj: sceneObj,
-								supports: sceneObj.supports
-							};
-
-							for(const obj of sceneObj.supports)
-							{
-								sceneStore.scene.remove(obj.group);
-							}
-
-							sceneObj.supports = [];
-						}
-						break;
-					case TransformEnum.Scale:
-						const minScale = Settings().scene.sharpness;
-
-						if(moveObject.to.x < minScale)
-						{
-							moveObject.to.x = minScale;
-						}
-						if(moveObject.to.y < minScale)
-						{
-							moveObject.to.y = minScale;
-						}
-						if(moveObject.to.z < minScale)
-						{
-							moveObject.to.z = minScale;
-						}
-
-						mesh.scale.set(moveObject.to.x, moveObject.to.y, moveObject.to.z);
-						break;
-				}
-
-				if(moveObject.sceneObject === sceneStore.transformObjectGroup)
-				{
-					sceneStore.transformObjectGroupOld.position.set(
-						sceneStore.transformObjectGroup.position.x,
-						sceneStore.transformObjectGroup.position.y,
-						sceneStore.transformObjectGroup.position.z,
-					);
-					sceneStore.transformObjectGroupOld.rotation.set(
-						sceneStore.transformObjectGroup.rotation.x,
-						sceneStore.transformObjectGroup.rotation.y,
-						sceneStore.transformObjectGroup.rotation.z,
-					);
-					sceneStore.transformObjectGroupOld.scale.set(
-						sceneStore.transformObjectGroup.scale.x,
-						sceneStore.transformObjectGroup.scale.y,
-						sceneStore.transformObjectGroup.scale.z,
-					);
-				}
-			}
-
-			//console.log(moveObject);
-
-			if(!moveObject.renderBreak)
-			{
-				SceneUtils.updateFrame();
-			}
-
-			SceneUtils.updateTransformTool();
-			break;
 		case AppEventEnum.ADD_OBJECT:
-			sceneStore.objects.push(message.args);
-			SceneUtils.selectionChanged();
-			SceneUtils.instrumentStateChanged();
+			objectAdd(message);
 			break;
 	}
+
 	return true;
 };
-
-const eventList = new Array<Message>();
-const eventListeners: ((message: AppEventEnum, args?: object) => void)[] = [];
 
 export const AddListener = (listener: (message: AppEventEnum, args?: object) => void) => {
 	eventListeners.push(listener);
@@ -147,4 +43,30 @@ export const DeleteListener = (listener: object) => {
 			index--;
 		}
 	}
+};
+
+const eventList = new Array<AppEvent>();
+const eventListeners: ((message: AppEventEnum, args?: object) => void)[] = [];
+
+const objectAdd = (message: AppEvent) => {
+	const args = message.args as typeof AppEventArguments;
+	const app = AppStore.getInstance();
+	const scene = AppStore.sceneStore;
+
+	scene.objects.push(args!.object);
+	args!.object.AlignToPlaneXZ(scene.gridSize);
+	args!.object.AlignToPlaneY();
+	args!.object.AddToScene(true);
+	scene.animate();
+
+	runInAction(() => {
+		if (args?.source && !app.projectFolder)
+		{
+			const path = args.source.split('\\');
+			path.pop();
+			app.projectFolder = path.join('\\');
+		}
+
+		app.fileCount = scene.objects.length;
+	});
 };

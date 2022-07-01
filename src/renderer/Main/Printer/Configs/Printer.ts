@@ -1,9 +1,6 @@
 import { Log } from 'renderer/AppStore';
-import { Config } from '../../../Shared/Config';
-import { Bridge } from '../../../Shared/Globals';
-
-const fs = Bridge.window.fs;
-const path = Bridge.window.path;
+import { _default } from '../../../Shared/Config';
+import { bridge } from '../../../Shared/Globals';
 
 export class Printer {
 	name:string;
@@ -54,8 +51,8 @@ export class Printer {
 
 	static LoadDefaultConfigFromFile = function () {
 		try {
-			return new Printer(path.basename(Printer.DEFAULT_CONFIG_NAME + '.json'),
-				JSON.parse(fs.readFileSync(Printer.CONFIG_DIR +Printer.DEFAULT_CONFIG_NAME+'.json', 'utf8')));
+			return new Printer(bridge.path.basename(Printer.DEFAULT_CONFIG_NAME),
+				JSON.parse(bridge.fs.readFileSync(Printer.CONFIG_DIR +Printer.DEFAULT_CONFIG_NAME+'.json', 'utf8')));
 		}
 		catch (e) {
 			Log('Error read config: ' + e);
@@ -65,13 +62,13 @@ export class Printer {
 	};
 	static SaveToFile = function (config: Printer) {
 		try {
-			const dir = Bridge.window.userData() + Printer.CHANGED_DIR + Config.versionPrinterConfigs;
-			if (!fs.existsSync(dir)) {
-				fs.mkdirSync(dir);
+			const dir = bridge.userData() + Printer.CHANGED_DIR + _default.versionPrinterConfigs;
+			if (!bridge.fs.existsSync(dir)) {
+				bridge.fs.mkdirSync(dir);
 			}
 
-			fs.writeFileSync(Bridge.window.userData() + Printer.CHANGED_DIR +
-        Config.versionPrinterConfigs + '/' + config.name + '.json',
+			bridge.fs.writeFileSync(bridge.userData() + Printer.CHANGED_DIR +
+        _default.versionPrinterConfigs + '/' + config.name + '.json',
 			JSON.stringify(config),{ encoding:'utf8',flag:'w' });
 			return true;
 		}
@@ -86,13 +83,13 @@ export class Printer {
 			let config: PrinterConfig;
 
 			try {
-				config = JSON.parse(fs.readFileSync(Bridge.window.userData() + Printer.CHANGED_DIR
-          + Config.versionPrinterConfigs + '/' + modelName + '.json', 'utf8'));
+				config = JSON.parse(bridge.fs.readFileSync(bridge.userData() + Printer.CHANGED_DIR
+          + _default.versionPrinterConfigs + '/' + modelName + '.json', 'utf8'));
 			} catch (e) {
-				config  = JSON.parse(fs.readFileSync(Printer.CONFIG_DIR + modelName + '.json', 'utf8'));
+				config  = JSON.parse(bridge.fs.readFileSync(Printer.CONFIG_DIR + modelName + '.json', 'utf8'));
 			}
 
-			const obj = new Printer(path.basename(modelName), config);
+			const obj = new Printer(bridge.path.basename(modelName), config);
 
 			Log('Printer \'' + modelName + '\' loaded.');
 
@@ -105,38 +102,36 @@ export class Printer {
 		return null;
 	};
 	static ParseConfigFileNames = function () {
-		let files: string[] = [];
-
 		try {
-			const dir = Bridge.window.userData() + Printer.CHANGED_DIR + Config.versionPrinterConfigs;
-			if (fs.existsSync(dir)) {
-				files = [...fs.readdirSync(dir)];
-			}
-			if (fs.existsSync(Printer.CONFIG_DIR)) {
-				files = [...fs.readdirSync(Printer.CONFIG_DIR), ...files];
-			}
+			const dir = bridge.userData() + Printer.CHANGED_DIR + _default.versionPrinterConfigs;
+			const filesNormalize = (files: string[]) => {
+				files = files.filter(function(item, pos) {
+					if(item.indexOf('.json') === -1)
+					{
+						return false;
+					}
 
-			files = files.filter(function(item, pos) {
-				if(item.indexOf('.json') === -1)
-				{
-					return false;
-				}
+					return files.indexOf(item) === pos;
+				});
 
-				return files.indexOf(item) === pos;
-			});
+				files = files.map(function (t) {
+					return t.replaceAll('.json', '');
+				});
 
-			files = files.map(function (t) {
-				return t.replace('.json', '');
-			});
+				files.sort();
 
-			files.sort();
+				return files;
+			};
 
-			return files;
+			return {
+				default: filesNormalize(bridge.fs.readdirSync(Printer.CONFIG_DIR)),
+				changed: filesNormalize(bridge.fs.readdirSync(dir))
+			};
 		} catch (e) {
 			Log('Error read config files: ' + e);
 		}
 
-		return files;
+		return null;
 	};
 }
 

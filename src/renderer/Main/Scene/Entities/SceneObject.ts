@@ -1,14 +1,28 @@
-import { Box3, BoxHelper, BufferGeometry, Matrix4, Mesh, Vector3 } from 'three';
-import { AppEventEnum } from '../../../Shared/Enum/AppEventEnum';
-import { TransformEnum } from '../../../Shared/Enum/TransformEnum';
+import { AppEventEnum, TransformEnum } from 'renderer/Shared/Libs/Types';
+import {
+	Box3,
+	BoxHelper,
+	BufferGeometry,
+	Group,
+	LineSegments,
+	Matrix4,
+	Mesh,
+	Vector3,
+	WireframeGeometry
+} from 'three';
+import { AppStore } from '../../../AppStore';
 import { Dispatch } from '../../../Shared/Events';
 import { MoveObject } from '../../../Shared/Scene/MoveObject';
 import { SceneStore } from '../SceneStore';
 
 export class SceneObject {
 	name: string;
+
+	obj: Group;
 	mesh: Mesh;
 	bbox: BoxHelper;
+	wireframe: LineSegments;
+
 	min: Vector3;
 	max: Vector3;
 	center: Vector3;
@@ -17,13 +31,18 @@ export class SceneObject {
 	scaleFactor: number;
 	isSelected: boolean;
 
-	private _wasSelected: boolean;
+	public settings = {
+		wireframe: false,
+		bbox: false
+	};
+
+	private wasSelected: boolean;
 
 	constructor(geometry: BufferGeometry,
 		name: string,
 		objs: SceneObject[],
-		sceneStore: SceneStore,
-		selected = false)
+		selected = false,
+		sceneStore: SceneStore = AppStore.sceneStore)
 	{
 		let index = 0;
 		let sceneName = index + ' : ' + name;
@@ -37,8 +56,6 @@ export class SceneObject {
 		this.sceneStore = sceneStore;
 
 		this.mesh = new Mesh(geometry, sceneStore.materialForObjects.normal);
-		this.bbox = new BoxHelper(this.mesh, 0xffff00);
-
 		this.mesh.castShadow = true;
 		this.mesh.receiveShadow = false;
 		this.mesh.scale.set(0.1, 0.1, 0.1);
@@ -49,28 +66,52 @@ export class SceneObject {
 		this.max = nullVector;
 		this.center = nullVector;
 
-		this.Update();
-		this.UpdateGeometryCenter();
+		this.Update(true);
+		this.UpdateGeometryCenter(true);
 
-		this.isSelected = selected;
-		this._wasSelected = selected;
+		this.wireframe = this.SetupWireframe(geometry);
+		this.wireframe.visible = false;
+
+		this.bbox = new BoxHelper(this.mesh, 0xffff00);
+		this.bbox.visible = false;
+
+		this.obj = new Group();
+		this.obj.add(this.mesh);
+		this.obj.add(this.bbox);
+		this.obj.add(this.wireframe);
+
+		this.isSelected = this.wasSelected = selected;
 		this.SetSelection();
 
 		this.scaleFactor = (0.1 / this.size.x + 0.1 / this.size.y + 0.1 / this.size.z) / 3;
 	}
 
+	private SetupWireframe(geometry: BufferGeometry) {
+		const wireframe = new WireframeGeometry( geometry );
+		const line = new LineSegments( wireframe );
+		const lineMaterial = line.material as any;
+		lineMaterial.opacity = 0.25;
+		lineMaterial.transparent = true;
+		lineMaterial.color = '#000';
+		// lineMaterial.depthTest = false;
+		line.scale.multiplyScalar( 0.1 );
+		return  line;
+	}
+
 	SetSelection() {
 		let wasSelectedChanged: undefined | boolean;
 
-		if (this._wasSelected !== this.isSelected) {
-			wasSelectedChanged = this._wasSelected;
-			this._wasSelected = this.isSelected;
+		if (this.wasSelected !== this.isSelected) {
+			wasSelectedChanged = this.wasSelected;
+			this.wasSelected = this.isSelected;
 		}
 
 		if (this.isSelected) {
 			this.mesh.material = this.sceneStore.materialForObjects.select;
+			this.wireframe.visible = this.settings.wireframe;
 		} else {
 			this.mesh.material = this.sceneStore.materialForObjects.normal;
+			this.wireframe.visible = false;
 		}
 
 		return {
@@ -79,15 +120,18 @@ export class SceneObject {
 		};
 	}
 
-	Update() {
-		this.SetSelection();
+	Update(init = false) {
+		if (!init) {
+			this.SetSelection();
+			this.wireframe.updateMatrixWorld();
+			this.bbox.update();
+		}
 
 		this.UpdateSize();
 
 		this.mesh.updateMatrixWorld();
-		this.bbox.update();
 
-		this.mesh.geometry.computeBoundsTree();
+		// this.mesh.geometry.computeBoundsTree();
 		this.mesh.geometry.computeBoundingBox();
 		this.mesh.geometry.computeBoundingSphere();
 
@@ -100,17 +144,22 @@ export class SceneObject {
 		new Box3().setFromObject(this.mesh).getSize(this.size);
 	}
 
-	UpdateGeometryCenter() {
+	UpdateGeometryCenter(init = false) {
 		this.mesh.geometry.applyMatrix4(new Matrix4().makeTranslation(-this.center.x, -this.center.y, -this.center.z));
-		this.Update();
+		this.Update(init);
 	}
 
-	AddToScene(scene: THREE.Scene, withBoxHelper?: boolean) {
+	AddToScene(withWireframe?: boolean, withBoxHelper?: boolean) {
 		if (withBoxHelper) {
-			scene.add(this.bbox);
+			this.bbox.visible = true;
+			this.settings.bbox = true;
+		}
+		if (withWireframe) {
+			this.wireframe.visible = true;
+			this.settings.wireframe = true;
 		}
 
-		scene.add(this.mesh);
+		this.sceneStore.scene.add(this.obj);
 	}
 
 	AlignToPlaneY() {

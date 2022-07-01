@@ -1,4 +1,4 @@
-import { makeObservable, observable } from 'mobx';
+import { makeAutoObservable } from 'mobx';
 import { HeaderStore } from './HeaderStore';
 import { TransformStore } from './Main/Components/TransformStore';
 import { ConsoleStore } from './Main/Console/ConsoleStore';
@@ -9,7 +9,7 @@ export const Log = consoleStore.Add;
 
 export class AppStore {
 	public static console = consoleStore;
-	public static scene: SceneStore;
+	public static sceneStore: SceneStore;
 	public static transform = new TransformStore();
 	public static inits: (() => void)[] = [];
 
@@ -17,9 +17,16 @@ export class AppStore {
 	public static header: HeaderStore;
 
 	public static load = () => {
-		this.scene = new SceneStore();
+		this.sceneStore = new SceneStore();
 		this.transform = new TransformStore();
 		this.inits.forEach((item) => item());
+		this.instance.ready = true;
+	};
+	public static setState = (state: Pages) => {
+		AppStore.getInstance().setState(state);
+	};
+	public static isState = (state: Pages) => {
+		return AppStore.getInstance().getState() === state;
 	};
 
 	public static getInstance(): AppStore {
@@ -33,17 +40,25 @@ export class AppStore {
 
 	private constructor() {
 		AppStore.instance = this;
-		this.state = Pages.None;
-
-		makeObservable(this, {
-			state: observable,
-		});
+		makeAutoObservable(this);
 	}
 
-	public state: Pages;
+	private _state = Pages.Main;
+
+	public getState() {
+		return this._state;
+	}
+	public setState(state: Pages) {
+		this._state = state;
+	}
+
+	public ready = false;
+	public dropFile = false;
+	public fileCount = 0;
+	public projectFolder?: string;
 }
 
-setTimeout(AppStore.load, 100);
+setTimeout(AppStore.load, 50);
 
 export enum Pages {
   None,

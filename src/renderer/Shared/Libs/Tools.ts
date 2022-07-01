@@ -1,3 +1,5 @@
+import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial';
+
 export const linearGenerator = function* (){
 	let i = 0;
 	while (true) {
@@ -18,4 +20,10 @@ export const generateID = (length = 8) => {
 
 //eslint-disable-next-line @typescript-eslint/no-empty-function
 export const emptyFunc = () => {};
+
+export type Grid = {
+  obj: any;
+  mat: LineMaterial;
+  dispose: Function;
+};
 

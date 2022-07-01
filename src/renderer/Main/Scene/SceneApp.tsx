@@ -9,7 +9,7 @@ export class SceneApp extends Component<any, any> {
 	}
 
 	componentDidMount() {
-		AppStore.inits.push(() => AppStore.scene.setupCanvas(this.mount));
+		AppStore.inits.push(() => AppStore.sceneStore.setupCanvas(this.mount));
 	}
 
 	componentWillUnmount() {
@@ -18,7 +18,7 @@ export class SceneApp extends Component<any, any> {
 
 	render() {
 		return (
-			<div style={{
+			<div onWheel={(evt) => AppStore.sceneStore.onZoom(evt)} style={{
 				width: '100%',
 				height: '100%'
 			}}>

@@ -123,29 +123,12 @@ export class SceneInitializer extends SceneBase {
 			{
 				Log('Drop ' + e.dataTransfer.files.length + ' file(s) event');
 				Array.from(e.dataTransfer.files).forEach(file =>
-					AppStore.sceneStore.handleLoadFile(file.name));
+					AppStore.sceneStore.handleLoadFile(file.path));
 			}
 			else {
 				Log('DataTransfer is null, skip drag and drop' );
 			}
 		};
-	};
-
-	public handleLoadFile = (file: string) => {
-		const result = AppStore.sceneStore.file3dLoad(file, function (geometry: BufferGeometry, path: string) {
-			Dispatch(AppEventEnum.ADD_OBJECT, {
-				source: path,
-				object: new SceneObject(geometry, file, AppStore.sceneStore.objects, true)
-			});
-		});
-
-		if(result)
-		{
-			Log('File load ' + file);
-		}
-		else {
-			Log('Error file format ' + file);
-		}
 	};
 
 	private file3dLoad = (file: File | string, handler: Function): boolean => {
@@ -179,17 +162,22 @@ export class SceneInitializer extends SceneBase {
 		}
 	};
 
-	public setupOrbitController() {
-		this.temp.wasChangeLook = false;
-		this.orbitControls = new OrbitControls(this.activeCamera, this.renderer.domElement);
-		this.orbitControls.enableDamping = true;
-		this.orbitControls.rotateSpeed = 0.3;
-		this.orbitControls.update();
-		this.orbitControls.addEventListener( 'change', () => {
-			this.temp.wasChangeLook = true;
-			this.animate();
+	public handleLoadFile = (file: string) => {
+		const result = AppStore.sceneStore.file3dLoad(file, function (geometry: BufferGeometry, path: string) {
+			Dispatch(AppEventEnum.ADD_OBJECT, {
+				source: path,
+				object: new SceneObject(geometry, file, AppStore.sceneStore.objects, true)
+			});
 		});
-	}
+
+		if(result)
+		{
+			Log('File load ' + file.split('\\').pop());
+		}
+		else {
+			Log('Error file format ' + file.split('\\').pop());
+		}
+	};
 
 	public onZoom(evt?:  React.WheelEvent<HTMLDivElement>) {
 		const zoom = 5;
@@ -223,6 +211,18 @@ export class SceneInitializer extends SceneBase {
 				this.orbitControls.enableZoom = true;
 			}
 		}
+	}
+
+	public setupOrbitController() {
+		this.temp.wasChangeLook = false;
+		this.orbitControls = new OrbitControls(this.activeCamera, this.renderer.domElement);
+		this.orbitControls.enableDamping = true;
+		this.orbitControls.rotateSpeed = 0.5;
+		this.orbitControls.update();
+		this.orbitControls.addEventListener( 'change', () => {
+			this.temp.wasChangeLook = true;
+			this.animate();
+		});
 	}
 
 	public setupTransformControls() {

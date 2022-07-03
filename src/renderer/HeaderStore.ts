@@ -3,7 +3,7 @@ import { AppStore } from './AppStore';
 import { SubscribersMouseClick } from './Shared/Libs/Listerners';
 
 export class HeaderStore {
-	public static instance: HeaderStore;
+	private static instance: HeaderStore;
 
 	public static getInstance(): HeaderStore {
 		if (!HeaderStore.instance)

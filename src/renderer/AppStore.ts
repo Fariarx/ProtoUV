@@ -10,15 +10,15 @@ export const Log = consoleStore.Add;
 export class AppStore {
 	public static console = consoleStore;
 	public static sceneStore: SceneStore;
-	public static transform = new TransformStore();
+	public static transform: TransformStore;
 	public static inits: (() => void)[] = [];
 
-	public static instance: AppStore;
+	private static instance: AppStore;
 	public static header: HeaderStore;
 
 	public static load = () => {
-		this.sceneStore = new SceneStore();
-		this.transform = new TransformStore();
+		this.sceneStore = SceneStore.getInstance();
+		this.transform = TransformStore.getInstance();
 		this.inits.forEach((item) => item());
 		this.instance.ready = true;
 	};

@@ -9,7 +9,7 @@ import { Sizes } from './Shared/Styled/Sizes';
 export const BottomLineApp = observer(() => {
 	const app = AppStore.getInstance();
 
-	return <FlexBoxColumn  sx={{
+	return <FlexBoxColumn sx={{
 		position: 'absolute',
 		height: Sizes.twentyFour,
 		bottom: 0,

@@ -4,7 +4,18 @@ import { TransformEnum } from '../../Shared/Libs/Types';
 export class TransformStore {
 	public state: TransformEnum;
 
-	public constructor() {
+	private static instance: TransformStore;
+
+	public static getInstance(): TransformStore {
+		if (!TransformStore.instance)
+		{
+			TransformStore.instance = new TransformStore();
+		}
+
+		return TransformStore.instance;
+	}
+
+	private constructor() {
 		this.state = TransformEnum.None;
 		makeAutoObservable(this);
 	}

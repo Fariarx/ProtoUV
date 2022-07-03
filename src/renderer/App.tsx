@@ -14,6 +14,7 @@ import { ConfiguratorAutoApp } from './Configurator/ConfiguratorAutoApp';
 import { ConfiguratorManuallyApp } from './Configurator/ConfiguratorManuallyApp';
 import { HeaderApp } from './HeaderApp';
 import { DragAndDropApp } from './Main/Components/DragAndDropApp';
+import { TransformApp } from './Main/Components/TransformApp';
 import { ConsoleApp } from './Main/Console/ConsoleApp';
 import { SceneApp } from './Main/Scene/SceneApp';
 import { UpdateScheme, darkTheme } from './Shared/Colors';
@@ -34,6 +35,7 @@ const Main = observer(() => {
 				<Divider />
 				<AnimationFade in={store.getState() === Pages.Main} unmount={false}>
 					<FlexBoxRow>
+						<TransformApp/>
 						<FlexBoxColumn>
 							<FlexBoxRow>
 								<Box sx={{

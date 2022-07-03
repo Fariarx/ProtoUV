@@ -9,7 +9,18 @@ import { Printer } from '../Printer/Configs/Printer';
 import { SceneInitializer } from './SceneInitializer';
 
 export class SceneStore extends SceneInitializer {
-	public constructor() {
+	private static instance: SceneStore;
+
+	public static getInstance(): SceneStore {
+		if (!SceneStore.instance)
+		{
+			SceneStore.instance = new SceneStore();
+		}
+
+		return SceneStore.instance;
+	}
+
+	private constructor() {
 		super();
 		this.setupPrinter();
 		this.setup();

@@ -3,10 +3,10 @@ import { observer } from 'mobx-react';
 import { useState } from 'react';
 import { AppStore, Pages } from '../AppStore';
 import { Printer } from '../Main/Printer/Configs/Printer';
-import { colors } from '../Shared/Colors';
 import { config, saveConfig } from '../Shared/Config';
 import { FlexBoxColumn, FlexBoxColumnFit, flexChildrenCenter } from '../Shared/Styled/FlexBox';
 import { Sizes } from '../Shared/Styled/Sizes';
+import { colors } from '../Shared/Theme';
 
 export let tempPrinter: Printer | undefined;
 

@@ -1,5 +1,5 @@
 import { Menu, MenuProps, alpha, styled } from '@mui/material';
-import { colors } from '../Colors';
+import { colors } from '../Theme';
 import { Sizes } from './Sizes';
 
 export const StyledMenu = styled((props: MenuProps) => (
@@ -10,7 +10,7 @@ export const StyledMenu = styled((props: MenuProps) => (
 ))(({ theme }) => ({
 	'& .MuiPaper-root': {
 		fontSize: Sizes.sixteen,
-		border: '1px solid ' + colors.background.commonLight,
+		border: '1px solid ' + colors.background.commonest,
 		backgroundColor: colors.background.heavy,
 		minWidth: 140,
 		borderRadius: 0,

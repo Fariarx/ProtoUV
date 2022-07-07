@@ -276,8 +276,9 @@ export class SceneInitializer extends SceneBase {
 	}
 
 	public setupCanvas(canvas: HTMLDivElement | null) {
-		this.stats.domElement.style.marginTop = '30px';
-		this.stats.domElement.style.marginLeft = '4px';
+		this.stats.domElement.style.marginTop = '80%';
+		this.stats.domElement.style.marginLeft = '8px';
+		this.stats.domElement.style.opacity = '0.3';
 		this.stats.domElement.style.zIndex = '1';
 
 		canvas?.appendChild(this.renderer.domElement);

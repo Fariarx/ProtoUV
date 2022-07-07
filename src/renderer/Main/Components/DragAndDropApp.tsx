@@ -1,6 +1,6 @@
 import { Box, Fade, Modal } from '@mui/material';
 import { AiOutlineFileAdd } from '@react-icons/all-files/ai/AiOutlineFileAdd';
-import { colors } from '../../Shared/Colors';
+import { colors } from '../../Shared/Theme';
 
 export const DragAndDropApp = ({ open } : { open:boolean }) => {
 	return <Modal

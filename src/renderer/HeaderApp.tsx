@@ -6,7 +6,6 @@ import { observer } from 'mobx-react';
 import React from 'react';
 import { AppStore, Pages } from './AppStore';
 import { BindItem, HeaderStore } from './HeaderStore';
-import { colors } from './Shared/Colors';
 import {  bridge } from './Shared/Globals';
 import logo1 from './Shared/Image/uv128_v1.png';
 import { emptyFunc, linearGenerator } from './Shared/Libs/Tools';
@@ -14,6 +13,7 @@ import { AnimationGrow } from './Shared/Styled/Animation';
 import { FlexBoxRow, FlexBoxRowFit } from './Shared/Styled/FlexBox';
 import { Sizes } from './Shared/Styled/Sizes';
 import { StyledMenu } from './Shared/Styled/StyledMenu';
+import { colors } from './Shared/Theme';
 
 export const APP_HEADER_HEIGHT = '26px';
 
@@ -110,7 +110,7 @@ const MenuHeaderItem = observer((props: {name: string, store: HeaderStore, binds
 			marginTop: '-1px',
 			bgcolor: isOpen ? colors.interact.neutral : 'unset',
 			'&:hover': {
-				bgcolor: isOpen ? colors.interact.neutral : colors.background.commonLight
+				bgcolor: isOpen ? colors.interact.neutral : colors.background.commonest
 			}
 		}} >
 			<Typography variant={'body2'} sx={{

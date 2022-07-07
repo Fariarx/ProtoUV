@@ -1,5 +1,5 @@
 import { ToggleButton } from '@mui/material';
-import { colors } from '../Colors';
+import { colors } from '../Theme';
 
 export const ButtonSetting = (props: {
   children: React.ReactNode;
@@ -28,7 +28,7 @@ export const ButtonSetting = (props: {
 				},
 				backgroundColor: props.checked ?
 					colors.interact.touch
-					: colors.background.commonLight,
+					: colors.background.commonest,
 			},
 		}}>
 		{props.children}

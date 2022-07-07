@@ -1,7 +1,7 @@
 import { List, ListItem, Paper, Typography } from '@mui/material';
 import { SwitchAndroid } from 'renderer/Shared/Styled/SwitchAndroid';
-import { colors } from '../../Shared/Colors';
 import { Sizes } from '../../Shared/Styled/Sizes';
+import { colors } from '../../Shared/Theme';
 
 export const SelectedApp = () => {
 	return <Paper variant={'outlined'} sx={{

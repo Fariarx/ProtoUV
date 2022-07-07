@@ -9,13 +9,14 @@ export const colors = {
 		dark:'#2d2d2d',
 		heavy:'#3B3F40',
 		common:'#444444',
-		commonLight:'#565656',
+		commonest:'#565656',
+		warm:'#808080',
 		light:'#cbcbcb',
 		white: '#fff'
 	},
 	interact:{
 		neutral:'#4168c0',
-		touch:'#61b6f8',
+		touch:'#4984fd',
 		warning:'#ffbd39',
 		danger:'#fb594f',
 	},

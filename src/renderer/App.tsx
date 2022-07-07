@@ -17,10 +17,10 @@ import { DragAndDropApp } from './Main/Components/DragAndDropApp';
 import { TransformApp } from './Main/Components/TransformApp';
 import { ConsoleApp } from './Main/Console/ConsoleApp';
 import { SceneApp } from './Main/Scene/SceneApp';
-import { UpdateScheme, darkTheme } from './Shared/Colors';
 import { AnimationFade, AnimationGrow } from './Shared/Styled/Animation';
 import { FlexBoxColumn, FlexBoxRow } from './Shared/Styled/FlexBox';
 import { Sizes } from './Shared/Styled/Sizes';
+import { UpdateScheme, darkTheme } from './Shared/Theme';
 
 UpdateScheme();
 

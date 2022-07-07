@@ -13,9 +13,9 @@ import { TransformControls } from 'three/examples/jsm/controls/TransformControls
 import { OutlineEffect } from 'three/examples/jsm/effects/OutlineEffect';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial';
-import { colors } from '../../Shared/Colors';
 import { config } from '../../Shared/Config';
 import { MaterialForScene, materialsForScene } from '../../Shared/Globals';
+import { colors } from '../../Shared/Theme';
 import { Printer } from '../Printer/Configs/Printer';
 import { SceneObject } from './Entities/SceneObject';
 

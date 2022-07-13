@@ -1,6 +1,6 @@
 import { makeAutoObservable } from 'mobx';
 import { HeaderStore } from './HeaderStore';
-import { TransformStore } from './Main/Components/TransformStore';
+import { TransformStore } from './Main/Components/LineTools/Transform/TransformStore';
 import { ConsoleStore } from './Main/Console/ConsoleStore';
 import { SceneStore } from './Main/Scene/SceneStore';
 
@@ -23,7 +23,17 @@ export class AppStore {
 		this.instance.ready = true;
 	};
 	public static setState = (state: Pages) => {
-		AppStore.getInstance().setState(state);
+		if (!AppStore.isState(state))
+		{
+			if (AppStore.sceneStore)
+			{
+				AppStore.sceneStore
+					.updatePrinter();
+			}
+			AppStore
+				.getInstance()
+				.setState(state);
+		}
 	};
 	public static isState = (state: Pages) => {
 		return AppStore.getInstance().getState() === state;

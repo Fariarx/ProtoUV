@@ -27,3 +27,5 @@ export type Grid = {
   dispose: Function;
 };
 
+export const toNormalizedRGBArray = (rgbStr: string) => rgbStr!.match(/\d+/g)!.map(Number).map(x => x/255);
+

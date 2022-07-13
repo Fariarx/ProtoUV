@@ -9,18 +9,18 @@ import { SnackbarProvider } from 'notistack';
 import { Route, MemoryRouter as Router, Routes } from 'react-router-dom';
 import './AppStore';
 import { AppStore, Log, Pages } from './AppStore';
-import { BottomLineApp } from './BottomLineApp';
 import { ConfiguratorAutoApp } from './Configurator/ConfiguratorAutoApp';
 import { ConfiguratorManuallyApp } from './Configurator/ConfiguratorManuallyApp';
 import { HeaderApp } from './HeaderApp';
+import { LineBottomApp } from './LineBottomApp';
 import { DragAndDropApp } from './Main/Components/DragAndDropApp';
-import { TransformApp } from './Main/Components/TransformApp';
+import { LineTopToolApp } from './Main/Components/LineTools/LineTopToolApp';
 import { ConsoleApp } from './Main/Console/ConsoleApp';
 import { SceneApp } from './Main/Scene/SceneApp';
 import { AnimationFade, AnimationGrow } from './Shared/Styled/Animation';
 import { FlexBoxColumn, FlexBoxRow } from './Shared/Styled/FlexBox';
 import { Sizes } from './Shared/Styled/Sizes';
-import { UpdateScheme, darkTheme } from './Shared/Theme';
+import { UpdateScheme, colors, darkTheme } from './Shared/Theme';
 
 UpdateScheme();
 
@@ -32,11 +32,12 @@ const Main = observer(() => {
 			<ThemeProvider theme={darkTheme}>
 				<CssBaseline enableColorScheme />
 				<HeaderApp />
-				<Divider />
+				<Divider color={colors.background.dark}/>
 				<AnimationFade in={store.getState() === Pages.Main} unmount={false}>
 					<FlexBoxRow>
-						<TransformApp/>
 						<FlexBoxColumn>
+							<LineTopToolApp/>
+							<Divider />
 							<FlexBoxRow>
 								<Box sx={{
 									width:'100%',
@@ -45,7 +46,7 @@ const Main = observer(() => {
 									<SceneApp />
 								</Box>
 							</FlexBoxRow>
-							<BottomLineApp/>
+							<LineBottomApp/>
 						</FlexBoxColumn>
 						<ConsoleApp />
 						<DragAndDropApp open={store.dropFile} />

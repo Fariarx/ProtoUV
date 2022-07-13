@@ -1,6 +1,6 @@
 import { Euler, Object3D, Vector3 } from 'three';
 import { SceneObject } from '../../Main/Scene/Entities/SceneObject';
-import { TransformEnum } from '../Enum/TransformEnum';
+import { TransformEnum } from '../Libs/Types';
 
 export type MoveObject = {
   instrument?: TransformEnum;

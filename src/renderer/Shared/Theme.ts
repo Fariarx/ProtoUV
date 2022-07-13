@@ -6,6 +6,7 @@ export const colors = {
 	},
 	background:{
 		black:'#000',
+		darkest:'#232323',
 		dark:'#2d2d2d',
 		heavy:'#3B3F40',
 		common:'#444444',
@@ -15,8 +16,10 @@ export const colors = {
 		white: '#fff'
 	},
 	interact:{
-		neutral:'#4168c0',
 		touch:'#4984fd',
+		neutral:'#4168c0',
+		touch1:'#614ed3',
+		neutral1:'#5241c0',
 		warning:'#ffbd39',
 		danger:'#fb594f',
 	},
@@ -25,8 +28,8 @@ export const colors = {
 		colorBackgroundSceneBottom:'#6c6c6c',
 		colorBackground:'#1d1d1d',
 		color1:'#2a2a2a',
-		workingPlaneLimitColor:'#a96e69',
-		workingPlaneColor:'#6d7075',
+		workingPlaneLimitColor:'rgba(169, 110, 105, 1)',
+		workingPlaneColor:'rgba(109, 112, 117, 1)',
 	},
 	logo: {
 		main: '#5e48ff'

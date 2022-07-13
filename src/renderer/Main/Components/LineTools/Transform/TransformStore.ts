@@ -1,5 +1,5 @@
 import { makeAutoObservable } from 'mobx';
-import { TransformEnum } from '../../Shared/Libs/Types';
+import { TransformEnum } from '../../../../Shared/Libs/Types';
 
 export class TransformStore {
 	public state: TransformEnum;

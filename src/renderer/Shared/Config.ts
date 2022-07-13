@@ -1,11 +1,11 @@
 import { Restore } from './Libs/Restore';
 
 export const _default = {
-	version: 1,
+	version: 3,
 	versionPrinterConfigs: 3,
 	settings: {
 		ui: {
-			opacity: 0.8,
+			opacity: 0.5,
 		},
 		scene:{
 			transformAlignToPlane: true,

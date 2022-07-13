@@ -27,7 +27,7 @@ export class SceneInitializer extends SceneBase {
 		this.setupCameraRig();
 		this.setupOrbitController();
 		this.setupTransformControls();
-		this.setupCameraType(true);
+		this.switchCameraType(config.scene.setStartupPerspectiveCamera, true);
 		this.updateWindowResize();
 		this.setupDropFile();
 
@@ -40,10 +40,17 @@ export class SceneInitializer extends SceneBase {
 	}
 
 	private updateWindowResize = () => {
-		this.updateCameraWindowSize();
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
+		this.updateCameraWindowSize();
+
+		const target = this.orbitControls.target.clone();
+		this.orbitControls.dispose();
+		this.setupOrbitController();
+		this.orbitControls.target.copy(target);
 		this.orbitControls.update();
-		this.animate();
+
+		this.updateCameraWindowSize();
+		this.temp.windowResizeAt = Date.now();
 	};
 
 	private setupLight() {
@@ -75,12 +82,13 @@ export class SceneInitializer extends SceneBase {
 
 	private setupAxes() {
 		const origin = new Vector3();
-		const size = 1;
+		const size = 2;
 
 		const axesHelper = new Object3D();
-		axesHelper.add(new ArrowHelper(new Vector3(1, 0.01, 0.01), origin, size, '#b80808'));
-		axesHelper.add(new ArrowHelper(new Vector3(0.01, 1, 0.01), origin, size, '#09b111'));
-		axesHelper.add(new ArrowHelper(new Vector3(0.01, 0.01, 1), origin, size, '#091ab1'));
+		axesHelper.add(new ArrowHelper(new Vector3(1, 0, 0), origin, size, '#b80808'));
+		axesHelper.add(new ArrowHelper(new Vector3(0, 1, 0), origin, size, '#09b111'));
+		axesHelper.add(new ArrowHelper(new Vector3(0, 0, 1), origin, size, '#091ab1'));
+		axesHelper.position.set(0.04,0.04,0.04);
 
 		this.scene.add(axesHelper);
 		this.axes = axesHelper;
@@ -91,7 +99,7 @@ export class SceneInitializer extends SceneBase {
 		this.cameraRig.attach( this.perspectiveCamera );
 		this.cameraRig.attach( this.orthographicCamera );
 		this.perspectiveCamera.position.set(this.gridSize.x , this.gridSize.y , this.gridSize.z );
-		this.orthographicCamera.position.set(this.gridSize.x * 15, this.gridSize.y * 15, this.gridSize.z * 15);
+		this.orthographicCamera.position.set(this.gridSize.x * 10, this.gridSize.y * 10, this.gridSize.z * 10);
 		this.orthographicCamera.zoom = 40;
 		this.activeCamera.lookAt(this.gridSize.x / 2, 0, this.gridSize.z / 2);
 		this.orthographicCamera.updateProjectionMatrix();
@@ -100,10 +108,12 @@ export class SceneInitializer extends SceneBase {
 	private setupDropFile = () => {
 		const holder = this.renderer.domElement;
 
-		holder.ondragover = function() {
-			runInAction(() => {
-				AppStore.getInstance().dropFile = true;
-			});
+		holder.ondragover = function(e) {
+			if (e.dataTransfer?.files.length) {
+				runInAction(() => {
+					AppStore.getInstance().dropFile = true;
+				});
+			}
 			return false;
 		};
 
@@ -179,7 +189,7 @@ export class SceneInitializer extends SceneBase {
 		}
 	};
 
-	public onZoom(evt?:  React.WheelEvent<HTMLDivElement>) {
+	public onZoom(evt?: React.WheelEvent<HTMLDivElement>) {
 		const zoom = 5;
 
 		if (evt?.deltaY && evt.deltaY > 0)
@@ -216,8 +226,8 @@ export class SceneInitializer extends SceneBase {
 	public setupOrbitController() {
 		this.temp.wasChangeLook = false;
 		this.orbitControls = new OrbitControls(this.activeCamera, this.renderer.domElement);
+		this.orbitControls.object = this.activeCamera;
 		this.orbitControls.enableDamping = true;
-		this.orbitControls.rotateSpeed = 0.5;
 		this.orbitControls.update();
 		this.orbitControls.addEventListener( 'change', () => {
 			this.temp.wasChangeLook = true;
@@ -229,8 +239,8 @@ export class SceneInitializer extends SceneBase {
 		this.transformControls = new TransformControls(this.activeCamera, this.renderer.domElement);
 	}
 
-	public setupCameraType (isInit = false) {
-		if(config.scene.setStartupPerspectiveCamera)
+	public switchCameraType (isPerspective: boolean, isInit = false) {
+		if(isPerspective)
 		{
 			this.activeCamera = this.perspectiveCamera;
 		}
@@ -242,9 +252,7 @@ export class SceneInitializer extends SceneBase {
 		this.orbitControls.object = this.activeCamera;
 		this.orbitControls.target.set(this.gridSize.x / 2, 0, this.gridSize.z / 2);
 		this.orbitControls.update();
-
 		this.transformControls.camera = this.activeCamera;
-
 		this.updateCameraWindowSize();
 
 		if(!isInit)
@@ -263,7 +271,7 @@ export class SceneInitializer extends SceneBase {
 	public updateCameraWindowSize () {
 		if(this.activeCamera instanceof PerspectiveCamera) {
 			this.activeCamera.aspect = window.innerWidth / window.innerHeight;
-			this.activeCamera.fov = (360 / Math.PI) * Math.atan(Math.tan(((Math.PI / 180) * this.perspectiveCamera.fov / 2)) * (window.innerHeight / this.temp.windowHeight));
+			//this.activeCamera.fov = (360 / Math.PI) * Math.atan(Math.tan(((Math.PI / 180) * this.perspectiveCamera.fov / 2)) * (window.innerHeight / this.temp.windowHeight));
 			this.activeCamera.updateMatrix();
 		}
 		if(this.activeCamera instanceof OrthographicCamera) {
@@ -276,7 +284,7 @@ export class SceneInitializer extends SceneBase {
 	}
 
 	public setupCanvas(canvas: HTMLDivElement | null) {
-		this.stats.domElement.style.marginTop = '80%';
+		this.stats.domElement.style.marginTop = '66px';
 		this.stats.domElement.style.marginLeft = '8px';
 		this.stats.domElement.style.opacity = '0.3';
 		this.stats.domElement.style.zIndex = '1';
@@ -291,6 +299,11 @@ export class SceneInitializer extends SceneBase {
 			{
 				clearTimeout(this.temp.needAnimateTimer);
 				this.temp.needAnimateTimer = null;
+			}
+
+			if(Date.now() - this.temp.windowResizeAt < 50)
+			{
+				return;
 			}
 
 			if(this.temp.lastFrameTime && Date.now() - this.temp.lastFrameTime < 5)
@@ -348,6 +361,9 @@ export class SceneInitializer extends SceneBase {
 			}, 700);
 
 			this.stats.update();
+
+			// if dumping enabled
+			this.orbitControls.update();
 
 			/*if (this.isTransformWorking) {
 				requestAnimationFrame(_animate);

@@ -1,19 +1,20 @@
 import { Box, Divider, Tooltip, Typography } from '@mui/material';
 import { observer } from 'mobx-react';
 import { AppStore } from './AppStore';
+import { config } from './Shared/Config';
 import { bridge } from './Shared/Globals';
 import { FlexBoxColumn, FlexBoxRow } from './Shared/Styled/FlexBox';
 import { Sizes } from './Shared/Styled/Sizes';
 import { colors } from './Shared/Theme';
 
-export const BottomLineApp = observer(() => {
+export const LineBottomApp = observer(() => {
 	const app = AppStore.getInstance();
 
 	return <FlexBoxColumn sx={{
 		position: 'absolute',
 		height: Sizes.twentyFour,
 		bottom: 0,
-		opacity: 0.5,
+		opacity: config.ui.opacity,
 		userSelect: 'none',
 	}}>
 		<Divider />

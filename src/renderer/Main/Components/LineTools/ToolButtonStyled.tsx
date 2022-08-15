@@ -5,19 +5,20 @@ import { FlexBoxColumnFit, flexChildrenCenter } from '../../../Shared/Styled/Fle
 import { Sizes } from '../../../Shared/Styled/Sizes';
 import { colors } from '../../../Shared/Theme';
 
-export const StyledToolButton = observer((props: {
+export const ToolButtonStyled = observer((props: {
   children: React.ReactElement;
-  onClick: () => void;
+  onClick: (arg: React.MouseEvent<HTMLElement>) => void;
   description: string;
   selected: boolean;
   clickColor?: string;
   hoverColor?: string;
+  mini?: boolean;
 }) => {
 	const size = Sizes.twentyFour;
 
 	return <Tooltip title={props.description} arrow>
 		<FlexBoxColumnFit onClick={props.onClick} sx={{
-			width: Sizes.sum(size, size),
+			width: props.mini ? size : Sizes.sum(size, size),
 			height: size,
 			...flexChildrenCenter,
 			marginRight: Sizes.four,

@@ -14,7 +14,8 @@ import { ConfiguratorManuallyApp } from './Configurator/ConfiguratorManuallyApp'
 import { HeaderApp } from './HeaderApp';
 import { LineBottomApp } from './LineBottomApp';
 import { DragAndDropApp } from './Main/Components/DragAndDropApp';
-import { LineTopToolApp } from './Main/Components/LineTools/LineTopToolApp';
+import { ToolsApp } from './Main/Components/LineTools/ToolsApp';
+import { ViewChangeApp } from './Main/Components/ViewChange/ViewChangeApp';
 import { ConsoleApp } from './Main/Console/ConsoleApp';
 import { SceneApp } from './Main/Scene/SceneApp';
 import { AnimationFade, AnimationGrow } from './Shared/Styled/Animation';
@@ -36,13 +37,14 @@ const Main = observer(() => {
 				<AnimationFade in={store.getState() === Pages.Main} unmount={false}>
 					<FlexBoxRow>
 						<FlexBoxColumn>
-							<LineTopToolApp/>
+							<ToolsApp/>
 							<Divider />
 							<FlexBoxRow>
 								<Box sx={{
 									width:'100%',
 									height: '100%'
 								}}>
+									<ViewChangeApp/>
 									<SceneApp />
 								</Box>
 							</FlexBoxRow>

@@ -33,7 +33,7 @@ export const ToolButtonStyled = observer((props: {
 			'&:active': {
 				//borderRadius: Sizes.four,
 				backgroundColor: props.clickColor ?? colors.interact.touch,
-				transform: 'translateY(-2px)'
+				transform: 'translateY(-1px)'
 			}
 		}}>
 			{props.children}

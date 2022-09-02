@@ -55,8 +55,7 @@ export const TransformPopover = observer((props: {
 						backgroundColor: colors.background.dark,
 						borderRadius: Sizes.eight,
 						height: Sizes.fortyEight,
-						width: '100%',
-            pl: Sizes.
+						width: '100%'
 					}}>
 
 					</Stack>

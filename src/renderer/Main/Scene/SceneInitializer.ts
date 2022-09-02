@@ -99,8 +99,8 @@ export class SceneInitializer extends SceneBase {
 		this.cameraRig.attach( this.perspectiveCamera );
 		this.cameraRig.attach( this.orthographicCamera );
 		this.perspectiveCamera.position.set(this.gridSize.x , this.gridSize.y , this.gridSize.z );
-		this.orthographicCamera.position.set(this.gridSize.x * 10, this.gridSize.y * 10, this.gridSize.z * 10);
-		this.orthographicCamera.zoom = 40;
+		this.orthographicCamera.position.set(this.gridSize.x * 10, this.gridSize.y * 5, this.gridSize.z * 10);
+		this.orthographicCamera.zoom = 90;
 		this.activeCamera.lookAt(this.gridSize.x / 2, 0, this.gridSize.z / 2);
 		this.orthographicCamera.updateProjectionMatrix();
 	}

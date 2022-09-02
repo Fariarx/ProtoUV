@@ -46,8 +46,8 @@ export class Printer {
 	}
 
 	static DEFAULT_CONFIG_NAME = 'Voxelab Proxima 6';
-	static CHANGED_DIR = '/ChangedConfigsV';
-	static CONFIG_DIR = './src/renderer/Main/Printer/Configs/Default/';
+	static CHANGED_DIR = '\\ChangedConfigsV';
+	static CONFIG_DIR = '.\\src\\renderer\\Main\\Printer\\Configs\\Default\\';
 
 	static LoadDefaultConfigFromFile = function () {
 		try {
@@ -68,7 +68,7 @@ export class Printer {
 			}
 
 			bridge.fs.writeFileSync(bridge.userData() + Printer.CHANGED_DIR +
-        _default.versionPrinterConfigs + '/' + config.name + '.json',
+        _default.versionPrinterConfigs + '\\' + config.name + '.json',
 			JSON.stringify(config),{ encoding:'utf8',flag:'w' });
 			return true;
 		}
@@ -84,7 +84,7 @@ export class Printer {
 
 			try {
 				config = JSON.parse(bridge.fs.readFileSync(bridge.userData() + Printer.CHANGED_DIR
-          + _default.versionPrinterConfigs + '/' + modelName + '.json', 'utf8'));
+          + _default.versionPrinterConfigs + '\\' + modelName + '.json', 'utf8'));
 			} catch (e) {
 				config  = JSON.parse(bridge.fs.readFileSync(Printer.CONFIG_DIR + modelName + '.json', 'utf8'));
 			}
@@ -102,36 +102,45 @@ export class Printer {
 		return null;
 	};
 	static ParseConfigFileNames = function () {
+		const filesNormalize = (files: string[]) => {
+			files = files.filter(function(item, pos) {
+				if(item.indexOf('.json') === -1)
+				{
+					return false;
+				}
+
+				return files.indexOf(item) === pos;
+			});
+
+			files = files.map(function (t) {
+				return t.replaceAll('.json', '');
+			});
+
+			files.sort();
+
+			return files;
+		};
+
+		let _changed;
+
 		try {
-			const dir = bridge.userData() + Printer.CHANGED_DIR + _default.versionPrinterConfigs;
-			const filesNormalize = (files: string[]) => {
-				files = files.filter(function(item, pos) {
-					if(item.indexOf('.json') === -1)
-					{
-						return false;
-					}
-
-					return files.indexOf(item) === pos;
-				});
-
-				files = files.map(function (t) {
-					return t.replaceAll('.json', '');
-				});
-
-				files.sort();
-
-				return files;
-			};
-
-			return {
-				default: filesNormalize(bridge.fs.readdirSync(Printer.CONFIG_DIR)),
-				changed: filesNormalize(bridge.fs.readdirSync(dir))
-			};
+			_changed = filesNormalize(bridge.fs.readdirSync(Printer.CONFIG_DIR));
 		} catch (e) {
 			Log('Error read config files: ' + e);
 		}
 
-		return null;
+		let _default;
+
+		try {
+			_default = filesNormalize(bridge.fs.readdirSync(Printer.CONFIG_DIR));
+		} catch (e) {
+			Log('Error read config files: ' + e);
+		}
+
+		return {
+			default: _default ?? [],
+			changed: _changed ?? []
+		};
 	};
 }
 

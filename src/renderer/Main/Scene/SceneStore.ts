@@ -1,4 +1,3 @@
-import { runInAction } from 'mobx';
 import { Mesh, PCFSoftShadowMap, PlaneGeometry, Scene, Vector2, Vector3 } from 'three';
 import { Line2 } from 'three/examples/jsm/lines/Line2';
 import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry';
@@ -52,9 +51,7 @@ export class SceneStore extends SceneInitializer {
 		}
 		else
 		{
-			runInAction(() => {
-				AppStore.setState(Pages.Configurator);
-			});
+			AppStore.setState(Pages.Configurator);
 			Log('Printer configuration is empty!');
 		}
 	}

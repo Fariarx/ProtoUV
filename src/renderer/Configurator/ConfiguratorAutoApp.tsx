@@ -14,11 +14,6 @@ export const ConfiguratorAutoApp = observer(() => {
 	const [hasFocus, setterFocus] = useState(true);
 	const [printerName, setterPrinterName] = useState('');
 	const isValidPrinter = () => configs?.default.includes(printerName) || configs?.changed.includes(printerName);
-	if (!configs)
-	{
-		Log('Error to parse configs');
-		return <Box/>;
-	}
 
 	const save = () => {
 		const printer = Printer.LoadConfigFromFile(printerName);

@@ -6,7 +6,6 @@ import { Sizes } from '../../Shared/Styled/Sizes';
 import { colors } from '../../Shared/Theme';
 
 export const ConsoleApp = observer((props: {mt?: string, mb?: string}) => {
-
 	return <Fade in={AppStore.console.isVisible}>
 		<Box sx={{
 			width:'60%',
@@ -22,7 +21,7 @@ export const ConsoleApp = observer((props: {mt?: string, mb?: string}) => {
 			fontVariant: 'unicase',
 			...props
 		}}>
-			{AppStore.console.list.map(x => <Typography key={linearGenerator.next().value} variant={'body2'}>
+			{AppStore.console.list.slice().reverse().map(x => <Typography key={linearGenerator.next().value} variant={'body2'}>
 				{x.time} {'>'} {x.text}
 			</Typography>)}
 		</Box>

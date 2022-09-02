@@ -1,4 +1,4 @@
-import { Autocomplete, Box, IconButton, InputAdornment, Link, TextField } from '@mui/material';
+import { Autocomplete, IconButton, InputAdornment, Link, TextField } from '@mui/material';
 import { MdNavigateNext } from '@react-icons/all-files/md/MdNavigateNext';
 import { observer } from 'mobx-react';
 import { useState } from 'react';

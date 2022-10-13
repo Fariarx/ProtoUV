@@ -1,8 +1,10 @@
 import { makeAutoObservable } from 'mobx';
+import { singleton } from 'tsyringe';
 
 const LOG_LIMIT_COUNT = 50;
 const OPEN_TIMEOUT = undefined;
 
+@singleton()
 export class ConsoleStore {
 	private _isVisible = true;
 

@@ -50,7 +50,7 @@ const eventListeners: ((message: AppEventEnum, args?: object) => void)[] = [];
 
 const objectAdd = (message: AppEvent) => {
 	const args = message.args as typeof AppEventArguments;
-	const app = AppStore.getInstance();
+	const app = AppStore.instance;
 	const scene = AppStore.sceneStore;
 
 	scene.objects.push(args!.object);

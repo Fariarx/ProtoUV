@@ -8,7 +8,7 @@ import { Sizes } from './Shared/Styled/Sizes';
 import { colors } from './Shared/Theme';
 
 export const LineBottomApp = observer(() => {
-	const app = AppStore.getInstance();
+	const app = AppStore.instance;
 
 	return <FlexBoxColumn sx={{
 		position: 'absolute',

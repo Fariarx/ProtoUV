@@ -1,21 +1,12 @@
 import { makeAutoObservable } from 'mobx';
+import { singleton } from 'tsyringe';
 import { TransformEnum } from '../../../../Shared/Libs/Types';
 
+@singleton()
 export class TransformStore {
 	public state: TransformEnum;
 
-	private static instance: TransformStore;
-
-	public static getInstance(): TransformStore {
-		if (!TransformStore.instance)
-		{
-			TransformStore.instance = new TransformStore();
-		}
-
-		return TransformStore.instance;
-	}
-
-	private constructor() {
+	public constructor() {
 		this.state = TransformEnum.None;
 		makeAutoObservable(this);
 	}

@@ -26,15 +26,13 @@ import { UpdateScheme, colors, darkTheme } from './Shared/Theme';
 UpdateScheme();
 
 const Main = observer(() => {
-	const store = AppStore.getInstance();
-
-	return <FlexBoxColumn sx={{ opacity: store.ready ? '1' : '0' }}>
+	return <FlexBoxColumn sx={{ opacity: AppStore.instance.ready ? '1' : '0' }}>
 		<SnackbarProvider maxSnack={3}>
 			<ThemeProvider theme={darkTheme}>
 				<CssBaseline enableColorScheme />
 				<HeaderApp />
 				<Divider color={colors.background.dark}/>
-				<AnimationFade in={store.getState() === Pages.Main} unmount={false}>
+				<AnimationFade in={AppStore.getState() === Pages.Main} unmount={false}>
 					<FlexBoxRow>
 						<FlexBoxColumn>
 							<ToolsApp/>
@@ -51,16 +49,16 @@ const Main = observer(() => {
 							<LineBottomApp/>
 						</FlexBoxColumn>
 						<ConsoleApp />
-						<DragAndDropApp open={store.dropFile} />
+						<DragAndDropApp open={AppStore.instance.dropFile} />
 					</FlexBoxRow>
 				</AnimationFade>
-				<AnimationGrow in={store.getState() === Pages.Configurator}>
+				<AnimationGrow in={AppStore.getState() === Pages.Configurator}>
 					<FlexBoxColumn>
 						<ConfiguratorAutoApp/>
 						<ConsoleApp mb={Sizes.twelve}/>
 					</FlexBoxColumn>
 				</AnimationGrow>
-				<AnimationGrow in={store.getState() === Pages.ConfiguratorManually}>
+				<AnimationGrow in={AppStore.getState() === Pages.ConfiguratorManually}>
 					<FlexBoxColumn>
 						<ConfiguratorManuallyApp/>
 					</FlexBoxColumn>

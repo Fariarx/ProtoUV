@@ -1,66 +1,43 @@
+import 'reflect-metadata';
 import { makeAutoObservable } from 'mobx';
+import { container, singleton } from 'tsyringe';
 import { HeaderStore } from './HeaderStore';
 import { TransformStore } from './Main/Components/LineTools/Transform/TransformStore';
 import { ConsoleStore } from './Main/Console/ConsoleStore';
 import { SceneStore } from './Main/Scene/SceneStore';
 
-const consoleStore = new ConsoleStore();
-export const Log = consoleStore.Add;
+export const Log = container.resolve(ConsoleStore).Add;
 
+@singleton()
 export class AppStore {
-	public static console = consoleStore;
-	public static sceneStore: SceneStore;
-	public static transform: TransformStore;
-	public static inits: (() => void)[] = [];
+	public static console = container.resolve(ConsoleStore);
+	public static sceneStore = container.resolve(SceneStore);
+	public static transform = container.resolve(TransformStore);
+	public static header = container.resolve(HeaderStore);
 
-	private static instance: AppStore;
-	public static header: HeaderStore;
-
-	public static load = () => {
-		this.sceneStore = SceneStore.getInstance();
-		this.transform = TransformStore.getInstance();
-		this.inits.forEach((item) => item());
-		this.instance.ready = true;
-	};
-	public static setState = (state: Pages) => {
-		if (!AppStore.isState(state))
-		{
-			if (AppStore.sceneStore)
-			{
-				AppStore.sceneStore
-					.updatePrinter();
-			}
-			AppStore
-				.getInstance()
-				.setState(state);
-		}
-	};
-	public static isState = (state: Pages) => {
-		return AppStore.getInstance().getState() === state;
-	};
-
-	public static getInstance(): AppStore {
-		if (!AppStore.instance)
-		{
-			AppStore.instance = new AppStore();
-		}
-
-		return AppStore.instance;
+	public static get instance() {
+		return container.resolve(AppStore);
 	}
 
-	private constructor() {
-		AppStore.instance = this;
+	public constructor() {
 		makeAutoObservable(this);
+		this.ready = true;
 	}
 
-	private _state = Pages.Main;
+	public static isState = (state: Pages) => {
+		return AppStore.getState() === state;
+	};
 
-	public getState() {
-		return this._state;
+	public static getState() {
+		return AppStore.instance.state;
 	}
-	public setState(state: Pages) {
-		this._state = state;
+
+	public static setState(state: Pages) {
+		AppStore.sceneStore.updatePrinter();
+		AppStore.instance.state = state;
 	}
+
+	protected state = Pages.Main;
 
 	public ready = false;
 	public dropFile = false;
@@ -68,11 +45,9 @@ export class AppStore {
 	public projectFolder?: string;
 }
 
-setTimeout(AppStore.load, 50);
-
 export enum Pages {
-  None,
-  Main,
-  Configurator,
-  ConfiguratorManually
+	None,
+	Main,
+	Configurator,
+	ConfiguratorManually
 }

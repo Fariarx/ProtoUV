@@ -111,7 +111,7 @@ export class SceneInitializer extends SceneBase {
 		holder.ondragover = function(e) {
 			if (e.dataTransfer?.files.length) {
 				runInAction(() => {
-					AppStore.getInstance().dropFile = true;
+					AppStore.instance.dropFile = true;
 				});
 			}
 			return false;
@@ -119,14 +119,14 @@ export class SceneInitializer extends SceneBase {
 
 		holder.ondragleave = function() {
 			runInAction(() => {
-				AppStore.getInstance().dropFile = false;
+				AppStore.instance.dropFile = false;
 			});
 			return false;
 		};
 
 		holder.ondrop = function(e) {
 			runInAction(() => {
-				AppStore.getInstance().dropFile = false;
+				AppStore.instance.dropFile = false;
 			});
 
 			if(e.dataTransfer)

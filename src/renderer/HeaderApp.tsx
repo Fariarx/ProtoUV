@@ -1,12 +1,14 @@
+import 'reflect-metadata';
 import { Box, ButtonGroup, IconButton, MenuItem, Typography, styled } from '@mui/material';
 import { VscChromeClose } from '@react-icons/all-files/vsc/VscChromeClose';
 import { VscChromeMaximize } from '@react-icons/all-files/vsc/VscChromeMaximize';
 import { VscChromeMinimize } from '@react-icons/all-files/vsc/VscChromeMinimize';
 import { observer } from 'mobx-react';
 import React from 'react';
+import { container } from 'tsyringe';
 import { AppStore, Pages } from './AppStore';
 import { BindItem, HeaderStore } from './HeaderStore';
-import {  bridge } from './Shared/Globals';
+import { bridge } from './Shared/Globals';
 import logo1 from './Shared/Image/uv128_v1.png';
 import { emptyFunc, linearGenerator } from './Shared/Libs/Tools';
 import { AnimationGrow } from './Shared/Styled/Animation';
@@ -18,7 +20,7 @@ import { colors } from './Shared/Theme';
 export const APP_HEADER_HEIGHT = '26px';
 
 export const HeaderApp = observer(() => {
-	const store = HeaderStore.getInstance();
+	const store = container.resolve(HeaderStore);
 
 	return <Box sx={{
 		width: '100%',
@@ -40,7 +42,7 @@ export const HeaderApp = observer(() => {
 			</Typography>
 			<LogoIcon/>
 		</FlexBoxRowFit>
-		<AnimationGrow in={AppStore.getInstance().getState() === Pages.Main}>
+		<AnimationGrow in={AppStore.getState() === Pages.Main}>
 			<FlexBoxRow sx={{ width: 'fit-content' }}>
 				<FlexBoxRow sx={{ width: 'fit-content', marginLeft: Sizes.eight }}>
 					<MenuHeaderItem name={'File'} store={store} binds={[{

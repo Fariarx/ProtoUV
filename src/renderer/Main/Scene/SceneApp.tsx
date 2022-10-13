@@ -9,7 +9,7 @@ export class SceneApp extends Component<any, any> {
 	}
 
 	componentDidMount() {
-		AppStore.inits.push(() => AppStore.sceneStore.setupCanvas(this.mount));
+		AppStore.sceneStore.setupCanvas(this.mount);
 	}
 
 	componentWillUnmount() {

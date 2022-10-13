@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "target": "es2021",
     "module": "commonjs",
     "lib": ["dom", "es2021"],

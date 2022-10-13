@@ -1,21 +1,10 @@
 import { makeAutoObservable, runInAction } from 'mobx';
-import { AppStore } from './AppStore';
+import { singleton } from 'tsyringe';
 import { SubscribersMouseClick } from './Shared/Libs/Listerners';
 
+@singleton()
 export class HeaderStore {
-	private static instance: HeaderStore;
-
-	public static getInstance(): HeaderStore {
-		if (!HeaderStore.instance)
-		{
-			HeaderStore.instance = new HeaderStore();
-		}
-
-		return HeaderStore.instance;
-	}
-
-	private constructor() {
-		AppStore.header = this;
+	public constructor() {
 		makeAutoObservable(this);
 		this.subscribers();
 	}

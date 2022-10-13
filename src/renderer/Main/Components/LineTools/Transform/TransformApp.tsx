@@ -3,6 +3,8 @@ import { FiCode } from '@react-icons/all-files/fi/FiCode';
 import { Md3DRotation } from '@react-icons/all-files/md/Md3DRotation';
 import { observer } from 'mobx-react';
 import { FlexBoxRowFit } from 'renderer/Shared/Styled/FlexBox';
+import { container } from 'tsyringe';
+import { AppStore } from '../../../../AppStore';
 import { TransformEnum } from '../../../../Shared/Libs/Types';
 import { TransformPopover } from './TransformPopover';
 import { TransformStore } from './TransformStore';
@@ -10,7 +12,7 @@ import { TransformStore } from './TransformStore';
 const scale = 'scale(1.1)';
 
 export const TransformApp = observer(() => {
-	const  store: TransformStore = TransformStore.getInstance();
+	const  store = container.resolve(TransformStore);
 
 	return <>
 		<FlexBoxRowFit sx={{

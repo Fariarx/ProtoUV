@@ -62,7 +62,9 @@ export const ConfiguratorAutoApp = observer(() => {
 								error={!isValidPrinter() && !hasFocus}
 								helperText={<>
                   Please select your printer or{' '}
-									<Link sx={{ cursor: 'pointer' }} onClick={() => AppStore.setState(Pages.ConfiguratorManually)}>
+									<Link sx={{ cursor: 'pointer' }} onClick={() =>
+										AppStore.setState(Pages.ConfiguratorManually)
+									}>
                     create a new configuration
 									</Link>
 								</>}

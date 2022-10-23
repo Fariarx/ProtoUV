@@ -1,4 +1,4 @@
-import { Euler, Object3D, Vector3 } from 'three';
+import { Euler, Vector3 } from 'three';
 import { SceneObject } from '../../Main/Scene/Entities/SceneObject';
 
 export enum AppEventEnum {
@@ -29,7 +29,7 @@ export type AppEventMoveObject = {
   instrument?: TransformEnum;
   from: Vector3 | Euler;
   to: Vector3 | Euler;
-  sceneObject: SceneObject | Object3D;
+  sceneObject: SceneObject;
   actionBreak: true | undefined;
   renderBreak: true | undefined;
   id: number | undefined;

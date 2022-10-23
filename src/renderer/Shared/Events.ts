@@ -1,7 +1,6 @@
 import { runInAction } from 'mobx';
-import { Mesh } from 'three';
+import { LineSegments, Mesh } from 'three';
 import { AppStore } from '../AppStore';
-import { SceneObject } from '../Main/Scene/Entities/SceneObject';
 import { config } from './Config';
 import { AppEvent, AppEventAddObject, AppEventArguments, AppEventEnum, AppEventMoveObject, TransformEnum } from './Libs/Types';
 
@@ -78,10 +77,8 @@ const objectAdd = (message: AppEvent) => {
 
 const objectTransform = (message: AppEvent) => {
 	const moveObject = message.args as AppEventMoveObject;
-
-	const mesh: Mesh = moveObject.sceneObject instanceof SceneObject
-		? moveObject.sceneObject.mesh
-		: <Mesh>moveObject.sceneObject;
+	const mesh: Mesh = moveObject.sceneObject.mesh;
+	const wireframe: LineSegments = moveObject.sceneObject.wireframe;
 
 	moveObject.to = moveObject.to.clone();
 	moveObject.from = moveObject.from.clone();
@@ -96,9 +93,11 @@ const objectTransform = (message: AppEvent) => {
 		switch (moveObject.instrument) {
 			case TransformEnum.Move:
 				mesh.position.set(moveObject.to.x, moveObject.to.y, moveObject.to.z);
+				wireframe.position.set(moveObject.to.x, moveObject.to.y, moveObject.to.z);
 				break;
 			case TransformEnum.Rotate:
 				mesh.rotation.set(moveObject.to.x, moveObject.to.y, moveObject.to.z);
+				wireframe.rotation.set(moveObject.to.x, moveObject.to.y, moveObject.to.z);
 				break;
 			case TransformEnum.Scale:
 
@@ -116,26 +115,8 @@ const objectTransform = (message: AppEvent) => {
 				}
 
 				mesh.scale.set(moveObject.to.x, moveObject.to.y, moveObject.to.z);
+				wireframe.scale.set(moveObject.to.x, moveObject.to.y, moveObject.to.z);
 				break;
-		}
-
-		if(moveObject.sceneObject === AppStore.sceneStore.transformObjectGroup)
-		{
-			AppStore.sceneStore.transformObjectGroupOld.position.set(
-				AppStore.sceneStore.transformObjectGroup.position.x,
-				AppStore.sceneStore.transformObjectGroup.position.y,
-				AppStore.sceneStore.transformObjectGroup.position.z,
-			);
-			AppStore.sceneStore.transformObjectGroupOld.rotation.set(
-				AppStore.sceneStore.transformObjectGroup.rotation.x,
-				AppStore.sceneStore.transformObjectGroup.rotation.y,
-				AppStore.sceneStore.transformObjectGroup.rotation.z,
-			);
-			AppStore.sceneStore.transformObjectGroupOld.scale.set(
-				AppStore.sceneStore.transformObjectGroup.scale.x,
-				AppStore.sceneStore.transformObjectGroup.scale.y,
-				AppStore.sceneStore.transformObjectGroup.scale.z,
-			);
 		}
 	}
 

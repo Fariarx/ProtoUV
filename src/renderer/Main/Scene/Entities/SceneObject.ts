@@ -41,8 +41,7 @@ export class SceneObject {
 		name: string,
 		objs: SceneObject[],
 		selected = false,
-		sceneStore: SceneStore = AppStore.sceneStore)
-	{
+		sceneStore: SceneStore = AppStore.sceneStore) {
 		let index = 0;
 		let sceneName = index + ' : ' + name;
 
@@ -92,7 +91,6 @@ export class SceneObject {
 		lineMaterial.opacity = 0.25;
 		lineMaterial.transparent = true;
 		lineMaterial.color = '#000';
-		// lineMaterial.depthTest = false;
 		line.scale.multiplyScalar( 0.1 );
 		return  line;
 	}

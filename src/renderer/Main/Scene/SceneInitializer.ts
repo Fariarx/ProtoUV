@@ -13,7 +13,7 @@ import { APP_HEADER_HEIGHT } from '../../HeaderApp';
 import { config, saveConfig } from '../../Shared/Config';
 import { Dispatch } from '../../Shared/Events';
 import { isKeyPressed } from '../../Shared/Libs/Keys';
-import { SubscribersMouseUp, SubscribersWindowResize } from '../../Shared/Libs/Listerners';
+import { SubscribersMouseDown, SubscribersMouseUp, SubscribersWindowResize } from '../../Shared/Libs/Listerners';
 import { AppEventEnum, AppEventSelectionChanged, TransformEnum } from '../../Shared/Libs/Types';
 import { SceneObject } from './Entities/SceneObject';
 import { SceneBase } from './SceneBase';
@@ -143,8 +143,15 @@ export class SceneInitializer extends SceneBase {
 	public setupMouse() {
 		const vector = new Vector3();
 
-		SubscribersMouseUp.push((e: any)=> {
-			if (e.button !== 0 || !this.printer) {
+		let clickTime: number | null = null;
+
+		SubscribersMouseDown.push(() => {
+			clickTime = Date.now();
+		});
+
+		SubscribersMouseUp.push(e => {
+			if (e.button !== 0 || !this.printer || clickTime === null || Date.now() - clickTime > 500)
+			{
 				return;
 			}
 
@@ -174,7 +181,6 @@ export class SceneInitializer extends SceneBase {
 				const sceneObj  = AppStore.sceneStore.objects[sceneObjIndex];
 
 				if (!isKeyPressed(Key.Ctrl) && !isKeyPressed(Key.Shift)) {
-					console.log(AppStore.sceneStore.groupSelected.length > 1);
 					if (!sceneObj.isSelected) {
 						AppStore.sceneStore.objects.forEach((t, i) => {
 							if (i === sceneObjIndex) {
@@ -228,7 +234,6 @@ export class SceneInitializer extends SceneBase {
 		if (AppStore.sceneStore.groupSelected.length) {
 			const centerGroup = SceneObject.CalculateGroupCenter(AppStore.sceneStore.groupSelected);
 			AppStore.sceneStore.transformObjectGroup.position.set(centerGroup.x, 0, centerGroup.z);
-			AppStore.sceneStore.transformObjectGroupOld.position.set(centerGroup.x, 0, centerGroup.z);
 		}
 
 		this.updateTransformControls();
@@ -242,9 +247,7 @@ export class SceneInitializer extends SceneBase {
 		const isWorkingInstrument = AppStore.transform.state !== TransformEnum.None;
 
 		AppStore.sceneStore.transformObjectGroup.position.setX(AppStore.sceneStore.gridSize.x / 2).setZ(AppStore.sceneStore.gridSize.z / 2).setY(0);
-		AppStore.sceneStore.transformObjectGroupOld.position.setX(AppStore.sceneStore.gridSize.x / 2).setZ(AppStore.sceneStore.gridSize.z / 2).setY(0);
 		AppStore.sceneStore.transformObjectGroup.rotation.set(0,0,0);
-		AppStore.sceneStore.transformObjectGroupOld.rotation.set(0,0,0);
 
 		if(isWorkingInstrument && AppStore.sceneStore.groupSelected.length)
 		{

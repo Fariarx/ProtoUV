@@ -19,6 +19,7 @@ export const ConsoleApp = observer((props: {mt?: string, mb?: string}) => {
 			marginLeft: Sizes.twelve,
 			marginBottom: Sizes.sum(Sizes.twentyFour, Sizes.eight),
 			fontVariant: 'unicase',
+			userSelect: 'none',
 			...props
 		}}>
 			{AppStore.console.list.slice().reverse().map(x => <Typography key={linearGenerator.next().value} variant={'body2'}>

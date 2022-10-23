@@ -16,7 +16,7 @@ export class Printer {
 			this.name = _name;
 		}
 		else {
-			this.name = '';
+			this.name = 'Unknown';
 		}
 
 		if(!_settings) {

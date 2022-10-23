@@ -1,6 +1,6 @@
 import '@fontsource/roboto/300.css';
 import {
-	Box, CssBaseline,
+	CssBaseline,
 	Divider,
 	ThemeProvider
 } from '@mui/material';

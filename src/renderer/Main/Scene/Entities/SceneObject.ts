@@ -302,4 +302,14 @@ export class SceneObject {
 
 		return geometry;
 	}
+
+	static SelectObjsAlignY = () => {
+		if (AppStore.sceneStore.groupSelected.length ) {
+			for (const sceneObject of AppStore.sceneStore.groupSelected) {
+				sceneObject.AlignToPlaneY();
+			}
+		}
+
+		AppStore.sceneStore.animate();
+	};
 }

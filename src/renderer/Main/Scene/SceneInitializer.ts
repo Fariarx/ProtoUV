@@ -2,7 +2,7 @@ import { runInAction } from 'mobx';
 import {
 	AmbientLight, ArrowHelper, BufferGeometry,
 	DirectionalLight,
-	Group, Mesh, Object3D, OrthographicCamera, PerspectiveCamera, Raycaster, Vector3
+	Group, MathUtils, Mesh, Object3D, OrthographicCamera, PerspectiveCamera, Raycaster, Vector3
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
@@ -12,9 +12,10 @@ import { AppStore, Log } from '../../AppStore';
 import { APP_HEADER_HEIGHT } from '../../HeaderApp';
 import { config, saveConfig } from '../../Shared/Config';
 import { Dispatch } from '../../Shared/Events';
+import { EnumHelpers } from '../../Shared/Helpers/Enum';
 import { isKeyPressed } from '../../Shared/Libs/Keys';
 import { SubscribersMouseDown, SubscribersMouseUp, SubscribersWindowResize } from '../../Shared/Libs/Listerners';
-import { AppEventEnum, AppEventSelectionChanged, TransformEnum } from '../../Shared/Libs/Types';
+import { AppEventEnum, AppEventMoveObject, AppEventSelectionChanged, TransformEnum } from '../../Shared/Libs/Types';
 import { SceneObject } from './Entities/SceneObject';
 import { SceneBase } from './SceneBase';
 
@@ -141,28 +142,36 @@ export class SceneInitializer extends SceneBase {
 	};
 
 	public setupMouse() {
-		const vector = new Vector3();
+		const vectorMouseUp = new Vector3();
+		const vectorMouseDown = new Vector3();
 
 		let clickTime: number | null = null;
 
-		SubscribersMouseDown.push(() => {
+		SubscribersMouseDown.push((e) => {
 			clickTime = Date.now();
-		});
-
-		SubscribersMouseUp.push(e => {
-			if (e.button !== 0 || !this.printer || clickTime === null || Date.now() - clickTime > 500)
-			{
-				return;
-			}
-
-			vector.set(
+			vectorMouseUp.set(
 				(e.clientX / window.innerWidth) * 2 - 1,
 				- ((e.clientY - APP_HEADER_HEIGHT) / window.innerHeight) * 2 + 1,
 				0.5);
+		});
+
+		SubscribersMouseUp.push(e => {
+			const clickTimeMillis = clickTime === null ? 0 : Date.now() - clickTime;
+
+			vectorMouseUp.set((e.clientX / window.innerWidth) * 2 - 1,
+				- ((e.clientY - APP_HEADER_HEIGHT) / window.innerHeight) * 2 + 1,
+				0.5);
+
+			if (e.button !== 0 || !this.printer || clickTimeMillis > 200
+        || Math.abs(vectorMouseDown.x - vectorMouseUp.x) > 50
+        || Math.abs(vectorMouseDown.y - vectorMouseUp.y) > 50
+        || clickTimeMillis > 500) {
+				return;
+			}
 
 			const raycaster = new Raycaster();
 
-			raycaster.setFromCamera(vector, AppStore.sceneStore.activeCamera);
+			raycaster.setFromCamera(vectorMouseUp, AppStore.sceneStore.activeCamera);
 
 			const intersects = raycaster.intersectObjects(SceneObject.GetMeshesFromObjs(AppStore.sceneStore.objects), false);
 
@@ -234,6 +243,7 @@ export class SceneInitializer extends SceneBase {
 		if (AppStore.sceneStore.groupSelected.length) {
 			const centerGroup = SceneObject.CalculateGroupCenter(AppStore.sceneStore.groupSelected);
 			AppStore.sceneStore.transformObjectGroup.position.set(centerGroup.x, 0, centerGroup.z);
+			AppStore.sceneStore.transformGroupMarker.position.set(centerGroup.x, 0, centerGroup.z);
 		}
 
 		this.updateTransformControls();
@@ -242,21 +252,6 @@ export class SceneInitializer extends SceneBase {
 
 		this.animate();
 	}
-
-	public updateTransformControls = () => {
-		const isWorkingInstrument = AppStore.transform.state !== TransformEnum.None;
-
-		AppStore.sceneStore.transformObjectGroup.position.setX(AppStore.sceneStore.gridSize.x / 2).setZ(AppStore.sceneStore.gridSize.z / 2).setY(0);
-		AppStore.sceneStore.transformObjectGroup.rotation.set(0,0,0);
-
-		if(isWorkingInstrument && AppStore.sceneStore.groupSelected.length)
-		{
-			AppStore.sceneStore.transformControls.attach(AppStore.sceneStore.transformObjectGroup);
-		}
-		else {
-			AppStore.sceneStore.transformControls.detach();
-		}
-	};
 
 	public handleLoadFile = (file: string) => {
 		const result = AppStore.sceneStore.file3dLoad(file, function (geometry: BufferGeometry, path: string) {
@@ -323,7 +318,157 @@ export class SceneInitializer extends SceneBase {
 
 	public setupTransformControls() {
 		this.transformControls = new TransformControls(this.activeCamera, this.renderer.domElement);
+		this.transformControls.setSize(0.8);
+		this.transformControls.setSpace('world');
+		this.transformControls.setTranslationSnap( 0.25 );
+		this.transformControls.setRotationSnap(MathUtils.degToRad( 15 ) );
+		this.transformControls.setScaleSnap( 0.0001 );
+		this.scene.add(this.transformControls);
+		this.scene.add(this.transformObjectGroup);
+		this.scene.add(this.transformGroupMarker);
+
+		this.transformControls.addEventListener( 'dragging-changed', function ( event ) {
+			AppStore.sceneStore.orbitControls.enabled = !event.value;
+
+			if (!event.value) {
+				if (config.scene.transformAlignToPlane)
+				{
+					SceneObject.SelectObjsAlignY();
+				}
+			}
+			else {
+				AppStore.sceneStore.transformGroupMarker.position.set(
+					AppStore.sceneStore.transformObjectGroup.position.x,
+					AppStore.sceneStore.transformObjectGroup.position.y,
+					AppStore.sceneStore.transformObjectGroup.position.z);
+				AppStore.sceneStore.transformGroupMarker.rotation.set(
+					AppStore.sceneStore.transformObjectGroup.rotation.x,
+					AppStore.sceneStore.transformObjectGroup.rotation.y,
+					AppStore.sceneStore.transformObjectGroup.rotation.z);
+				AppStore.sceneStore.transformGroupMarker.scale.set(
+					AppStore.sceneStore.transformObjectGroup.scale.x,
+					AppStore.sceneStore.transformObjectGroup.scale.y,
+					AppStore.sceneStore.transformObjectGroup.scale.z);
+			}
+
+			AppStore.sceneStore.animate();
+		});
+
+		this.transformControls.addEventListener( 'change', () => {
+			const transformObj = this.transformObjectGroup;
+			const transformMarker = this.transformGroupMarker;
+
+			if (transformObj !== null && this.groupSelected.length) {
+				let now, old;
+
+				switch (AppStore.transform.state) {
+					case TransformEnum.Move:
+						now = transformObj.position;
+						old = transformMarker.position;
+
+						if (!now.equals(old)) {
+							const differenceVector3 = new Vector3(old.x - now.x, old.y - now.y, old.z - now.z);
+
+							transformObj.position.set(now.x, now.y, now.z);
+							transformMarker.position.set(now.x, now.y, now.z);
+
+							for (const sceneObject of this.groupSelected) {
+								const oldPosition = sceneObject.mesh.position.clone();
+								const newPosition = sceneObject.mesh.position.clone();
+
+								newPosition.x -= differenceVector3.x;
+								newPosition.y -= differenceVector3.y;
+								newPosition.z -= differenceVector3.z;
+
+								Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
+									from: oldPosition,
+									to: newPosition,
+									sceneObject: sceneObject
+								} as AppEventMoveObject);
+							}
+						}
+						break;
+					case TransformEnum.Rotate:
+						now = transformObj.rotation;
+						old = transformMarker.rotation;
+
+						if (!now.equals(old)) {
+							const differenceVector3 = new Vector3(old.x - now.x, old.y - now.y, old.z - now.z);
+
+							transformObj.rotation.set(now.x, now.y, now.z);
+							transformMarker.rotation.set(now.x, now.y, now.z);
+
+							for (const sceneObject of this.groupSelected) {
+								const oldPosition = sceneObject.mesh.rotation.clone();
+								const newPosition = sceneObject.mesh.rotation.clone();
+
+								newPosition.x -= differenceVector3.x;
+								newPosition.y -= differenceVector3.y;
+								newPosition.z -= differenceVector3.z;
+
+								Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
+									from: oldPosition,
+									to: newPosition,
+									sceneObject: sceneObject
+								} as AppEventMoveObject);
+							}
+						}
+						break;
+					case TransformEnum.Scale:
+						now = transformObj.scale;
+						old = transformMarker.scale;
+
+						if (!now.equals(old)) {
+							const differenceVector3 = new Vector3(old.x - now.x, old.y - now.y, old.z - now.z);
+
+							transformObj.scale.set(now.x, now.y, now.z);
+							transformMarker.scale.set(now.x, now.y, now.z);
+
+							for (const sceneObject of this.groupSelected) {
+								const oldPosition = sceneObject.mesh.scale.clone();
+								const newPosition = sceneObject.mesh.scale.clone();
+
+								newPosition.x -= differenceVector3.x;
+								newPosition.y -= differenceVector3.y;
+								newPosition.z -= differenceVector3.z;
+
+								Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
+									from: oldPosition,
+									to: newPosition,
+									sceneObject: sceneObject
+								} as AppEventMoveObject);
+
+								sceneObject.UpdateSize();//for .size and CalculateGroupMaxSize()
+							}
+						}
+						break;
+				}
+			} else {
+				Log('Error of \'change\': transformObj is null or this.sceneStore.groupSelected.length = 0');
+			}
+		});
 	}
+
+	public updateTransformControls = () => {
+		const isWorkingInstrument = AppStore.transform.state !== TransformEnum.None;
+
+		AppStore.sceneStore.transformObjectGroup.position.setX(AppStore.sceneStore.gridSize.x / 2).setZ(AppStore.sceneStore.gridSize.z / 2).setY(0);
+		AppStore.sceneStore.transformObjectGroup.rotation.set(0,0,0);
+		AppStore.sceneStore.transformGroupMarker.position.setX(AppStore.sceneStore.gridSize.x / 2).setZ(AppStore.sceneStore.gridSize.z / 2).setY(0);
+		AppStore.sceneStore.transformGroupMarker.rotation.set(0,0,0);
+
+		if(isWorkingInstrument && AppStore.sceneStore.groupSelected.length)
+		{
+			AppStore.sceneStore.transformControls.attach(AppStore.sceneStore.transformObjectGroup);
+			AppStore.sceneStore.transformControls.setMode(EnumHelpers
+				.valueOf(TransformEnum, AppStore.transform.state) as 'translate' | 'rotate' | 'scale');
+		}
+		else {
+			AppStore.sceneStore.transformControls.detach();
+		}
+
+		this.animate();
+	};
 
 	public switchCameraType (isPerspective: boolean, isInit = false) {
 		if (isPerspective)

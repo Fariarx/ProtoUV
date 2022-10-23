@@ -124,6 +124,4 @@ const objectTransform = (message: AppEvent) => {
 	{
 		AppStore.sceneStore.animate();
 	}
-
-	AppStore.sceneStore.updateTransformControls();
 };

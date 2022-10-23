@@ -2,16 +2,19 @@ import { runInAction } from 'mobx';
 import {
 	AmbientLight, ArrowHelper, BufferGeometry,
 	DirectionalLight,
-	Group, Object3D, OrthographicCamera, PerspectiveCamera, Vector3
+	Group, Mesh, Object3D, OrthographicCamera, PerspectiveCamera, Raycaster, Vector3
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader';
+import { Key } from 'ts-keycode-enum';
 import { AppStore, Log } from '../../AppStore';
+import { APP_HEADER_HEIGHT } from '../../HeaderApp';
 import { config, saveConfig } from '../../Shared/Config';
 import { Dispatch } from '../../Shared/Events';
-import { SubscribersWindowResize } from '../../Shared/Libs/Listerners';
-import { AppEventEnum } from '../../Shared/Libs/Types';
+import { isKeyPressed } from '../../Shared/Libs/Keys';
+import { SubscribersMouseUp, SubscribersWindowResize } from '../../Shared/Libs/Listerners';
+import { AppEventEnum, AppEventSelectionChanged, TransformEnum } from '../../Shared/Libs/Types';
 import { SceneObject } from './Entities/SceneObject';
 import { SceneBase } from './SceneBase';
 
@@ -30,6 +33,7 @@ export class SceneInitializer extends SceneBase {
 		this.switchCameraType(config.scene.setStartupPerspectiveCamera, true);
 		this.updateWindowResize();
 		this.setupDropFile();
+		this.setupMouse();
 
 		Log('SceneComponents loaded!');
 	}
@@ -99,9 +103,10 @@ export class SceneInitializer extends SceneBase {
 		this.cameraRig.attach( this.perspectiveCamera );
 		this.cameraRig.attach( this.orthographicCamera );
 		this.perspectiveCamera.position.set(this.gridSize.x , this.gridSize.y , this.gridSize.z );
+		this.perspectiveCamera.lookAt(this.gridSize.x / 2, 0, this.gridSize.z / 2);
 		this.orthographicCamera.position.set(this.gridSize.x * 10, this.gridSize.y * 10, this.gridSize.z * 10);
-		this.orthographicCamera.zoom = 50;
-		this.activeCamera.lookAt(this.gridSize.x / 2, 0, this.gridSize.z / 2);
+		this.orthographicCamera.lookAt(this.gridSize.x / 2, 0, this.gridSize.z / 2);
+		this.orthographicCamera.zoom = 40;
 		this.orthographicCamera.updateProjectionMatrix();
 	}
 
@@ -123,7 +128,7 @@ export class SceneInitializer extends SceneBase {
 				AppStore.instance.dropFile = false;
 			});
 
-			if(e.dataTransfer)
+			if (e.dataTransfer)
 			{
 				Log('Drop ' + e.dataTransfer.files.length + ' file(s) event');
 				Array.from(e.dataTransfer.files).forEach(file =>
@@ -135,34 +140,118 @@ export class SceneInitializer extends SceneBase {
 		};
 	};
 
-	private file3dLoad = (file: File | string, handler: Function): boolean => {
-		const extension: string = (()=>{
-			let array;
+	public setupMouse() {
+		const vector = new Vector3();
 
-			if(typeof file === 'string')
-			{
-				array = file;
-			}
-			else
-			{
-				array = file.name;
+		SubscribersMouseUp.push((e: any)=> {
+			if (e.button !== 0 || !this.printer) {
+				return;
 			}
 
-			array = array.split('.');
+			vector.set(
+				(e.clientX / window.innerWidth) * 2 - 1,
+				- ((e.clientY - APP_HEADER_HEIGHT) / window.innerHeight) * 2 + 1,
+				0.5);
 
-			return (array[array.length - 1] as string).toLocaleLowerCase();
-		})();
+			const raycaster = new Raycaster();
 
-		const url = (typeof file === 'string' ? file : file.path);
+			raycaster.setFromCamera(vector, AppStore.sceneStore.activeCamera);
 
-		switch (extension) {
-			case 'stl':
-				new STLLoader().load(url, ( geometry ) => {
-					handler(geometry, url);
-				});
-				return true;
-			default:
-				return false;
+			const intersects = raycaster.intersectObjects(SceneObject.GetMeshesFromObjs(AppStore.sceneStore.objects), false);
+
+			intersects.sort((a, b) => {
+				return a.distance < b.distance ? -1 : 1;
+			});
+
+			if(intersects.length && intersects[0].face )
+			{
+				const sceneObjIndex = SceneObject.SearchIndexByMesh(AppStore.sceneStore.objects, intersects[0].object as Mesh);
+				if (sceneObjIndex < 0)
+				{
+					return;
+				}
+
+				const sceneObj  = AppStore.sceneStore.objects[sceneObjIndex];
+
+				if (!isKeyPressed(Key.Ctrl) && !isKeyPressed(Key.Shift)) {
+					console.log(AppStore.sceneStore.groupSelected.length > 1);
+					if (!sceneObj.isSelected) {
+						AppStore.sceneStore.objects.forEach((t, i) => {
+							if (i === sceneObjIndex) {
+								return;
+							}
+							t.isSelected = false;
+						});
+
+						sceneObj.isSelected = !sceneObj.isSelected;
+
+					} else if (AppStore.sceneStore.groupSelected.length > 1) {
+						AppStore.sceneStore.objects.forEach(t => {
+							t.isSelected = false;
+						});
+
+						sceneObj.isSelected = true;
+					}
+					else {
+						sceneObj.isSelected = !sceneObj.isSelected;
+					}
+				}
+				else {
+					sceneObj.isSelected = !sceneObj.isSelected;
+				}
+
+				AppStore.sceneStore.selectionChanged();
+				AppStore.sceneStore.animate();
+			}
+		});
+	}
+
+	public selectionChanged() {
+		AppStore.sceneStore.transformControls.detach();
+		AppStore.sceneStore.groupSelected = [];
+
+		const changes: AppEventSelectionChanged[] = [];
+
+		for (const object of AppStore.sceneStore.objects) {
+			if (object.isSelected) {
+				AppStore.sceneStore.groupSelected.push(object);
+			}
+
+			const state = object.SetSelection();
+
+			changes.push({
+				uuid:object.mesh.uuid,
+				state: state
+			});
+		}
+
+		if (AppStore.sceneStore.groupSelected.length) {
+			const centerGroup = SceneObject.CalculateGroupCenter(AppStore.sceneStore.groupSelected);
+			AppStore.sceneStore.transformObjectGroup.position.set(centerGroup.x, 0, centerGroup.z);
+			AppStore.sceneStore.transformObjectGroupOld.position.set(centerGroup.x, 0, centerGroup.z);
+		}
+
+		this.updateTransformControls();
+
+		changes.forEach(x => Dispatch(AppEventEnum.SELECTION_CHANGED, x));
+
+		this.animate();
+	}
+
+	public updateTransformControls = () => {
+		const isWorkingInstrument = AppStore.transform.state !== TransformEnum.None;
+
+		AppStore.sceneStore.transformObjectGroup.position.setX(AppStore.sceneStore.gridSize.x / 2).setZ(AppStore.sceneStore.gridSize.z / 2).setY(0);
+		AppStore.sceneStore.transformObjectGroupOld.position.setX(AppStore.sceneStore.gridSize.x / 2).setZ(AppStore.sceneStore.gridSize.z / 2).setY(0);
+		AppStore.sceneStore.transformObjectGroup.rotation.set(0,0,0);
+		AppStore.sceneStore.transformObjectGroupOld.rotation.set(0,0,0);
+
+		if(isWorkingInstrument && AppStore.sceneStore.groupSelected.length)
+		{
+			AppStore.sceneStore.transformControls.attach(AppStore.sceneStore.transformObjectGroup);
+		}
+		else {
+			AppStore.sceneStore.transformControls.detach();
 		}
 	};
 
@@ -174,7 +263,7 @@ export class SceneInitializer extends SceneBase {
 			});
 		});
 
-		if(result)
+		if (result)
 		{
 			Log('File load ' + file.split('\\').pop());
 		}
@@ -234,7 +323,7 @@ export class SceneInitializer extends SceneBase {
 	}
 
 	public switchCameraType (isPerspective: boolean, isInit = false) {
-		if(isPerspective)
+		if (isPerspective)
 		{
 			this.activeCamera = this.perspectiveCamera;
 			config.scene.setStartupPerspectiveCamera = true;
@@ -253,7 +342,7 @@ export class SceneInitializer extends SceneBase {
 		this.transformControls.camera = this.activeCamera;
 		this.updateCameraWindowSize();
 
-		if(!isInit)
+		if (!isInit)
 		{
 			this.animate();
 		}
@@ -267,12 +356,12 @@ export class SceneInitializer extends SceneBase {
 	}
 
 	public updateCameraWindowSize () {
-		if(this.activeCamera instanceof PerspectiveCamera) {
+		if (this.activeCamera instanceof PerspectiveCamera) {
 			this.activeCamera.aspect = window.innerWidth / window.innerHeight;
 			//this.activeCamera.fov = (360 / Math.PI) * Math.atan(Math.tan(((Math.PI / 180) * this.perspectiveCamera.fov / 2)) * (window.innerHeight / this.temp.windowHeight));
 			this.activeCamera.updateMatrix();
 		}
-		if(this.activeCamera instanceof OrthographicCamera) {
+		if (this.activeCamera instanceof OrthographicCamera) {
 			this.activeCamera.left = window.innerWidth / -2;
 			this.activeCamera.right = window.innerWidth / 2;
 			this.activeCamera.top = window.innerHeight / 2;
@@ -293,18 +382,18 @@ export class SceneInitializer extends SceneBase {
 
 	public animate () {
 		const frameLag = () => {
-			if(this.temp.needAnimateTimer)
+			if (this.temp.needAnimateTimer)
 			{
 				clearTimeout(this.temp.needAnimateTimer);
 				this.temp.needAnimateTimer = null;
 			}
 
-			if(Date.now() - this.temp.windowResizeAt < 50)
+			if (Date.now() - this.temp.windowResizeAt < 50)
 			{
 				return;
 			}
 
-			if(this.temp.lastFrameTime && Date.now() - this.temp.lastFrameTime < 5)
+			if (this.temp.lastFrameTime && Date.now() - this.temp.lastFrameTime < 5)
 			{
 				this.temp.needAnimateTimer = setTimeout(() => {
 					this.animate();
@@ -327,7 +416,7 @@ export class SceneInitializer extends SceneBase {
 
 			this.lightFromCamera.position.set(this.activeCamera.position.x, this.activeCamera.position.y, this.activeCamera.position.z);
 
-			/*if(this.activeCamera.position.y >= 0)
+			/*if (this.activeCamera.position.y >= 0)
 			{
 				SceneObject.UpdateSupportRender(this.groupSelected, true);
 				SceneObject.UpdateSupportRender(SceneObject.GetUniqueInA(this.objects,this.groupSelected), false);
@@ -352,7 +441,7 @@ export class SceneInitializer extends SceneBase {
 
 				this.renderer.render(this.scene, this.activeCamera);
 
-				if(this.activeCamera.position.y >= 0)
+				if (this.activeCamera.position.y >= 0)
 				{
 					this.outlineEffectRenderer.renderOutline(this.scene, this.activeCamera);
 				}
@@ -375,4 +464,35 @@ export class SceneInitializer extends SceneBase {
 
 		requestAnimationFrame(_animate);
 	}
+
+	private file3dLoad = (file: File | string, handler: Function): boolean => {
+		const extension: string = (()=>{
+			let array;
+
+			if (typeof file === 'string')
+			{
+				array = file;
+			}
+			else
+			{
+				array = file.name;
+			}
+
+			array = array.split('.');
+
+			return (array[array.length - 1] as string).toLocaleLowerCase();
+		})();
+
+		const url = (typeof file === 'string' ? file : file.path);
+
+		switch (extension) {
+			case 'stl':
+				new STLLoader().load(url, ( geometry ) => {
+					handler(geometry, url);
+				});
+				return true;
+			default:
+				return false;
+		}
+	};
 }

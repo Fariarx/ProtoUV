@@ -18,10 +18,11 @@ export class SceneApp extends Component<any, any> {
 
 	render() {
 		return (
-			<div onWheel={(evt) => AppStore.sceneStore.onZoom(evt)} style={{
-				width: '100%',
-				height: '100%'
-			}}>
+			<div onWheel={(evt) => AppStore.sceneStore.onZoom(evt)}
+				style={{
+					width: '100%',
+					height: '100%'
+				}}>
 				<div style={{
 					width: '100%',
 					height: '100%'

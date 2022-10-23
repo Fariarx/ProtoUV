@@ -12,14 +12,14 @@ export class Printer {
 	workerData: any = {};
 
 	constructor(_name?: string, _settings?: PrinterConfig) {
-		if(_name) {
+		if (_name) {
 			this.name = _name;
 		}
 		else {
 			this.name = 'Unknown';
 		}
 
-		if(!_settings) {
+		if (!_settings) {
 			this.Workspace = {
 				SizeX: 0,
 				SizeY: 0,
@@ -104,7 +104,7 @@ export class Printer {
 	static ParseConfigFileNames = function () {
 		const filesNormalize = (files: string[]) => {
 			files = files.filter(function(item, pos) {
-				if(item.indexOf('.json') === -1)
+				if (item.indexOf('.json') === -1)
 				{
 					return false;
 				}

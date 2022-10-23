@@ -4,8 +4,6 @@ import { observer } from 'mobx-react';
 import { colors } from '../../Shared/Theme';
 
 export const DragAndDropApp = observer(({ open } : { open:boolean }) => {
-	console.log(open);
-
 	return <Modal
 		open={open}
 		closeAfterTransition

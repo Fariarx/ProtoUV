@@ -74,7 +74,10 @@ export abstract class SceneBase {
 
 	public scene: Scene = new Scene();
 	public objects: SceneObject[] = [];
+	public groupSelected: SceneObject[] = [];
 	public decorations: Group = new Group();
+	public transformObjectGroupOld: Object3D = new Object3D();
+	public transformObjectGroup: Object3D = new Object3D();
 
 	public grid!: SceneGrid;
 	public gridSize: Vector3 = new Vector3(1, 1, 1);

@@ -28,12 +28,12 @@ export class SceneStore extends SceneInitializer {
 	public setupPrinter() {
 		let printer;
 
-		if(this.printerName)
+		if (this.printerName)
 		{
 			printer = Printer.LoadConfigFromFile(this.printerName);
 		}
 
-		if(printer)
+		if (printer)
 		{
 			this.printer = printer;
 			this.updatePrinter();
@@ -46,14 +46,14 @@ export class SceneStore extends SceneInitializer {
 	}
 
 	public updatePrinter() {
-		if(this.grid)
+		if (this.grid)
 		{
 			this.grid.dispose();
 		}
 
 		this.decorations.clear();
 
-		if(this.printer) {
+		if (this.printer) {
 			const sizeXZ = new Vector2(this.printer.Workspace.SizeX * 0.1, this.printer.Workspace.SizeY * 0.1);
 			const sizeCeiledXZ = new Vector2(Math.ceil(sizeXZ.x), Math.ceil(sizeXZ.y));
 			this.gridSize.set(sizeCeiledXZ.x, this.printer.Workspace.Height * 0.1, sizeCeiledXZ.y);

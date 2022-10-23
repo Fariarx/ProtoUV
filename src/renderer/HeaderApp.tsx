@@ -17,14 +17,15 @@ import { Sizes } from './Shared/Styled/Sizes';
 import { StyledMenu } from './Shared/Styled/StyledMenu';
 import { colors } from './Shared/Theme';
 
-export const APP_HEADER_HEIGHT = '26px';
+export const APP_HEADER_HEIGHT = 26;
+export const APP_HEADER_HEIGHT_PX = APP_HEADER_HEIGHT + 'px';
 
 export const HeaderApp = observer(() => {
 	const store = container.resolve(HeaderStore);
 
 	return <Box sx={{
 		width: '100%',
-		height: APP_HEADER_HEIGHT,
+		height: APP_HEADER_HEIGHT_PX,
 		background: colors.background.dark,
 		display: 'flex',
 		flexDirection: 'row',

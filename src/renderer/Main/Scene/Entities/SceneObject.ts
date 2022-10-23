@@ -1,4 +1,4 @@
-import { AppEventEnum, TransformEnum } from 'renderer/Shared/Libs/Types';
+import { AppEventEnum, AppEventMoveObject, TransformEnum } from 'renderer/Shared/Libs/Types';
 import {
 	Box3,
 	BoxHelper,
@@ -12,7 +12,6 @@ import {
 } from 'three';
 import { AppStore } from '../../../AppStore';
 import { Dispatch } from '../../../Shared/Events';
-import { MoveObject } from '../../../Shared/Scene/MoveObject';
 import { SceneStore } from '../SceneStore';
 
 export class SceneObject {
@@ -99,10 +98,7 @@ export class SceneObject {
 	}
 
 	SetSelection() {
-		let wasSelectedChanged: undefined | boolean;
-
 		if (this.wasSelected !== this.isSelected) {
-			wasSelectedChanged = this.wasSelected;
 			this.wasSelected = this.isSelected;
 		}
 
@@ -116,7 +112,7 @@ export class SceneObject {
 
 		return {
 			now: this.isSelected,
-			was: wasSelectedChanged
+			was: this.wasSelected
 		};
 	}
 
@@ -170,7 +166,7 @@ export class SceneObject {
 			to: this.mesh.position.clone().setY(this.size.y / 2),
 			sceneObject: this as SceneObject,
 			instrument: TransformEnum.Move
-		} as MoveObject);
+		} as AppEventMoveObject);
 	}
 
 	AlignToPlaneXZ(gridVec: Vector3) {
@@ -181,7 +177,7 @@ export class SceneObject {
 			to: this.mesh.position.clone().setX(gridVec.x / 2).setZ(gridVec.z / 2),
 			sceneObject: this as SceneObject,
 			instrument: TransformEnum.Move
-		} as MoveObject);
+		} as AppEventMoveObject);
 	}
 
 	IsEqual3dObject(_mesh: THREE.Mesh) {
@@ -191,12 +187,11 @@ export class SceneObject {
 	static SearchIndexByMesh(objs: SceneObject[], _mesh: THREE.Mesh) {
 		let _index = -1;
 
-		objs.every(function (element, index) {
-			if (element.mesh === _mesh) {
+		objs.every((element, index) => {
+			if (element.mesh.uuid === _mesh.uuid) {
 				_index = index;
 				return false;
 			}
-
 			return true;
 		});
 
@@ -206,7 +201,7 @@ export class SceneObject {
 	static SearchSceneObjByMesh(objs: SceneObject[], _mesh: THREE.Mesh) : SceneObject | null {
 		const result = this.SearchIndexByMesh(objs, _mesh);
 
-		if(result > -1)
+		if (result > -1)
 		{
 			return objs[result];
 		}
@@ -226,7 +221,7 @@ export class SceneObject {
 		const result:SceneObject[] = [];
 
 		a.forEach((element) => {
-			if(b.indexOf(element) === -1)
+			if (b.indexOf(element) === -1)
 			{
 				result.push(element);
 			}

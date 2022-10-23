@@ -1,3 +1,4 @@
+import { Euler, Object3D, Vector3 } from 'three';
 import { SceneObject } from '../../Main/Scene/Entities/SceneObject';
 
 export enum AppEventEnum {
@@ -9,12 +10,29 @@ export enum AppEventEnum {
   SELECT_SUPPORTS_MODE
 }
 
-export declare const AppEventArguments: AppEventAddObject | undefined;
+export declare const AppEventArguments: AppEventAddObject | AppEventMoveObject | AppEventSelectionChanged | undefined;
 
 export type AppEvent = {
   name: AppEventEnum;
   args: typeof AppEventArguments;
-  last: any;
+};
+
+export type AppEventSelectionChanged = {
+  uuid: string;
+  state: {
+    now:boolean;
+    was: boolean;
+  };
+};
+
+export type AppEventMoveObject = {
+  instrument?: TransformEnum;
+  from: Vector3 | Euler;
+  to: Vector3 | Euler;
+  sceneObject: SceneObject | Object3D;
+  actionBreak: true | undefined;
+  renderBreak: true | undefined;
+  id: number | undefined;
 };
 
 export type AppEventAddObject = {

@@ -2,28 +2,40 @@ import { BsArrowsMove } from '@react-icons/all-files/bs/BsArrowsMove';
 import { FiCode } from '@react-icons/all-files/fi/FiCode';
 import { Md3DRotation } from '@react-icons/all-files/md/Md3DRotation';
 import { observer } from 'mobx-react';
-import { FlexBoxRowFit } from 'renderer/Shared/Styled/FlexBox';
 import { container } from 'tsyringe';
 import { AppStore } from '../../../../AppStore';
 import { TransformEnum } from '../../../../Shared/Libs/Types';
-import { TransformPopover } from './TransformPopover';
+import { ToolButtonStyled } from '../ToolButtonStyled';
 import { TransformStore } from './TransformStore';
 
 const scale = 'scale(1.1)';
 
 export const TransformApp = observer(() => {
-	const  store = container.resolve(TransformStore);
+	const store = container.resolve(TransformStore);
+	const change = (state: TransformEnum) => {
+		AppStore.transform.state = state === AppStore.transform.state ?
+			TransformEnum.None : state;
+	};
 
 	return <>
-		<FlexBoxRowFit sx={{
-			userSelect: 'none',
-			height: 'fit-content',
-			width: 'fit-content',
-		}}>
-			<TransformPopover store={store} tool={TransformEnum.Move} description={'move'} icon={<BsArrowsMove transform={scale}/>}/>
-			<TransformPopover store={store} tool={TransformEnum.Rotate} description={'rotate'} icon={<Md3DRotation transform={scale}/>}/>
-			<TransformPopover store={store} tool={TransformEnum.Scale} description={'scale'} icon={<FiCode transform={scale}/>}/>
-		</FlexBoxRowFit>
+		<ToolButtonStyled description={'move'}
+			mini={store.state !== TransformEnum.Move}
+			selected={store.state === TransformEnum.Move}
+			onClick={() => change(TransformEnum.Move)}>
+			<BsArrowsMove transform={scale}/>
+		</ToolButtonStyled>
+		<ToolButtonStyled description={'rotate'}
+			mini={store.state !== TransformEnum.Rotate}
+			selected={store.state === TransformEnum.Rotate}
+			onClick={() => change(TransformEnum.Rotate)}>
+			<Md3DRotation transform={scale}/>
+		</ToolButtonStyled>
+		<ToolButtonStyled description={'scale'}
+			mini={store.state !== TransformEnum.Scale}
+			selected={store.state === TransformEnum.Scale}
+			onClick={() => change(TransformEnum.Scale)}>
+			<FiCode transform={scale}/>
+		</ToolButtonStyled>
 	</>;
 });
 

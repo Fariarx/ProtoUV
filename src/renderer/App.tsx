@@ -35,16 +35,12 @@ const Main = observer(() => {
 				<AnimationFade in={AppStore.getState() === Pages.Main} unmount={false}>
 					<FlexBoxRow>
 						<FlexBoxColumn>
-							<ToolsApp/>
-							<Divider />
 							<FlexBoxRow>
-								<Box sx={{
-									width:'100%',
-									height: '100%'
-								}}>
+								<FlexBoxRow>
+									<ToolsApp/>
 									<ViewChangeApp/>
 									<SceneApp />
-								</Box>
+								</FlexBoxRow>
 							</FlexBoxRow>
 							<LineBottomApp/>
 						</FlexBoxColumn>

@@ -109,7 +109,6 @@ const MenuHeaderItem = observer((props: {name: string, store: HeaderStore, binds
 		<FlexBoxRow ref={setAnchorEl} onClick={() => store.setMenuItemOpen(name)} sx={{
 			paddingLeft: Sizes.eight,
 			paddingRight: Sizes.eight,
-			marginTop: '-1px',
 			bgcolor: isOpen ? colors.interact.neutral : 'unset',
 			'&:hover': {
 				bgcolor: isOpen ? colors.interact.neutral : colors.background.commonest

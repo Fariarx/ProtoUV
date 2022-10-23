@@ -9,7 +9,7 @@ export const _default = {
 		},
 		scene:{
 			transformAlignToPlane: true,
-			setStartupPerspectiveCamera: false,
+			setStartupPerspectiveCamera: true,
 			sharpness:.0001
 		},
 		workerCount: 10,

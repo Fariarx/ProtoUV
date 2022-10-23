@@ -53,7 +53,7 @@ export abstract class SceneBase {
 	public materialForPlane?: Material;
 	public materialForObjects: MaterialForScene = this.materialsForScene.default;
 	public perspectiveCamera = new PerspectiveCamera(
-		40,
+		60,
 		window.innerWidth / window.innerHeight,
 		0.01,
 		1000
@@ -64,7 +64,6 @@ export abstract class SceneBase {
 		window.innerHeight / 2,
 		window.innerHeight / - 2,
 		0.0001,
-		1000,
 	);
 	public activeCamera: OrthographicCamera | PerspectiveCamera = this.perspectiveCamera;
 

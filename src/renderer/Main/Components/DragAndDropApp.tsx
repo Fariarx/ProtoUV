@@ -1,8 +1,11 @@
 import { Box, Fade, Modal } from '@mui/material';
 import { AiOutlineFileAdd } from '@react-icons/all-files/ai/AiOutlineFileAdd';
+import { observer } from 'mobx-react';
 import { colors } from '../../Shared/Theme';
 
-export const DragAndDropApp = ({ open } : { open:boolean }) => {
+export const DragAndDropApp = observer(({ open } : { open:boolean }) => {
+	console.log(open);
+
 	return <Modal
 		open={open}
 		closeAfterTransition
@@ -23,4 +26,4 @@ export const DragAndDropApp = ({ open } : { open:boolean }) => {
 			</Box>
 		</Fade>
 	</Modal>;
-};
+});

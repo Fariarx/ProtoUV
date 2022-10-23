@@ -8,7 +8,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader';
 import { AppStore, Log } from '../../AppStore';
-import { config } from '../../Shared/Config';
+import { config, saveConfig } from '../../Shared/Config';
 import { Dispatch } from '../../Shared/Events';
 import { SubscribersWindowResize } from '../../Shared/Libs/Listerners';
 import { AppEventEnum } from '../../Shared/Libs/Types';
@@ -99,8 +99,8 @@ export class SceneInitializer extends SceneBase {
 		this.cameraRig.attach( this.perspectiveCamera );
 		this.cameraRig.attach( this.orthographicCamera );
 		this.perspectiveCamera.position.set(this.gridSize.x , this.gridSize.y , this.gridSize.z );
-		this.orthographicCamera.position.set(this.gridSize.x * 10, this.gridSize.y * 5, this.gridSize.z * 10);
-		this.orthographicCamera.zoom = 90;
+		this.orthographicCamera.position.set(this.gridSize.x * 10, this.gridSize.y * 10, this.gridSize.z * 10);
+		this.orthographicCamera.zoom = 50;
 		this.activeCamera.lookAt(this.gridSize.x / 2, 0, this.gridSize.z / 2);
 		this.orthographicCamera.updateProjectionMatrix();
 	}
@@ -108,19 +108,13 @@ export class SceneInitializer extends SceneBase {
 	private setupDropFile = () => {
 		const holder = this.renderer.domElement;
 
-		holder.ondragover = function(e) {
-			if (e.dataTransfer?.files.length) {
-				runInAction(() => {
-					AppStore.instance.dropFile = true;
-				});
-			}
+		holder.ondragover = function() {
+			AppStore.instance.dropFile = true;
 			return false;
 		};
 
 		holder.ondragleave = function() {
-			runInAction(() => {
-				AppStore.instance.dropFile = false;
-			});
+			AppStore.instance.dropFile = false;
 			return false;
 		};
 
@@ -243,10 +237,14 @@ export class SceneInitializer extends SceneBase {
 		if(isPerspective)
 		{
 			this.activeCamera = this.perspectiveCamera;
+			config.scene.setStartupPerspectiveCamera = true;
+			saveConfig();
 		}
 		else
 		{
 			this.activeCamera = this.orthographicCamera;
+			config.scene.setStartupPerspectiveCamera = false;
+			saveConfig();
 		}
 
 		this.orbitControls.object = this.activeCamera;

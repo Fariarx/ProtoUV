@@ -1,24 +1,16 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore: Unreachable code error
 import electron, { BrowserWindow, app, dialog, ipcMain, shell } from 'electron';
-import log from 'electron-log';
-import { autoUpdater } from 'electron-updater';
 import path from 'path';
 import { resolveHtmlPath } from './util';
-
-export class AppUpdater {
-	constructor() {
-		log.transports.file.level = 'info';
-		autoUpdater.logger = log;
-		autoUpdater.checkForUpdatesAndNotify();
-	}
-}
 
 let mainWindow: BrowserWindow | null = null;
 let mainWindowIsFocused: boolean | undefined;
 
-ipcMain.on('electron.userData', (event) => {
+ipcMain.on('electron.userData', (event: any) => {
 	event.returnValue = electron.app.getPath('userData');
 });
-ipcMain.on('electron.checkFocus', (event) => {
+ipcMain.on('electron.checkFocus', (event: any) => {
 	event.returnValue = mainWindowIsFocused;
 });
 ipcMain.on('electron.minimize', () => {
@@ -36,11 +28,11 @@ ipcMain.on('electron.closeWindow', () => {
 	// eslint-disable-next-line no-unused-expressions
 	_window && _window.close();
 });
-ipcMain.on('electron.openFileDialog', (event) => {
+ipcMain.on('electron.openFileDialog', (event: any) => {
 	if (mainWindow) {
 		dialog.showOpenDialog(mainWindow, {
 			properties: ['openFile']
-		}).then(result => {
+		}).then((result: any) => {
 			event.returnValue = result;
 		});
 	}
@@ -80,7 +72,7 @@ const createWindow = async () => {
 	}
 
 	const RESOURCES_PATH = app.isPackaged
-		? path.join(process.resourcesPath, 'assets')
+		? path.join((process as any).resourcesPath, 'assets')
 		: path.join(__dirname, '../../assets');
 
 	const getAssetPath = (...paths: string[]): string => {
@@ -96,7 +88,8 @@ const createWindow = async () => {
 			preload: app.isPackaged
 				? path.join(__dirname, 'preload.js')
 				: path.join(__dirname, '../../.erb/dll/preload.js'),
-			webSecurity: false
+			webSecurity: false,
+			sandbox: false,
 		},
 		titleBarStyle: 'hidden',
 	});
@@ -121,14 +114,10 @@ const createWindow = async () => {
 	});
 
 	// Open urls in the user's browser
-	mainWindow.webContents.setWindowOpenHandler((edata) => {
-		shell.openExternal(edata.url);
+	mainWindow.webContents.setWindowOpenHandler((data: any) => {
+		shell.openExternal(data.url);
 		return { action: 'deny' };
 	});
-
-	// Remove this if your app does not use auto updates
-	// eslint-disable-next-line
-  new AppUpdater();
 };
 
 /**

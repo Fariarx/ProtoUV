@@ -2,14 +2,14 @@
   "name": "electron-react-boilerplate",
   "description": "A foundation for scalable desktop apps",
   "scripts": {
-    "build": "concurrently \"npm run build:main\" \"npm run build:renderer\"",
+    "build": "concurrently \"yarn run build:main\" \"yarn run build:renderer\"",
     "build:main": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.main.prod.ts",
     "build:renderer": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.prod.ts",
     "rebuild": "electron-rebuild --parallel --types prod,dev,optional --module-dir release/app",
     "lint": "cross-env NODE_ENV=development eslint . --ext .js,.jsx,.ts,.tsx",
-    "package": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish never",
+    "package": "ts-node ./.erb/scripts/clean.js dist && yarn run build && electron-builder build --publish never",
     "postinstall": "ts-node .erb/scripts/check-native-dep.js && electron-builder install-app-deps && cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.dev.dll.ts && opencollective-postinstall",
-    "start": "ts-node ./.erb/scripts/check-port-in-use.js && npm run start:renderer",
+    "start": "ts-node ./.erb/scripts/check-port-in-use.js && yarn run start:renderer",
     "start:main": "cross-env NODE_ENV=development electronmon -r ts-node/register/transpile-only ./src/main/main.ts",
     "start:preload": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.preload.dev.ts",
     "start:renderer": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack serve --config ./.erb/configs/webpack.config.renderer.dev.ts",
@@ -160,17 +160,19 @@
     ]
   },
   "devDependencies": {
+    "@electron/docs-parser": "^0.12.4",
     "@pmmmwh/react-refresh-webpack-plugin": "0.5.5",
     "@teamsupercell/typings-for-css-modules-loader": "^2.5.1",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.0.0",
+    "@types/electron": "^1.6.10",
     "@types/jest": "^27.4.1",
     "@types/node": "17.0.23",
-    "@types/three": "^0.140.0",
     "@types/react": "^17.0.43",
-    "@types/react-dom": "^17.0.14",
+    "@types/react-dom": "^18.0.7",
     "@types/react-test-renderer": "^17.0.1",
     "@types/terser-webpack-plugin": "^5.0.4",
+    "@types/three": "^0.140.0",
     "@types/webpack-bundle-analyzer": "^4.4.1",
     "@types/webpack-env": "^1.16.3",
     "@typescript-eslint/eslint-plugin": "^5.18.0",
@@ -183,7 +185,7 @@
     "css-loader": "^6.7.1",
     "css-minimizer-webpack-plugin": "^3.4.1",
     "detect-port": "^1.3.0",
-    "electron": "^18.0.1",
+    "electron": "21.2.0",
     "electron-builder": "^23.0.3",
     "electron-devtools-installer": "^3.2.0",
     "electron-notarize": "^1.2.1",
@@ -255,8 +257,7 @@
     "tsyringe": "^4.7.0"
   },
   "devEngines": {
-    "node": ">=14.x",
-    "npm": ">=7.x"
+    "node": ">=14.x"
   },
   "collective": {
     "url": "https://opencollective.com/electron-react-boilerplate-594"

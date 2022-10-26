@@ -9,6 +9,7 @@ import { colors } from '../../Shared/Theme';
 export const ConsoleApp = observer((props: {mt?: string, mb?: string}) => {
 	const [ selectable, setSelectable ] = useState(false);
 
+	// #TODO Добавить окно для клика
 	return <Fade in={AppStore.console.isVisible}>
 		<Box
 			onDoubleClick={() => {
@@ -28,6 +29,7 @@ export const ConsoleApp = observer((props: {mt?: string, mb?: string}) => {
 				marginBottom: Sizes.sum(Sizes.twentyFour, Sizes.eight),
 				fontVariant: 'unicase',
 				userSelect: selectable ? 'unset' : 'none',
+				pointerEvents: selectable ? 'unset' : 'none',
 				...props
 			}}>
 			{AppStore.console.list.slice().reverse().map(x => <Typography key={linearGenerator.next().value} variant={'body2'}>

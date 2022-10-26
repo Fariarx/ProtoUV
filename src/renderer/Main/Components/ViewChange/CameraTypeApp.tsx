@@ -11,7 +11,7 @@ export const CameraTypeApp = () => {
 
 	return <IconButton
 		onClick={() => {
-			AppStore.sceneStore.switchCameraType(!isPerspective);
+			AppStore.sceneStore.updateCameraType(!isPerspective);
 			setterIsPerspective(!isPerspective);
 		}}>
 		{isPerspective

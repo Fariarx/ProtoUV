@@ -3,7 +3,7 @@ import { FiCode } from '@react-icons/all-files/fi/FiCode';
 import { Md3DRotation } from '@react-icons/all-files/md/Md3DRotation';
 import { observer } from 'mobx-react';
 import { container } from 'tsyringe';
-import { TransformEnum } from '../../../../Shared/Libs/Types';
+import { TransformEnum } from '../../../Shared/Libs/Types';
 import { ToolButtonStyled } from '../ToolButtonStyled';
 import { TransformStore } from './TransformStore';
 

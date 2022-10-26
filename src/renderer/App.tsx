@@ -14,7 +14,7 @@ import { ConfiguratorManuallyApp } from './Configurator/ConfiguratorManuallyApp'
 import { HeaderApp } from './HeaderApp';
 import { LineBottomApp } from './LineBottomApp';
 import { DragAndDropApp } from './Main/Components/DragAndDropApp';
-import { ToolsApp } from './Main/Components/LineTools/ToolsApp';
+import { ToolsApp } from './Main/Components/ToolsApp';
 import { ViewChangeApp } from './Main/Components/ViewChange/ViewChangeApp';
 import { ConsoleApp } from './Main/Console/ConsoleApp';
 import { SceneApp } from './Main/Scene/SceneApp';

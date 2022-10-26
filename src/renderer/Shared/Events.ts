@@ -1,5 +1,5 @@
 import { runInAction } from 'mobx';
-import { LineSegments, Mesh } from 'three';
+import { BufferGeometry, LineSegments, Mesh, Vector3 } from 'three';
 import { AppStore } from '../AppStore';
 import { config } from './Config';
 import { AppEvent, AppEventAddObject, AppEventArguments, AppEventEnum, AppEventMoveObject, TransformEnum } from './Libs/Types';
@@ -78,9 +78,8 @@ const objectAdd = (message: AppEvent) => {
 const objectTransform = (message: AppEvent) => {
 	const moveObject = message.args as AppEventMoveObject;
 	const mesh: Mesh = moveObject.sceneObject.mesh;
-	const wireframe: LineSegments = moveObject.sceneObject.wireframe;
 
-	moveObject.to = moveObject.to.clone();
+	moveObject.different = moveObject.different.clone();
 	moveObject.from = moveObject.from.clone();
 
 	if (!moveObject.actionBreak) {
@@ -92,30 +91,26 @@ const objectTransform = (message: AppEvent) => {
 
 		switch (moveObject.instrument) {
 			case TransformEnum.Move:
-				mesh.position.set(moveObject.to.x, moveObject.to.y, moveObject.to.z);
-				wireframe.position.set(moveObject.to.x, moveObject.to.y, moveObject.to.z);
+				mesh.position.add(moveObject.different as Vector3);
 				break;
 			case TransformEnum.Rotate:
-				mesh.rotation.set(moveObject.to.x, moveObject.to.y, moveObject.to.z);
-				wireframe.rotation.set(moveObject.to.x, moveObject.to.y, moveObject.to.z);
+				mesh.rotation.setFromVector3(moveObject.different as Vector3);
 				break;
 			case TransformEnum.Scale:
+				if(moveObject.different.x < minScale)
+				{
+					moveObject.different.x = minScale;
+				}
+				if(moveObject.different.y < minScale)
+				{
+					moveObject.different.y = minScale;
+				}
+				if(moveObject.different.z < minScale)
+				{
+					moveObject.different.z = minScale;
+				}
 
-				if(moveObject.to.x < minScale)
-				{
-					moveObject.to.x = minScale;
-				}
-				if(moveObject.to.y < minScale)
-				{
-					moveObject.to.y = minScale;
-				}
-				if(moveObject.to.z < minScale)
-				{
-					moveObject.to.z = minScale;
-				}
-
-				mesh.scale.set(moveObject.to.x, moveObject.to.y, moveObject.to.z);
-				wireframe.scale.set(moveObject.to.x, moveObject.to.y, moveObject.to.z);
+				mesh.scale.add(moveObject.different as Vector3);
 				break;
 		}
 	}

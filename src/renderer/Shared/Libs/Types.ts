@@ -28,7 +28,7 @@ export type AppEventSelectionChanged = {
 export type AppEventMoveObject = {
   instrument?: TransformEnum;
   from: Vector3 | Euler;
-  to: Vector3 | Euler;
+  different: Vector3 | Euler;
   sceneObject: SceneObject;
   actionBreak: true | undefined;
   renderBreak: true | undefined;

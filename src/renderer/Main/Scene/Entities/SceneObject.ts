@@ -1,9 +1,6 @@
 import { AppEventEnum, AppEventMoveObject, TransformEnum } from 'renderer/Shared/Libs/Types';
 import {
-	Box3,
-	BoxHelper,
 	BufferGeometry,
-	Group,
 	LineSegments,
 	Matrix4,
 	Mesh,
@@ -12,14 +9,14 @@ import {
 } from 'three';
 import { AppStore } from '../../../AppStore';
 import { Dispatch } from '../../../Shared/Events';
+import { ThreeHelper } from '../../../Shared/Helpers/Three';
 import { SceneStore } from '../SceneStore';
 
 export class SceneObject {
 	name: string;
 
-	obj: Group;
+	geometry: BufferGeometry;
 	mesh: Mesh;
-	bbox: BoxHelper;
 	wireframe: LineSegments;
 
 	min: Vector3;
@@ -27,7 +24,6 @@ export class SceneObject {
 	center: Vector3;
 	size: Vector3 = new Vector3();
 	sceneStore: SceneStore;
-	scaleFactor: number;
 	isSelected: boolean;
 
 	public settings = {
@@ -52,6 +48,7 @@ export class SceneObject {
 
 		this.name = sceneName;
 		this.sceneStore = sceneStore;
+		this.geometry = geometry;
 
 		this.mesh = new Mesh(geometry, sceneStore.materialForObjects.normal);
 		this.mesh.castShadow = true;
@@ -64,24 +61,15 @@ export class SceneObject {
 		this.max = nullVector;
 		this.center = nullVector;
 
-		this.Update(true);
-		this.UpdateGeometryCenter(true);
-
 		this.wireframe = this.SetupWireframe(geometry);
 		this.wireframe.visible = false;
-
-		this.bbox = new BoxHelper(this.mesh, 0xffff00);
-		this.bbox.visible = false;
-
-		this.obj = new Group();
-		this.obj.add(this.mesh);
-		this.obj.add(this.bbox);
-		this.obj.add(this.wireframe);
+		this.mesh.add(this.wireframe);
 
 		this.isSelected = this.wasSelected = selected;
 		this.SetSelection();
 
-		this.scaleFactor = (0.1 / this.size.x + 0.1 / this.size.y + 0.1 / this.size.z) / 3;
+		this.Update(true);
+		this.UpdateGeometry(true);
 	}
 
 	private SetupWireframe(geometry: BufferGeometry) {
@@ -117,35 +105,44 @@ export class SceneObject {
 	Update(init = false) {
 		if (!init) {
 			this.SetSelection();
-			this.wireframe.updateMatrixWorld();
-			this.bbox.update();
 		}
 
-		this.UpdateSize();
-
 		this.mesh.updateMatrixWorld();
+		this.wireframe.matrix = this.mesh.matrix.clone();
+		this.wireframe.updateMatrixWorld();
 
-		// this.mesh.geometry.computeBoundsTree();
-		this.mesh.geometry.computeBoundingBox();
-		this.mesh.geometry.computeBoundingSphere();
-
-		this.min = (this.mesh.geometry.boundingBox as Box3).min;
-		this.max = (this.mesh.geometry.boundingBox as Box3).max;
-		this.center = (this.mesh.geometry.boundingSphere as THREE.Sphere).center;
+		this.UpdateSize();
 	}
 
 	UpdateSize() {
-		new Box3().setFromObject(this.mesh).getSize(this.size);
+		const geometry = this.mesh.geometry;
+		const vertices = geometry.attributes.position.array;
+
+		let minPoint = new Vector3(0, 9999, 0);
+		let maxPoint = new Vector3(0, -9999, 0);
+		for (let i = 0; i < vertices.length; i=i+3) {
+			if (vertices[i+1] < minPoint.y)
+			{
+				minPoint = new Vector3(vertices[i], vertices[i+1], vertices[i+2]);
+			}
+			if (vertices[i+1] > maxPoint.y)
+			{
+				maxPoint = new Vector3(vertices[i], vertices[i+1], vertices[i+2]);
+			}
+		}
+
+		this.min = this.mesh.localToWorld(minPoint);
+		this.max = this.mesh.localToWorld(maxPoint);
+		this.center = this.max.clone().sub(this.min).normalize();
 	}
 
-	UpdateGeometryCenter(init = false) {
+	UpdateGeometry(init = false) {
 		this.mesh.geometry.applyMatrix4(new Matrix4().makeTranslation(-this.center.x, -this.center.y, -this.center.z));
 		this.Update(init);
 	}
 
 	AddToScene(withWireframe?: boolean, withBoxHelper?: boolean) {
 		if (withBoxHelper) {
-			this.bbox.visible = true;
 			this.settings.bbox = true;
 		}
 		if (withWireframe) {
@@ -153,33 +150,42 @@ export class SceneObject {
 			this.settings.wireframe = true;
 		}
 
-		this.sceneStore.scene.add(this.obj);
+		this.sceneStore.scene.add(this.mesh);
+		this.sceneStore.scene.add(this.wireframe);
 	}
 
 	AlignToPlaneY() {
-		this.Update();
-
 		Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
 			from: this.mesh.position.clone(),
-			to: this.mesh.position.clone().setY(this.size.y / 2),
+			different: this.mesh.position.clone().setY(this.size.y / 2),
 			sceneObject: this as SceneObject,
 			instrument: TransformEnum.Move
 		} as AppEventMoveObject);
+
+		this.Update();
 	}
 
 	AlignToPlaneXZ(gridVec: Vector3) {
-		this.Update();
-
 		Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
 			from: this.mesh.position.clone(),
-			to: this.mesh.position.clone().setX(gridVec.x / 2).setZ(gridVec.z / 2),
+			different: this.mesh.position.clone().setX(gridVec.x / 2).setZ(gridVec.z / 2),
 			sceneObject: this as SceneObject,
 			instrument: TransformEnum.Move
 		} as AppEventMoveObject);
+
+		this.Update();
 	}
 
 	IsEqual3dObject(_mesh: THREE.Mesh) {
 		return _mesh === this.mesh;
+	}
+
+	Dispose() {
+		this.sceneStore.groupSelected.splice(this.sceneStore.objects.findIndex(x => x.name === this.name), 1);
+		this.sceneStore.objects.splice(this.sceneStore.objects.findIndex(x => x.name === this.name), 1);
+
+		this.mesh.clear();
+		this.wireframe.clear();
 	}
 
 	static SearchIndexByMesh(objs: SceneObject[], _mesh: THREE.Mesh) {
@@ -310,6 +316,17 @@ export class SceneObject {
 			}
 		}
 
+		AppStore.sceneStore.animate();
+	};
+
+	static SelectObjsDelete = () => {
+		if (AppStore.sceneStore.groupSelected.length ) {
+			for (const sceneObject of AppStore.sceneStore.groupSelected) {
+				sceneObject.Dispose();
+			}
+		}
+
+		AppStore.sceneStore.transformControls.detach();
 		AppStore.sceneStore.animate();
 	};
 }

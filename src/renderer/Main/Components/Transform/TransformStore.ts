@@ -1,7 +1,7 @@
 import { makeAutoObservable } from 'mobx';
 import { singleton } from 'tsyringe';
-import { AppStore } from '../../../../AppStore';
-import { TransformEnum } from '../../../../Shared/Libs/Types';
+import { AppStore } from '../../../AppStore';
+import { TransformEnum } from '../../../Shared/Libs/Types';
 
 @singleton()
 export class TransformStore {

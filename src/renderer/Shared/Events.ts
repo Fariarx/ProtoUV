@@ -79,9 +79,6 @@ const objectTransform = (message: AppEvent) => {
 	const moveObject = message.args as AppEventMoveObject;
 	const mesh: Mesh = moveObject.sceneObject.mesh;
 
-	moveObject.different = moveObject.different.clone();
-	moveObject.from = moveObject.from.clone();
-
 	if (!moveObject.actionBreak) {
 		if (!moveObject.instrument) {
 			moveObject.instrument = AppStore.transform.state;
@@ -91,29 +88,49 @@ const objectTransform = (message: AppEvent) => {
 
 		switch (moveObject.instrument) {
 			case TransformEnum.Move:
-				mesh.position.add(moveObject.different as Vector3);
+				if (moveObject.to.isDifferent)
+				{
+					mesh.position.add(moveObject.to as Vector3);
+				}
+				else {
+					mesh.position.set(moveObject.to.x, moveObject.to.y, moveObject.to.z);
+				}
 				break;
 			case TransformEnum.Rotate:
-				mesh.rotation.setFromVector3(moveObject.different as Vector3);
+				if (moveObject.to.isDifferent)
+				{
+					mesh.rotation.setFromVector3(moveObject.to as Vector3);
+				}
+				else {
+					mesh.rotation.set(moveObject.to.x, moveObject.to.y, moveObject.to.z);
+				}
 				break;
 			case TransformEnum.Scale:
-				if(moveObject.different.x < minScale)
+				if(moveObject.to.x < minScale)
 				{
-					moveObject.different.x = minScale;
+					moveObject.to.x = minScale;
 				}
-				if(moveObject.different.y < minScale)
+				if(moveObject.to.y < minScale)
 				{
-					moveObject.different.y = minScale;
+					moveObject.to.y = minScale;
 				}
-				if(moveObject.different.z < minScale)
+				if(moveObject.to.z < minScale)
 				{
-					moveObject.different.z = minScale;
+					moveObject.to.z = minScale;
 				}
 
-				mesh.scale.add(moveObject.different as Vector3);
+				if (moveObject.to.isDifferent)
+				{
+					mesh.scale.add(moveObject.to as Vector3);
+				}
+				else {
+					mesh.scale.set(moveObject.to.x, moveObject.to.y, moveObject.to.z);
+				}
 				break;
 		}
 	}
+
+	moveObject.sceneObject.Update();
 
 	if(!moveObject.renderBreak)
 	{

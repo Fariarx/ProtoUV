@@ -1,5 +1,7 @@
 import { AppEventEnum, AppEventMoveObject, TransformEnum } from 'renderer/Shared/Libs/Types';
 import {
+	Box3,
+	BoxHelper,
 	BufferGeometry,
 	LineSegments,
 	Matrix4,
@@ -17,10 +19,9 @@ export class SceneObject {
 
 	geometry: BufferGeometry;
 	mesh: Mesh;
-	wireframe: LineSegments;
 
-	min: Vector3;
-	max: Vector3;
+	minY: Vector3;
+	maxY: Vector3;
 	center: Vector3;
 	size: Vector3 = new Vector3();
 	sceneStore: SceneStore;
@@ -37,7 +38,8 @@ export class SceneObject {
 		name: string,
 		objs: SceneObject[],
 		selected = false,
-		sceneStore: SceneStore = AppStore.sceneStore) {
+		sceneStore: SceneStore = AppStore.sceneStore)
+	{
 		let index = 0;
 		let sceneName = index + ' : ' + name;
 
@@ -49,27 +51,20 @@ export class SceneObject {
 		this.name = sceneName;
 		this.sceneStore = sceneStore;
 		this.geometry = geometry;
-
 		this.mesh = new Mesh(geometry, sceneStore.materialForObjects.normal);
 		this.mesh.castShadow = true;
 		this.mesh.receiveShadow = false;
 		this.mesh.scale.set(0.1, 0.1, 0.1);
+		this.mesh.geometry.center();
 
-		const nullVector = new Vector3();
-
-		this.min = nullVector;
-		this.max = nullVector;
-		this.center = nullVector;
-
-		this.wireframe = this.SetupWireframe(geometry);
-		this.wireframe.visible = false;
-		this.mesh.add(this.wireframe);
+		this.minY = new Vector3();
+		this.maxY = new Vector3();
+		this.center = new Vector3();
 
 		this.isSelected = this.wasSelected = selected;
 		this.SetSelection();
 
-		this.Update(true);
-		this.UpdateGeometry(true);
+		this.Update();
 	}
 
 	private SetupWireframe(geometry: BufferGeometry) {
@@ -90,10 +85,8 @@ export class SceneObject {
 
 		if (this.isSelected) {
 			this.mesh.material = this.sceneStore.materialForObjects.select;
-			this.wireframe.visible = this.settings.wireframe;
 		} else {
 			this.mesh.material = this.sceneStore.materialForObjects.normal;
-			this.wireframe.visible = false;
 		}
 
 		return {
@@ -102,43 +95,71 @@ export class SceneObject {
 		};
 	}
 
-	Update(init = false) {
-		if (!init) {
-			this.SetSelection();
-		}
-
-		this.mesh.updateMatrixWorld();
-		this.wireframe.matrix = this.mesh.matrix.clone();
-		this.wireframe.updateMatrixWorld();
-
+	Update() {
 		this.UpdateSize();
 	}
 
 	UpdateSize() {
 		const geometry = this.mesh.geometry;
 		const vertices = geometry.attributes.position.array;
+		const deltaMax = 999999;
 
-		let minPoint = new Vector3(0, 9999, 0);
-		let maxPoint = new Vector3(0, -9999, 0);
+		const minXPoint = new Vector3(deltaMax, 0, 0);
+		const maxXPoint = new Vector3(-deltaMax, 0, 0);
+		const minYPoint = new Vector3(0, deltaMax, 0);
+		const maxYPoint = new Vector3(0, -deltaMax, 0);
+		const minZPoint = new Vector3(0, 0, deltaMax);
+		const maxZPoint = new Vector3(0, 0, -deltaMax);
+
+		const vector3 = new Vector3();
+
 		for (let i = 0; i < vertices.length; i=i+3) {
-			if (vertices[i+1] < minPoint.y)
+			const vertex = this.mesh.localToWorld(vector3.set(vertices[i], vertices[i+1], vertices[i+2]));
+
+			if (vertex.y < minYPoint.y)
 			{
-				minPoint = new Vector3(vertices[i], vertices[i+1], vertices[i+2]);
+				minYPoint.set(vertex.x, vertex.y, vertex.z);
 			}
-			if (vertices[i+1] > maxPoint.y)
+			if (vertex.y > maxYPoint.y)
 			{
-				maxPoint = new Vector3(vertices[i], vertices[i+1], vertices[i+2]);
+				maxYPoint.set(vertex.x, vertex.y, vertex.z);
+			}
+			if (vertex.x < minXPoint.x)
+			{
+				minXPoint.set(vertex.x, vertex.y, vertex.z);
+			}
+			if (vertex.x > maxXPoint.x)
+			{
+				maxXPoint.set(vertex.x, vertex.y, vertex.z);
+			}
+			if (vertex.z < minZPoint.z)
+			{
+				minZPoint.set(vertex.x, vertex.y, vertex.z);
+			}
+			if (vertex.z > maxZPoint.z)
+			{
+				maxZPoint.set(vertex.x, vertex.y, vertex.z);
 			}
 		}
 
-		this.min = this.mesh.localToWorld(minPoint);
-		this.max = this.mesh.localToWorld(maxPoint);
-		this.center = this.max.clone().sub(this.min).normalize();
-	}
+		this.minY = minYPoint;
+		this.maxY = maxYPoint;
 
-	UpdateGeometry(init = false) {
-		this.mesh.geometry.applyMatrix4(new Matrix4().makeTranslation(-this.center.x, -this.center.y, -this.center.z));
-		this.Update(init);
+		this.center.set(
+			(maxXPoint.x + minXPoint.x) / 2,
+			(maxYPoint.y + minYPoint.y) / 2,
+			(maxZPoint.z + minZPoint.z) / 2,
+		);
+
+		this.size.set(
+			Math.abs(maxXPoint.x - minXPoint.x),
+			Math.abs(maxYPoint.y - minYPoint.y),
+			Math.abs(maxZPoint.z - minZPoint.z),
+		);
+
+		ThreeHelper.DrawPoint( this.minY);
+		ThreeHelper.DrawPoint( this.maxY);
+		console.log(this.mesh.position, this.minY);
 	}
 
 	AddToScene(withWireframe?: boolean, withBoxHelper?: boolean) {
@@ -146,18 +167,19 @@ export class SceneObject {
 			this.settings.bbox = true;
 		}
 		if (withWireframe) {
-			this.wireframe.visible = true;
 			this.settings.wireframe = true;
 		}
 
 		this.sceneStore.scene.add(this.mesh);
-		this.sceneStore.scene.add(this.wireframe);
 	}
 
 	AlignToPlaneY() {
+		this.mesh.position.setY(0);
+		this.Update();
+
 		Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
 			from: this.mesh.position.clone(),
-			different: this.mesh.position.clone().setY(this.size.y / 2),
+			to: this.mesh.position.clone().setY(this.size.y / 2),
 			sceneObject: this as SceneObject,
 			instrument: TransformEnum.Move
 		} as AppEventMoveObject);
@@ -168,7 +190,7 @@ export class SceneObject {
 	AlignToPlaneXZ(gridVec: Vector3) {
 		Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
 			from: this.mesh.position.clone(),
-			different: this.mesh.position.clone().setX(gridVec.x / 2).setZ(gridVec.z / 2),
+			to: this.mesh.position.clone().setX(gridVec.x / 2).setZ(gridVec.z / 2),
 			sceneObject: this as SceneObject,
 			instrument: TransformEnum.Move
 		} as AppEventMoveObject);
@@ -183,9 +205,7 @@ export class SceneObject {
 	Dispose() {
 		this.sceneStore.groupSelected.splice(this.sceneStore.objects.findIndex(x => x.name === this.name), 1);
 		this.sceneStore.objects.splice(this.sceneStore.objects.findIndex(x => x.name === this.name), 1);
-
 		this.mesh.clear();
-		this.wireframe.clear();
 	}
 
 	static SearchIndexByMesh(objs: SceneObject[], _mesh: THREE.Mesh) {
@@ -312,6 +332,7 @@ export class SceneObject {
 	static SelectObjsAlignY = () => {
 		if (AppStore.sceneStore.groupSelected.length ) {
 			for (const sceneObject of AppStore.sceneStore.groupSelected) {
+				sceneObject.Update();
 				sceneObject.AlignToPlaneY();
 			}
 		}

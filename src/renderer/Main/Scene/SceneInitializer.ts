@@ -194,13 +194,7 @@ export class SceneInitializer extends SceneBase {
 		this.transformControls.addEventListener( 'dragging-changed', function ( event ) {
 			AppStore.sceneStore.orbitControls.enabled = !event.value;
 
-			if (!event.value) {
-				if (config.scene.transformAlignToPlane)
-				{
-					SceneObject.SelectObjsAlignY();
-				}
-			}
-			else {
+			if (event.value) {
 				AppStore.sceneStore.transformGroupMarker.position.set(
 					AppStore.sceneStore.transformObjectGroup.position.x,
 					AppStore.sceneStore.transformObjectGroup.position.y,
@@ -213,6 +207,9 @@ export class SceneInitializer extends SceneBase {
 					AppStore.sceneStore.transformObjectGroup.scale.x,
 					AppStore.sceneStore.transformObjectGroup.scale.y,
 					AppStore.sceneStore.transformObjectGroup.scale.z);
+			}
+			else {
+				SceneObject.SelectObjsAlignY();
 			}
 
 			AppStore.sceneStore.animate();
@@ -236,9 +233,16 @@ export class SceneInitializer extends SceneBase {
 							transformMarker.position.set(now.x, now.y, now.z);
 
 							for (const sceneObject of this.groupSelected) {
+								const oldPosition = sceneObject.mesh.position.clone();
+								const newPosition = sceneObject.mesh.position.clone();
+
+								newPosition.x -= differenceVector3.x;
+								newPosition.y -= differenceVector3.y;
+								newPosition.z -= differenceVector3.z;
+
 								Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
-									from: sceneObject.mesh.position,
-									different: differenceVector3.negate(),
+									from: oldPosition,
+									to: newPosition,
 									sceneObject: sceneObject
 								} as AppEventMoveObject);
 							}
@@ -251,10 +255,20 @@ export class SceneInitializer extends SceneBase {
 						if (!now.equals(old)) {
 							const differenceVector3 = new Vector3(old.x - now.x, old.y - now.y, old.z - now.z);
 
+							transformObj.rotation.set(now.x, now.y, now.z);
+							transformMarker.rotation.set(now.x, now.y, now.z);
+
 							for (const sceneObject of this.groupSelected) {
+								const oldPosition = sceneObject.mesh.rotation.clone();
+								const newPosition = sceneObject.mesh.rotation.clone();
+
+								newPosition.x -= differenceVector3.x;
+								newPosition.y -= differenceVector3.y;
+								newPosition.z -= differenceVector3.z;
+
 								Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
-									from: sceneObject.mesh.rotation,
-									different: differenceVector3.negate(),
+									from: oldPosition,
+									to: newPosition,
 									sceneObject: sceneObject
 								} as AppEventMoveObject);
 							}
@@ -271,21 +285,22 @@ export class SceneInitializer extends SceneBase {
 							transformMarker.scale.set(now.x, now.y, now.z);
 
 							for (const sceneObject of this.groupSelected) {
+								const oldPosition = sceneObject.mesh.scale.clone();
+								const newPosition = sceneObject.mesh.scale.clone();
+
+								newPosition.x -= differenceVector3.x;
+								newPosition.y -= differenceVector3.y;
+								newPosition.z -= differenceVector3.z;
+
 								Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
-									from: sceneObject.mesh.scale,
-									different: differenceVector3.negate(),
+									from: oldPosition,
+									to: newPosition,
 									sceneObject: sceneObject
 								} as AppEventMoveObject);
-
-								//for .size
-								sceneObject.UpdateSize();
 							}
 						}
 						break;
 				}
-
-				ThreeHelper.DrawPoint(transformMarker.position);
-				ThreeHelper.DrawPoint(transformObj.position);
 			} else {
 				Log('Error of \'change\': transformObj is null or this.sceneStore.groupSelected.length = 0');
 			}

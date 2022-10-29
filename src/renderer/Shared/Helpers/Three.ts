@@ -14,14 +14,19 @@ export class ThreeHelper {
 		scene.add( arrowHelper );
 	}
 
-	static DrawPoint(origin: Vector3, color = 0xf27f00, size  = 0.05, scene: Scene = AppStore.sceneStore.scene)
+	static DrawPoint(origin: Vector3, color = 0xf27f00, size  = 0.05, deleteAfterMs = 60000, scene: Scene = AppStore.sceneStore.scene)
 	{
-		const geometry = new SphereGeometry( size, 32, 16 );
+		const geometry = new SphereGeometry( size, 16, 16 );
 		const material = new MeshBasicMaterial( { color: color } );
 		const sphere = new Mesh( geometry, material );
 
 		sphere.position.set(origin.x,origin.y,origin.z);
 
-		scene.add( sphere );
+		scene.add(sphere);
+
+		if (deleteAfterMs)
+		{
+			setTimeout(() => scene.remove(sphere), deleteAfterMs);
+		}
 	}
 }

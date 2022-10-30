@@ -51,10 +51,10 @@ export class SceneObject {
 		this.name = sceneName;
 		this.sceneStore = sceneStore;
 		this.geometry = geometry;
+		this.geometry.scale(0.1, 0.1, 0.1);
 		this.mesh = new Mesh(geometry, sceneStore.materialForObjects.normal);
 		this.mesh.castShadow = true;
 		this.mesh.receiveShadow = false;
-		this.mesh.scale.set(0.1, 0.1, 0.1);
 		this.mesh.geometry.center();
 
 		this.minY = new Vector3();
@@ -62,20 +62,6 @@ export class SceneObject {
 		this.center = new Vector3();
 
 		this.isSelected = this.wasSelected = selected;
-		this.SetSelection();
-
-		this.Update();
-	}
-
-	private SetupWireframe(geometry: BufferGeometry) {
-		const wireframe = new WireframeGeometry( geometry );
-		const line = new LineSegments( wireframe );
-		const lineMaterial = line.material as any;
-		lineMaterial.opacity = 0.25;
-		lineMaterial.transparent = true;
-		lineMaterial.color = '#000';
-		line.scale.multiplyScalar( 0.1 );
-		return  line;
 	}
 
 	SetSelection() {
@@ -96,10 +82,13 @@ export class SceneObject {
 	}
 
 	Update() {
+		this.SetSelection();
 		this.UpdateSize();
 	}
 
 	UpdateSize() {
+		this.mesh.updateMatrixWorld();
+
 		const geometry = this.mesh.geometry;
 		const vertices = geometry.attributes.position.array;
 		const deltaMax = 999999;
@@ -156,18 +145,11 @@ export class SceneObject {
 			Math.abs(maxYPoint.y - minYPoint.y),
 			Math.abs(maxZPoint.z - minZPoint.z),
 		);
-
-		ThreeHelper.DrawPoint( this.minY);
-		ThreeHelper.DrawPoint( this.maxY);
-		console.log(this.mesh.position, this.minY);
 	}
 
-	AddToScene(withWireframe?: boolean, withBoxHelper?: boolean) {
+	AddToScene(withBoxHelper?: boolean) {
 		if (withBoxHelper) {
 			this.settings.bbox = true;
-		}
-		if (withWireframe) {
-			this.settings.wireframe = true;
 		}
 
 		this.sceneStore.scene.add(this.mesh);
@@ -175,16 +157,16 @@ export class SceneObject {
 
 	AlignToPlaneY() {
 		this.mesh.position.setY(0);
-		this.Update();
+		this.UpdateSize();
 
 		Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
 			from: this.mesh.position.clone(),
-			to: this.mesh.position.clone().setY(this.size.y / 2),
+			to: this.mesh.position.clone().setY(-this.minY.y),
 			sceneObject: this as SceneObject,
 			instrument: TransformEnum.Move
 		} as AppEventMoveObject);
 
-		this.Update();
+		this.UpdateSize();
 	}
 
 	AlignToPlaneXZ(gridVec: Vector3) {
@@ -195,7 +177,7 @@ export class SceneObject {
 			instrument: TransformEnum.Move
 		} as AppEventMoveObject);
 
-		this.Update();
+		this.UpdateSize();
 	}
 
 	IsEqual3dObject(_mesh: THREE.Mesh) {

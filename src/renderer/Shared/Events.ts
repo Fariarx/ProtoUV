@@ -58,9 +58,9 @@ const objectAdd = (message: AppEvent) => {
 	const scene = AppStore.sceneStore;
 
 	scene.objects.push(args!.object);
+	args!.object.AddToScene(true);
 	args!.object.AlignToPlaneXZ(scene.gridSize);
 	args!.object.AlignToPlaneY();
-	args!.object.AddToScene(true);
 	scene.animate();
 
 	runInAction(() => {
@@ -129,8 +129,6 @@ const objectTransform = (message: AppEvent) => {
 				break;
 		}
 	}
-
-	moveObject.sceneObject.Update();
 
 	if(!moveObject.renderBreak)
 	{

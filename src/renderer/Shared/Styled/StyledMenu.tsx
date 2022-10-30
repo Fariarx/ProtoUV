@@ -1,5 +1,5 @@
 import { Menu, MenuProps, alpha, styled } from '@mui/material';
-import { colors } from '../Theme';
+import { colors } from '../Config';
 import { Sizes } from './Sizes';
 
 export const StyledMenu = styled((props: MenuProps) => (

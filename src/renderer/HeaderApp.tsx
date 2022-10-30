@@ -8,6 +8,7 @@ import React from 'react';
 import { container } from 'tsyringe';
 import { AppStore, Pages } from './AppStore';
 import { BindItem, HeaderStore } from './HeaderStore';
+import { colors } from './Shared/Config';
 import { bridge } from './Shared/Globals';
 import logo1 from './Shared/Image/uv128_v1.png';
 import { emptyFunc, linearGenerator } from './Shared/Libs/Tools';
@@ -15,7 +16,6 @@ import { AnimationGrow } from './Shared/Styled/Animation';
 import { FlexBoxRow, FlexBoxRowFit } from './Shared/Styled/FlexBox';
 import { Sizes } from './Shared/Styled/Sizes';
 import { StyledMenu } from './Shared/Styled/StyledMenu';
-import { colors } from './Shared/Theme';
 
 export const APP_HEADER_HEIGHT = 26;
 export const APP_HEADER_HEIGHT_PX = APP_HEADER_HEIGHT + 'px';
@@ -27,6 +27,7 @@ export const HeaderApp = observer(() => {
 		width: '100%',
 		height: APP_HEADER_HEIGHT_PX,
 		background: colors.background.dark,
+		position: 'absolute',
 		display: 'flex',
 		flexDirection: 'row',
 		justifyContent: 'flex-end',

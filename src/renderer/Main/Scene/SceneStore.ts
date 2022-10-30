@@ -1,11 +1,13 @@
 import { Mesh, PCFSoftShadowMap, PlaneGeometry, Scene, Vector2, Vector3 } from 'three';
 import { Line2 } from 'three/examples/jsm/lines/Line2';
 import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry';
+import { singleton } from 'tsyringe';
 import { AppStore, Log, Pages } from '../../AppStore';
 import { Grid } from '../../Shared/Libs/Tools';
 import { Printer } from '../Printer/Configs/Printer';
 import { SceneInitializer } from './SceneInitializer';
 
+@singleton()
 export class SceneStore extends SceneInitializer {
 	public constructor() {
 		super();
@@ -40,7 +42,7 @@ export class SceneStore extends SceneInitializer {
 		}
 		else
 		{
-			AppStore.setState(Pages.Configurator);
+			setTimeout(() => AppStore.setState(Pages.Configurator));
 			Log('Printer configuration is empty!');
 		}
 	}

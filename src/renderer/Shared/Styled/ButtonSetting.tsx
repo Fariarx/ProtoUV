@@ -1,5 +1,5 @@
 import { ToggleButton } from '@mui/material';
-import { colors } from '../Theme';
+import { colors } from '../Config';
 
 export const ButtonSetting = (props: {
   children: React.ReactNode;

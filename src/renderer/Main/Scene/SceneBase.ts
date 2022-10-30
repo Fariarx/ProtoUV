@@ -14,8 +14,8 @@ import { OutlineEffect } from 'three/examples/jsm/effects/OutlineEffect';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial';
 import { config } from '../../Shared/Config';
+import { colors } from '../../Shared/Config';
 import { toNormalizedRGBArray } from '../../Shared/Libs/Tools';
-import { colors } from '../../Shared/Theme';
 import { Printer } from '../Printer/Configs/Printer';
 import { SceneObject } from './Entities/SceneObject';
 

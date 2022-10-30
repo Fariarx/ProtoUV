@@ -1,3 +1,4 @@
+import { Transform } from '@mui/icons-material';
 import { runInAction } from 'mobx';
 import { WheelEvent } from 'React';
 import {
@@ -16,8 +17,9 @@ import { Dispatch } from '../../Shared/Events';
 import { EnumHelpers } from '../../Shared/Helpers/Enum';
 import * as OrientationHelper from '../../Shared/Helpers/OrientationHelper';
 import { SubscribersKeyPressed, isKeyPressed } from '../../Shared/Libs/Keys';
-import { SubscribersMouseDown, SubscribersMouseUp, SubscribersWindowResize } from '../../Shared/Libs/Listerners';
+import { SubscribersDoubleMouseClick, SubscribersMouseDown, SubscribersMouseUp, SubscribersWindowResize } from '../../Shared/Libs/Listerners';
 import { AppEventEnum, AppEventMoveObject, AppEventSelectionChanged, TransformEnum } from '../../Shared/Libs/Types';
+import { TransformStore } from '../Components/Transform/TransformStore';
 import { SceneObject } from './Entities/SceneObject';
 import { SceneBase } from './SceneBase';
 
@@ -439,6 +441,11 @@ export class SceneInitializer extends SceneBase {
 				AppStore.sceneStore.updateSelectionChanged();
 				AppStore.sceneStore.animate();
 			}
+		});
+
+		SubscribersDoubleMouseClick.push(() => {
+
+			AppStore.transform.changeState(TransformEnum.None);
 		});
 	};
 	public updateSelectionChanged = () => {

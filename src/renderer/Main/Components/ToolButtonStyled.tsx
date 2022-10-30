@@ -1,9 +1,9 @@
 import { Tooltip } from '@mui/material';
 import { observer } from 'mobx-react';
 import React from 'react';
+import { colors } from '../../Shared/Config';
 import { FlexBoxColumnFit, flexChildrenCenter } from '../../Shared/Styled/FlexBox';
 import { Sizes } from '../../Shared/Styled/Sizes';
-import { colors } from '../../Shared/Theme';
 
 export const ToolButtonStyled = observer((props: {
   children: React.ReactElement;

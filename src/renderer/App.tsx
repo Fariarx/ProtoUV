@@ -18,10 +18,11 @@ import { ToolsApp } from './Main/Components/ToolsApp';
 import { ViewChangeApp } from './Main/Components/ViewChange/ViewChangeApp';
 import { ConsoleApp } from './Main/Console/ConsoleApp';
 import { SceneApp } from './Main/Scene/SceneApp';
+import { colors } from './Shared/Config';
 import { AnimationFade, AnimationGrow } from './Shared/Styled/Animation';
 import { FlexBoxColumn, FlexBoxRow } from './Shared/Styled/FlexBox';
 import { Sizes } from './Shared/Styled/Sizes';
-import { UpdateScheme, colors, darkTheme } from './Shared/Theme';
+import { UpdateScheme, darkTheme } from './Shared/Theme';
 
 UpdateScheme();
 
@@ -32,7 +33,8 @@ const Main = observer(() => {
 				<CssBaseline enableColorScheme />
 				<HeaderApp />
 				<Divider color={colors.background.dark}/>
-				<AnimationFade in={AppStore.getState() === Pages.Main} unmount={false}>
+
+				<AnimationFade in={AppStore.getState() === Pages.Main}>
 					<FlexBoxRow>
 						<FlexBoxColumn>
 							<FlexBoxRow>
@@ -48,17 +50,20 @@ const Main = observer(() => {
 						<DragAndDropApp open={AppStore.instance.dropFile} />
 					</FlexBoxRow>
 				</AnimationFade>
+
 				<AnimationGrow in={AppStore.getState() === Pages.Configurator}>
-					<FlexBoxColumn>
+					<FlexBoxRow>
 						<ConfiguratorAutoApp/>
 						<ConsoleApp mb={Sizes.twelve}/>
-					</FlexBoxColumn>
+					</FlexBoxRow>
 				</AnimationGrow>
+
 				<AnimationGrow in={AppStore.getState() === Pages.ConfiguratorManually}>
 					<FlexBoxColumn>
 						<ConfiguratorManuallyApp/>
 					</FlexBoxColumn>
 				</AnimationGrow>
+
 			</ThemeProvider>
 		</SnackbarProvider>
 	</FlexBoxColumn>;

@@ -91,8 +91,8 @@ export class SceneInitializer extends SceneBase {
 	};
 	private setupLight = () => {
 		this.lightGroup = new Group();
-		this.lightShadow = new DirectionalLight(0xffffff, 0.2);
-		this.lightFromCamera = new DirectionalLight(0xffffff, 0.3);
+		this.lightShadow = new DirectionalLight(0xffffff, 0.25);
+		this.lightFromCamera = new DirectionalLight(0xffffff, 0.35);
 
 		this.lightFromCamera.castShadow = false;
 		this.lightGroup.attach( this.lightFromCamera );
@@ -311,25 +311,40 @@ export class SceneInitializer extends SceneBase {
 		this.stats.domElement.style.marginLeft = '8px';
 		this.stats.domElement.style.opacity = '0.3';
 		this.stats.domElement.style.zIndex = '1';
-
+		this.setupOrientationHelper(canvas);
+		canvas?.appendChild(this.renderer.domElement);
+		canvas?.appendChild(this.stats.domElement);
+	};
+	public setupOrientationHelper = (canvas: HTMLDivElement | null) => {
 		const ohOptions = {
 			className: 'orientation-helper-in-scene'
 		};
 		const ohLabels = {
-			px: 'East',
-			nx: 'West',
-			pz: 'South',
-			nz: 'North',
-			py: 'Sky',
-			ny: 'Ground'
+			px: 'Front',
+			nx: 'Right',
+			pz: 'Left',
+			nz: 'Back',
+			py: 'Top',
+			ny: 'Bottom'
+		};
+		const translateCamera = (direction: Vector3) => {
+			this.orbitControls.enabled = false;
+			const dist = this.activeCamera.position.distanceTo( this.orbitControls.target),
+				newCameraPos = this.orbitControls.target.clone().add( direction.multiplyScalar( dist ) );
+			this.activeCamera.position.set(newCameraPos.x, newCameraPos.y, newCameraPos.z);
+			this.orbitControls.enabled = true;
+			this.animate();
 		};
 
-		const orientationHelper= new OrientationHelper.OrientationHelper(this.activeCamera, this.orbitControls, ohOptions, ohLabels);
+		this.orientationHelperPerspective = new OrientationHelper.OrientationHelper(this.perspectiveCamera, this.orbitControls, ohOptions, ohLabels) as any;
+		this.orientationHelperPerspective.addEventListener( 'click', (e : { normal: Vector3 }) => translateCamera(e.normal));
+		canvas?.appendChild(this.orientationHelperPerspective.domElement);
 
-		canvas?.appendChild((orientationHelper as any).domElement);
+		this.orientationHelperOrthographic = new OrientationHelper.OrientationHelper(this.orthographicCamera, this.orbitControls, ohOptions, ohLabels) as any;
+		this.orientationHelperOrthographic.addEventListener( 'click', (e : { normal: Vector3 }) => translateCamera(e.normal));
+		canvas?.appendChild(this.orientationHelperOrthographic.domElement);
 
-		canvas?.appendChild(this.renderer.domElement);
-		canvas?.appendChild(this.stats.domElement);
+		this.updateOrientationHelper();
 	};
 	public setupKeyboard = () => {
 		SubscribersKeyPressed.push(k => {
@@ -500,6 +515,7 @@ export class SceneInitializer extends SceneBase {
 			saveConfig();
 		}
 
+		this.updateOrientationHelper();
 		this.orbitControls.object = this.activeCamera;
 		this.orbitControls.target.set(this.gridSize.x / 2, 0, this.gridSize.z / 2);
 		this.orbitControls.update();
@@ -509,6 +525,16 @@ export class SceneInitializer extends SceneBase {
 		if (!isInit)
 		{
 			this.animate();
+		}
+	};
+	public updateOrientationHelper = () => {
+		const isPerspective = this.activeCamera instanceof PerspectiveCamera;
+		if (this.orientationHelperOrthographic && this.orientationHelperPerspective)
+		{
+			this.orientationHelperOrthographic.domElement.style.display = isPerspective ? 'none' : 'block';
+			this.orientationHelperPerspective.domElement.style.display = !isPerspective ? 'none' : 'block';
+			this.orientationHelperOrthographic[isPerspective ? 'deactivate' : 'activate']();
+			this.orientationHelperPerspective[!isPerspective ? 'deactivate' : 'activate']();
 		}
 	};
 	public handleLoadFile = (file: string) => {

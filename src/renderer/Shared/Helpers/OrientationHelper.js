@@ -35,21 +35,21 @@ var OrientationHelper = function ( camera, controls, options, labels ) {
 		width: 100,
 		height: 100,
 		className: '',
-		backgroundColor: 0xffffff,
+		backgroundColor: '#444',
 		backgroundOpacity: 0,
 		cameraFov: 50,
 		cameraNear: 1,
 		cameraFar: 1000,
 		cameraDistance: 150,
-		boxBackground: '#ddd',
-		boxColor: '#222',
+		boxBackground: '#444',
+		boxColor: '#fff',
 		boxCanvasSide: 64,
-		boxFontSize: 14,
+		boxFontSize: 17,
 		boxFontFamily: 'Arial',
 		model3D: null,
-		addRing: true,
+		addRing: false,
 		addLights: true,
-		addOrbitControls: true
+		addOrbitControls: false
 	}, options );
 
 	var _lbls = Object.assign( {
@@ -403,10 +403,10 @@ var OrientationHelper = function ( camera, controls, options, labels ) {
 
 			var geometry = new RingGeometry( 50, 60, 32 );
 			var material = new MeshPhysicalMaterial( {
-				color: 0xdddddd,
+				color: '#444',
 				side: DoubleSide,
 				transparent: true,
-				opacity: 0.45
+				opacity: 0.8
 			} );
 
 			var circle = new Mesh( geometry, material );
@@ -427,15 +427,15 @@ var OrientationHelper = function ( camera, controls, options, labels ) {
 		var lightsGroup = new Group();
 		lightsGroup.name = 'orientation-helper-lights';
 
-		var light = new DirectionalLight( 0xffe7b2, 0.15 );
+		var light = new DirectionalLight( '#dbeafa', 1.5 );
 		light.position.set( 500, 300, - 500 );
 		lightsGroup.add( light );
 
-		light = new DirectionalLight( 0xfff5aa, 0.15 );
+		light = new DirectionalLight( '#deccfa', 1.5 );
 		light.position.set( - 500, - 300, 500 );
 		lightsGroup.add( light );
 
-		lightsGroup.add( new AmbientLight( '#000', 0.95 ) );
+		lightsGroup.add( new AmbientLight( '#777888', 1.5 ) );
 
 		return lightsGroup;
 

@@ -40,9 +40,9 @@ export abstract class SceneBase {
 	public materialsForScene = {
 		default: {
 			normal: new MeshPhongMaterial( { color: '#f8a745', emissive:'#ffd4d4',
-				emissiveIntensity: 0.2 , flatShading: true, side: DoubleSide, shininess: 20, opacity: 0.7, transparent: true } ),
-			select: new MeshPhongMaterial( { color: '#858dff', emissive:'#ffd4d4',
-				emissiveIntensity: 0.2 , flatShading: true, side: DoubleSide, shininess: 20 } ),
+				emissiveIntensity: 0.15, flatShading: true, side: DoubleSide, shininess: 20, opacity: 0.7, transparent: true } ),
+			select: new MeshPhongMaterial( { color: '#858dff', emissive:'#ffffff',
+				emissiveIntensity: 0.15, side: DoubleSide } ),
 		} as MaterialForScene,
 	};
 
@@ -87,6 +87,7 @@ export abstract class SceneBase {
 	public lightFromCamera!: DirectionalLight;
 	public orbitControls!: OrbitControls;
 	public transformControls!: TransformControls;
+	public orientationHelperPerspective: any;
 
 	public cameraRig!: Group;
 	public axes!: Object3D;

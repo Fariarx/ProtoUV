@@ -272,7 +272,7 @@ var OrientationHelper = function ( camera, controls, options, labels ) {
 				normal: normal,
 				direction: scope._camera.position.clone().normalize()
 
-			} );
+			});
 
 		};
 

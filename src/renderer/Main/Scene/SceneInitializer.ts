@@ -334,6 +334,7 @@ export class SceneInitializer extends SceneBase {
 			this.activeCamera.position.set(newCameraPos.x, newCameraPos.y, newCameraPos.z);
 			this.orbitControls.enabled = true;
 			this.animate();
+			this.activeCamera.rotation.set(0, 0, 0);
 		};
 
 		this.orientationHelperPerspective = new OrientationHelper.OrientationHelper(this.perspectiveCamera, this.orbitControls, ohOptions, ohLabels) as any;
@@ -343,6 +344,13 @@ export class SceneInitializer extends SceneBase {
 		this.orientationHelperOrthographic = new OrientationHelper.OrientationHelper(this.orthographicCamera, this.orbitControls, ohOptions, ohLabels) as any;
 		this.orientationHelperOrthographic.addEventListener( 'click', (e : { normal: Vector3 }) => translateCamera(e.normal));
 		canvas?.appendChild(this.orientationHelperOrthographic.domElement);
+
+		this.orientationHelperPerspective.domElement.style.position = 'absolute';
+		this.orientationHelperOrthographic.domElement.style.position = 'absolute';
+		this.orientationHelperPerspective.domElement.style.right = '8px';
+		this.orientationHelperOrthographic.domElement.style.right = '8px';
+		this.orientationHelperPerspective.domElement.style.top = (8 + APP_HEADER_HEIGHT) + 'px';
+		this.orientationHelperOrthographic.domElement.style.top = (8 + APP_HEADER_HEIGHT) + 'px';
 
 		this.updateOrientationHelper();
 	};
@@ -652,7 +660,7 @@ export class SceneInitializer extends SceneBase {
 				{
 					this.outlineEffectRenderer.renderOutline(this.scene, this.activeCamera);
 				}
-			}, 700);
+			}, 1000);
 
 			this.stats.update();
 

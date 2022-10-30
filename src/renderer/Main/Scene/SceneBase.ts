@@ -25,7 +25,7 @@ export abstract class SceneBase {
 		alpha:true,
 	});
 	public outlineEffectRenderer: OutlineEffect = new OutlineEffect( this.renderer, {
-		defaultThickness:0.001
+		defaultThickness:0.0005
 	});
 	public materialForSupports = {
 		normal: new MeshLambertMaterial({ transparent: true, opacity: 0.6, color: '#5bc3fc' }),
@@ -34,7 +34,7 @@ export abstract class SceneBase {
 
 	public materialLine = new LineMaterial({
 		color: 0xa1a1a1,
-		linewidth: 3
+		linewidth: 2
 	});
 
 	public materialsForScene = {
@@ -88,6 +88,7 @@ export abstract class SceneBase {
 	public orbitControls!: OrbitControls;
 	public transformControls!: TransformControls;
 	public orientationHelperPerspective: any;
+	public orientationHelperOrthographic: any;
 
 	public cameraRig!: Group;
 	public axes!: Object3D;

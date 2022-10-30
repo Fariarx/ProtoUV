@@ -413,7 +413,7 @@ export class SceneInitializer extends SceneBase {
 				AppStore.sceneStore.groupSelected.push(object);
 			}
 
-			const state = object.SetSelection();
+			const state = object.UpdateSelection();
 
 			changes.push({
 				uuid:object.mesh.uuid,

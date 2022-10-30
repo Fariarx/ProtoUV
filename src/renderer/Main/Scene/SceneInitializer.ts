@@ -14,7 +14,7 @@ import { APP_HEADER_HEIGHT } from '../../HeaderApp';
 import { config, saveConfig } from '../../Shared/Config';
 import { Dispatch } from '../../Shared/Events';
 import { EnumHelpers } from '../../Shared/Helpers/Enum';
-import { ThreeHelper } from '../../Shared/Helpers/Three';
+import * as OrientationHelper from '../../Shared/Helpers/OrientationHelper';
 import { SubscribersKeyPressed, isKeyPressed } from '../../Shared/Libs/Keys';
 import { SubscribersMouseDown, SubscribersMouseUp, SubscribersWindowResize } from '../../Shared/Libs/Listerners';
 import { AppEventEnum, AppEventMoveObject, AppEventSelectionChanged, TransformEnum } from '../../Shared/Libs/Types';
@@ -73,8 +73,8 @@ export class SceneInitializer extends SceneBase {
 		}
 	};
 	private updateWindowResize = () => {
-		this.renderer.setSize(window.innerWidth, window.innerHeight);
 		this.updateCameraWindowSize();
+		this.renderer.setSize(window.innerWidth, window.innerHeight);
 
 		const target = this.orbitControls.target.clone();
 		this.orbitControls.dispose();
@@ -312,6 +312,22 @@ export class SceneInitializer extends SceneBase {
 		this.stats.domElement.style.opacity = '0.3';
 		this.stats.domElement.style.zIndex = '1';
 
+		const ohOptions = {
+			className: 'orientation-helper-in-scene'
+		};
+		const ohLabels = {
+			px: 'East',
+			nx: 'West',
+			pz: 'South',
+			nz: 'North',
+			py: 'Sky',
+			ny: 'Ground'
+		};
+
+		const orientationHelper= new OrientationHelper.OrientationHelper(this.activeCamera, this.orbitControls, ohOptions, ohLabels);
+
+		canvas?.appendChild((orientationHelper as any).domElement);
+
 		canvas?.appendChild(this.renderer.domElement);
 		canvas?.appendChild(this.stats.domElement);
 	};
@@ -460,18 +476,15 @@ export class SceneInitializer extends SceneBase {
 		this.orbitControls.update();
 	};
 	public updateCameraWindowSize = () => {
-		if (this.activeCamera instanceof PerspectiveCamera) {
-			this.activeCamera.aspect = window.innerWidth / window.innerHeight;
-			//this.activeCamera.fov = (360 / Math.PI) * Math.atan(Math.tan(((Math.PI / 180) * this.perspectiveCamera.fov / 2)) * (window.innerHeight / this.temp.windowHeight));
-			this.activeCamera.updateMatrix();
-		}
-		if (this.activeCamera instanceof OrthographicCamera) {
-			this.activeCamera.left = window.innerWidth / -2;
-			this.activeCamera.right = window.innerWidth / 2;
-			this.activeCamera.top = window.innerHeight / 2;
-			this.activeCamera.bottom = window.innerHeight / -2;
-			this.activeCamera.updateProjectionMatrix();
-		}
+		this.perspectiveCamera.aspect = window.innerWidth / window.innerHeight;
+		//this.activeCamera.fov = (360 / Math.PI) * Math.atan(Math.tan(((Math.PI / 180) * this.perspectiveCamera.fov / 2)) * (window.innerHeight / this.temp.windowHeight));
+		this.perspectiveCamera.updateMatrix();
+		this.perspectiveCamera.updateProjectionMatrix();
+		this.orthographicCamera.left = window.innerWidth / -2;
+		this.orthographicCamera.right = window.innerWidth / 2;
+		this.orthographicCamera.top = window.innerHeight / 2;
+		this.orthographicCamera.bottom = window.innerHeight / -2;
+		this.orthographicCamera.updateProjectionMatrix();
 	};
 	public updateCameraType = (isPerspective: boolean, isInit = false) => {
 		if (isPerspective)

@@ -1,6 +1,7 @@
 import { runInAction } from 'mobx';
-import { BufferGeometry, LineSegments, Mesh, Vector3 } from 'three';
+import { Mesh, Vector3 } from 'three';
 import { AppStore } from '../AppStore';
+import { SceneObject } from './../Main/Scene/Entities/SceneObject';
 import { config } from './Config';
 import { AppEvent, AppEventAddObject, AppEventArguments, AppEventEnum, AppEventMoveObject, TransformEnum } from './Libs/Types';
 
@@ -57,10 +58,13 @@ const objectAdd = (message: AppEvent) => {
 	const app = AppStore.instance;
 	const scene = AppStore.sceneStore;
 
+	SceneObject.DeselectAllObjects();
 	scene.objects.push(args!.object);
 	args!.object.AddToScene(true);
 	args!.object.AlignToPlaneXZ(scene.gridSize);
 	args!.object.AlignToPlaneY();
+	scene.updateSelectionChanged();
+	scene.updateTransformControls();
 	scene.animate();
 
 	runInAction(() => {

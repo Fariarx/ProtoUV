@@ -2,9 +2,9 @@ import { Box, Fade, Typography } from '@mui/material';
 import { observer } from 'mobx-react';
 import { useState } from 'react';
 import { AppStore } from '../../AppStore';
+import { colors } from '../../Shared/Config';
 import { linearGenerator } from '../../Shared/Libs/Tools';
 import { Sizes } from '../../Shared/Styled/Sizes';
-import { colors } from '../../Shared/Theme';
 
 export const ConsoleApp = observer((props: {mt?: string, mb?: string}) => {
 	const [ selectable, setSelectable ] = useState(false);

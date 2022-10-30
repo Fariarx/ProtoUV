@@ -4,7 +4,7 @@ import { MdBlurLinear } from '@react-icons/all-files/md/MdBlurLinear';
 import { useState } from 'react';
 import { AppStore } from '../../../AppStore';
 import { config } from '../../../Shared/Config';
-import { colors } from '../../../Shared/Theme';
+import { colors } from '../../../Shared/Config';
 
 export const CameraTypeApp = () => {
 	const [isPerspective, setterIsPerspective] = useState(config.scene.setStartupPerspectiveCamera);

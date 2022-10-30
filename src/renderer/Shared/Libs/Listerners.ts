@@ -1,3 +1,6 @@
+window.addEventListener('dblclick', (e: any) => SubscribersDoubleMouseClick.forEach(x => x(e)));
+export const SubscribersDoubleMouseClick: ((e: any) => void)[] = [];
+
 window.addEventListener('click', (e: any) => SubscribersMouseClick.forEach(x => x(e)));
 export const SubscribersMouseClick: ((e: any) => void)[] = [];
 

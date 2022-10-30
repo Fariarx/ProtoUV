@@ -1,3 +1,4 @@
+import { Transform } from '@mui/icons-material';
 import { runInAction } from 'mobx';
 import { WheelEvent } from 'React';
 import {
@@ -14,10 +15,11 @@ import { APP_HEADER_HEIGHT } from '../../HeaderApp';
 import { config, saveConfig } from '../../Shared/Config';
 import { Dispatch } from '../../Shared/Events';
 import { EnumHelpers } from '../../Shared/Helpers/Enum';
-import { ThreeHelper } from '../../Shared/Helpers/Three';
+import * as OrientationHelper from '../../Shared/Helpers/OrientationHelper';
 import { SubscribersKeyPressed, isKeyPressed } from '../../Shared/Libs/Keys';
-import { SubscribersMouseDown, SubscribersMouseUp, SubscribersWindowResize } from '../../Shared/Libs/Listerners';
+import { SubscribersDoubleMouseClick, SubscribersMouseDown, SubscribersMouseUp, SubscribersWindowResize } from '../../Shared/Libs/Listerners';
 import { AppEventEnum, AppEventMoveObject, AppEventSelectionChanged, TransformEnum } from '../../Shared/Libs/Types';
+import { TransformStore } from '../Components/Transform/TransformStore';
 import { SceneObject } from './Entities/SceneObject';
 import { SceneBase } from './SceneBase';
 
@@ -73,8 +75,8 @@ export class SceneInitializer extends SceneBase {
 		}
 	};
 	private updateWindowResize = () => {
-		this.renderer.setSize(window.innerWidth, window.innerHeight);
 		this.updateCameraWindowSize();
+		this.renderer.setSize(window.innerWidth, window.innerHeight);
 
 		const target = this.orbitControls.target.clone();
 		this.orbitControls.dispose();
@@ -91,8 +93,8 @@ export class SceneInitializer extends SceneBase {
 	};
 	private setupLight = () => {
 		this.lightGroup = new Group();
-		this.lightShadow = new DirectionalLight(0xffffff, 0.2);
-		this.lightFromCamera = new DirectionalLight(0xffffff, 0.3);
+		this.lightShadow = new DirectionalLight(0xffffff, 0.25);
+		this.lightFromCamera = new DirectionalLight(0xffffff, 0.35);
 
 		this.lightFromCamera.castShadow = false;
 		this.lightGroup.attach( this.lightFromCamera );
@@ -311,9 +313,48 @@ export class SceneInitializer extends SceneBase {
 		this.stats.domElement.style.marginLeft = '8px';
 		this.stats.domElement.style.opacity = '0.3';
 		this.stats.domElement.style.zIndex = '1';
-
+		this.setupOrientationHelper(canvas);
 		canvas?.appendChild(this.renderer.domElement);
 		canvas?.appendChild(this.stats.domElement);
+	};
+	public setupOrientationHelper = (canvas: HTMLDivElement | null) => {
+		const ohOptions = {
+			className: 'orientation-helper-in-scene'
+		};
+		const ohLabels = {
+			px: 'Front',
+			nx: 'Right',
+			pz: 'Left',
+			nz: 'Back',
+			py: 'Top',
+			ny: 'Bottom'
+		};
+		const translateCamera = (direction: Vector3) => {
+			this.orbitControls.enabled = false;
+			const dist = this.activeCamera.position.distanceTo( this.orbitControls.target),
+				newCameraPos = this.orbitControls.target.clone().add( direction.multiplyScalar( dist ) );
+			this.activeCamera.position.set(newCameraPos.x, newCameraPos.y, newCameraPos.z);
+			this.orbitControls.enabled = true;
+			this.animate();
+			this.activeCamera.rotation.set(0, 0, 0);
+		};
+
+		this.orientationHelperPerspective = new OrientationHelper.OrientationHelper(this.perspectiveCamera, this.orbitControls, ohOptions, ohLabels) as any;
+		this.orientationHelperPerspective.addEventListener( 'click', (e : { normal: Vector3 }) => translateCamera(e.normal));
+		canvas?.appendChild(this.orientationHelperPerspective.domElement);
+
+		this.orientationHelperOrthographic = new OrientationHelper.OrientationHelper(this.orthographicCamera, this.orbitControls, ohOptions, ohLabels) as any;
+		this.orientationHelperOrthographic.addEventListener( 'click', (e : { normal: Vector3 }) => translateCamera(e.normal));
+		canvas?.appendChild(this.orientationHelperOrthographic.domElement);
+
+		this.orientationHelperPerspective.domElement.style.position = 'absolute';
+		this.orientationHelperOrthographic.domElement.style.position = 'absolute';
+		this.orientationHelperPerspective.domElement.style.right = '8px';
+		this.orientationHelperOrthographic.domElement.style.right = '8px';
+		this.orientationHelperPerspective.domElement.style.top = (8 + APP_HEADER_HEIGHT) + 'px';
+		this.orientationHelperOrthographic.domElement.style.top = (8 + APP_HEADER_HEIGHT) + 'px';
+
+		this.updateOrientationHelper();
 	};
 	public setupKeyboard = () => {
 		SubscribersKeyPressed.push(k => {
@@ -401,6 +442,11 @@ export class SceneInitializer extends SceneBase {
 				AppStore.sceneStore.animate();
 			}
 		});
+
+		SubscribersDoubleMouseClick.push(() => {
+
+			AppStore.transform.changeState(TransformEnum.None);
+		});
 	};
 	public updateSelectionChanged = () => {
 		AppStore.sceneStore.transformControls.detach();
@@ -413,7 +459,7 @@ export class SceneInitializer extends SceneBase {
 				AppStore.sceneStore.groupSelected.push(object);
 			}
 
-			const state = object.SetSelection();
+			const state = object.UpdateSelection();
 
 			changes.push({
 				uuid:object.mesh.uuid,
@@ -460,18 +506,15 @@ export class SceneInitializer extends SceneBase {
 		this.orbitControls.update();
 	};
 	public updateCameraWindowSize = () => {
-		if (this.activeCamera instanceof PerspectiveCamera) {
-			this.activeCamera.aspect = window.innerWidth / window.innerHeight;
-			//this.activeCamera.fov = (360 / Math.PI) * Math.atan(Math.tan(((Math.PI / 180) * this.perspectiveCamera.fov / 2)) * (window.innerHeight / this.temp.windowHeight));
-			this.activeCamera.updateMatrix();
-		}
-		if (this.activeCamera instanceof OrthographicCamera) {
-			this.activeCamera.left = window.innerWidth / -2;
-			this.activeCamera.right = window.innerWidth / 2;
-			this.activeCamera.top = window.innerHeight / 2;
-			this.activeCamera.bottom = window.innerHeight / -2;
-			this.activeCamera.updateProjectionMatrix();
-		}
+		this.perspectiveCamera.aspect = window.innerWidth / window.innerHeight;
+		//this.activeCamera.fov = (360 / Math.PI) * Math.atan(Math.tan(((Math.PI / 180) * this.perspectiveCamera.fov / 2)) * (window.innerHeight / this.temp.windowHeight));
+		this.perspectiveCamera.updateMatrix();
+		this.perspectiveCamera.updateProjectionMatrix();
+		this.orthographicCamera.left = window.innerWidth / -2;
+		this.orthographicCamera.right = window.innerWidth / 2;
+		this.orthographicCamera.top = window.innerHeight / 2;
+		this.orthographicCamera.bottom = window.innerHeight / -2;
+		this.orthographicCamera.updateProjectionMatrix();
 	};
 	public updateCameraType = (isPerspective: boolean, isInit = false) => {
 		if (isPerspective)
@@ -487,6 +530,7 @@ export class SceneInitializer extends SceneBase {
 			saveConfig();
 		}
 
+		this.updateOrientationHelper();
 		this.orbitControls.object = this.activeCamera;
 		this.orbitControls.target.set(this.gridSize.x / 2, 0, this.gridSize.z / 2);
 		this.orbitControls.update();
@@ -496,6 +540,16 @@ export class SceneInitializer extends SceneBase {
 		if (!isInit)
 		{
 			this.animate();
+		}
+	};
+	public updateOrientationHelper = () => {
+		const isPerspective = this.activeCamera instanceof PerspectiveCamera;
+		if (this.orientationHelperOrthographic && this.orientationHelperPerspective)
+		{
+			this.orientationHelperOrthographic.domElement.style.display = isPerspective ? 'none' : 'block';
+			this.orientationHelperPerspective.domElement.style.display = !isPerspective ? 'none' : 'block';
+			this.orientationHelperOrthographic[isPerspective ? 'deactivate' : 'activate']();
+			this.orientationHelperPerspective[!isPerspective ? 'deactivate' : 'activate']();
 		}
 	};
 	public handleLoadFile = (file: string) => {
@@ -613,7 +667,7 @@ export class SceneInitializer extends SceneBase {
 				{
 					this.outlineEffectRenderer.renderOutline(this.scene, this.activeCamera);
 				}
-			}, 700);
+			}, 1000);
 
 			this.stats.update();
 

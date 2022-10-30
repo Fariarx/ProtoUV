@@ -5,9 +5,9 @@ import { useState } from 'react';
 import { AppStore, Log, Pages } from '../AppStore';
 import { Printer } from '../Main/Printer/Configs/Printer';
 import { config, saveConfig } from '../Shared/Config';
+import { colors } from '../Shared/Config';
 import { FlexBoxColumn, FlexBoxColumnFit, flexChildrenCenter } from '../Shared/Styled/FlexBox';
 import { Sizes } from '../Shared/Styled/Sizes';
-import { colors } from '../Shared/Theme';
 
 export const ConfiguratorAutoApp = observer(() => {
 	const configs = Printer.ParseConfigFileNames();

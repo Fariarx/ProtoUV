@@ -62,9 +62,10 @@ export class SceneObject {
 		this.center = new Vector3();
 
 		this.isSelected = this.wasSelected = selected;
+		this.Update();
 	}
 
-	SetSelection() {
+	UpdateSelection() {
 		if (this.wasSelected !== this.isSelected) {
 			this.wasSelected = this.isSelected;
 		}
@@ -82,7 +83,7 @@ export class SceneObject {
 	}
 
 	Update() {
-		this.SetSelection();
+		this.UpdateSelection();
 		this.UpdateSize();
 	}
 
@@ -312,7 +313,7 @@ export class SceneObject {
 	}
 
 	static SelectObjsAlignY = () => {
-		if (AppStore.sceneStore.groupSelected.length ) {
+		if (AppStore.sceneStore.groupSelected.length) {
 			for (const sceneObject of AppStore.sceneStore.groupSelected) {
 				sceneObject.Update();
 				sceneObject.AlignToPlaneY();
@@ -330,6 +331,18 @@ export class SceneObject {
 		}
 
 		AppStore.sceneStore.transformControls.detach();
+		AppStore.sceneStore.animate();
+	};
+
+	static DeselectAllObjects = () => {
+		if (AppStore.sceneStore.groupSelected.length) {
+			for (const sceneObject of AppStore.sceneStore.groupSelected) {
+				sceneObject.isSelected = false;
+				sceneObject.UpdateSelection();
+			}
+		}
+
+		AppStore.sceneStore.updateSelectionChanged();
 		AppStore.sceneStore.animate();
 	};
 }

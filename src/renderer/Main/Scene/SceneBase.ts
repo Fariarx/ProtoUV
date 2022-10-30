@@ -14,8 +14,8 @@ import { OutlineEffect } from 'three/examples/jsm/effects/OutlineEffect';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial';
 import { config } from '../../Shared/Config';
+import { colors } from '../../Shared/Config';
 import { toNormalizedRGBArray } from '../../Shared/Libs/Tools';
-import { colors } from '../../Shared/Theme';
 import { Printer } from '../Printer/Configs/Printer';
 import { SceneObject } from './Entities/SceneObject';
 
@@ -25,7 +25,7 @@ export abstract class SceneBase {
 		alpha:true,
 	});
 	public outlineEffectRenderer: OutlineEffect = new OutlineEffect( this.renderer, {
-		defaultThickness:0.001
+		defaultThickness:0.0005
 	});
 	public materialForSupports = {
 		normal: new MeshLambertMaterial({ transparent: true, opacity: 0.6, color: '#5bc3fc' }),
@@ -34,15 +34,15 @@ export abstract class SceneBase {
 
 	public materialLine = new LineMaterial({
 		color: 0xa1a1a1,
-		linewidth: 3
+		linewidth: 2
 	});
 
 	public materialsForScene = {
 		default: {
 			normal: new MeshPhongMaterial( { color: '#f8a745', emissive:'#ffd4d4',
-				emissiveIntensity: 0.2 , flatShading: true, side: DoubleSide, shininess: 20, opacity: 0.7, transparent: true } ),
-			select: new MeshPhongMaterial( { color: '#858dff', emissive:'#ffd4d4',
-				emissiveIntensity: 0.2 , flatShading: true, side: DoubleSide, shininess: 20 } ),
+				emissiveIntensity: 0.15, flatShading: true, side: DoubleSide, shininess: 20, opacity: 0.7, transparent: true } ),
+			select: new MeshPhongMaterial( { color: '#858dff', emissive:'#ffffff',
+				emissiveIntensity: 0.15, side: DoubleSide } ),
 		} as MaterialForScene,
 	};
 
@@ -87,6 +87,8 @@ export abstract class SceneBase {
 	public lightFromCamera!: DirectionalLight;
 	public orbitControls!: OrbitControls;
 	public transformControls!: TransformControls;
+	public orientationHelperPerspective: any;
+	public orientationHelperOrthographic: any;
 
 	public cameraRig!: Group;
 	public axes!: Object3D;

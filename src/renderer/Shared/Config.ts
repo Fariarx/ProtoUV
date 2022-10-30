@@ -1,8 +1,8 @@
 import { Restore } from './Libs/Restore';
 
 export const _default = {
-	version: 3,
-	versionPrinterConfigs: 3,
+	version: 4,
+	versionPrinterConfigs: 4,
 	settings: {
 		ui: {
 			opacity: 0.5,
@@ -11,6 +11,41 @@ export const _default = {
 			transformAlignToPlane: true,
 			setStartupPerspectiveCamera: true,
 			sharpness:.0001
+		},
+		colors: {
+			typography:{
+				background:'#aaaaaa'
+			},
+			background:{
+				black:'#000',
+				darkest:'#232323',
+				dark:'#2d2d2d',
+				heavy:'#3B3F40',
+				common:'#444444',
+				commonest:'#565656',
+				warm:'#808080',
+				light:'#cbcbcb',
+				white: '#fff'
+			},
+			interact:{
+				touch:'#4984fd',
+				neutral:'#4168c0',
+				touch1:'#614ed3',
+				neutral1:'#5241c0',
+				warning:'#ffbd39',
+				danger:'#fb594f',
+			},
+			scene:{
+				colorBackgroundScene:'#2f2f2f',
+				colorBackgroundSceneBottom:'#6c6c6c',
+				colorBackground:'#1d1d1d',
+				color1:'#2a2a2a',
+				workingPlaneLimitColor:'rgba(169, 110, 105, 1)',
+				workingPlaneColor:'rgba(109, 112, 117, 1)',
+			},
+			logo: {
+				main: '#5e48ff'
+			}
 		},
 		workerCount: 10,
 		printerName: ''
@@ -24,4 +59,6 @@ const storage = new Restore({
 
 export const saveConfig = () => storage.fullSave();
 export const config = storage.get('settings') as typeof _default.settings;
+export const colors = (storage.get('settings') as typeof _default.settings).colors;
 
+console.log(colors);

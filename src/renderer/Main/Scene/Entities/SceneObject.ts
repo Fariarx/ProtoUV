@@ -65,7 +65,7 @@ export class SceneObject {
 		this.Update();
 	}
 
-	UpdateSelection() {
+	UpdateSelection = () => {
 		if (this.wasSelected !== this.isSelected) {
 			this.wasSelected = this.isSelected;
 		}
@@ -80,14 +80,14 @@ export class SceneObject {
 			now: this.isSelected,
 			was: this.wasSelected
 		};
-	}
+	};
 
-	Update() {
+	Update = () => {
 		this.UpdateSelection();
 		this.UpdateSize();
-	}
+	};
 
-	UpdateSize() {
+	UpdateSize = () => {
 		this.mesh.updateMatrixWorld();
 
 		const geometry = this.mesh.geometry;
@@ -146,17 +146,16 @@ export class SceneObject {
 			Math.abs(maxYPoint.y - minYPoint.y),
 			Math.abs(maxZPoint.z - minZPoint.z),
 		);
-	}
+	};
 
-	AddToScene(withBoxHelper?: boolean) {
+	AddToScene = (withBoxHelper?: boolean) => {
 		if (withBoxHelper) {
 			this.settings.bbox = true;
 		}
-
 		this.sceneStore.scene.add(this.mesh);
-	}
+	};
 
-	AlignToPlaneY() {
+	AlignToPlaneY = () => {
 		this.mesh.position.setY(0);
 		this.UpdateSize();
 
@@ -168,9 +167,9 @@ export class SceneObject {
 		} as AppEventMoveObject);
 
 		this.UpdateSize();
-	}
+	};
 
-	AlignToPlaneXZ(gridVec: Vector3) {
+	AlignToPlaneXZ = (gridVec: Vector3) => {
 		Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
 			from: this.mesh.position.clone(),
 			to: this.mesh.position.clone().setX(gridVec.x / 2).setZ(gridVec.z / 2),
@@ -179,7 +178,38 @@ export class SceneObject {
 		} as AppEventMoveObject);
 
 		this.UpdateSize();
-	}
+	};
+
+	AlignToPlanePreparedToPrint = () => {
+		const size = this.size.clone();
+		const rotation = this.mesh.rotation.clone();
+
+		this.mesh.rotation.set(Math.PI / 2, 0, 0);
+		this.UpdateSize();
+		if(this.size.x > size.x)
+		{
+			size.set(this.size.x, this.size.y, this.size.z);
+			rotation.set(Math.PI / 2, 0, 0);
+		}
+
+		this.mesh.rotation.set(Math.PI / 3, 0, 0);
+		this.UpdateSize();
+		if(this.size.x > size.x)
+		{
+			size.set(this.size.x, this.size.y, this.size.z);
+			rotation.set(Math.PI / 2, 0, 0);
+		}
+
+		this.mesh.rotation.set(Math.PI / 4, 0, 0);
+		this.UpdateSize();
+		if(this.size.x > size.x)
+		{
+			size.set(this.size.x, this.size.y, this.size.z);
+			rotation.set(Math.PI / 2, 0, 0);
+		}
+
+		this.mesh.rotation.set(rotation.x, rotation.y, rotation.z);
+	};
 
 	IsEqual3dObject(_mesh: THREE.Mesh) {
 		return _mesh === this.mesh;

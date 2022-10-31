@@ -63,20 +63,21 @@ const objectAdd = (message: AppEvent) => {
 	args!.object.AddToScene(true);
 	args!.object.AlignToPlaneXZ(scene.gridSize);
 	args!.object.AlignToPlaneY();
-	scene.updateSelectionChanged();
-	scene.updateTransformControls();
-	scene.animate();
+  args!.object.AlignToPlanePreparedToPrint();
+  scene.updateSelectionChanged();
+  scene.updateTransformControls();
+  scene.animate();
 
-	runInAction(() => {
-		if (args?.source && !app.projectFolder)
-		{
-			const path = (args.source as string).split('\\');
-			path.pop();
-			app.projectFolder = path.join('\\');
-		}
+  runInAction(() => {
+  	if (args?.source && !app.projectFolder)
+  	{
+  		const path = (args.source as string).split('\\');
+  		path.pop();
+  		app.projectFolder = path.join('\\');
+  	}
 
-		app.fileCount = scene.objects.length;
-	});
+  	app.fileCount = scene.objects.length;
+  });
 };
 
 const objectTransform = (message: AppEvent) => {

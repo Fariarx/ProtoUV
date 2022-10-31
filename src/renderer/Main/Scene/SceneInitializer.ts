@@ -29,9 +29,10 @@ export class SceneInitializer extends SceneBase {
 	public constructor() {
 		super();
 
+		this.renderer.localClippingEnabled = false;
+
 		this.setupWindowResize();
 		this.setupLight();
-		this.setupAxes();
 		this.setupCameraRig();
 		this.setupOrbitController();
 		this.setupTransformControls();
@@ -94,14 +95,12 @@ export class SceneInitializer extends SceneBase {
 	private setupLight = () => {
 		this.lightGroup = new Group();
 		this.lightShadow = new DirectionalLight(0xffffff, 0.25);
-		this.lightFromCamera = new DirectionalLight(0xffffff, 0.35);
-
+		this.lightFromCamera = new DirectionalLight('#ecd7ff', 0.5);
 		this.lightFromCamera.castShadow = false;
 		this.lightGroup.attach( this.lightFromCamera );
 
 		const light1 = new AmbientLight( 0xffffff , 0.3); // soft white light
 		this.lightGroup.attach( light1 );
-
 		this.lightShadow.position.set( this.gridSize.x / 2, 10, this.gridSize.z / 2 ); //default; light shining from top
 		this.lightShadow.castShadow = true; // default false
 
@@ -109,7 +108,6 @@ export class SceneInitializer extends SceneBase {
 
 		target.position.set(this.gridSize.x / 2, 0, this.gridSize.z / 2);
 
-		this.lightShadow.target = target;
 		this.lightFromCamera.target = target;
 
 		this.lightGroup.attach(target);
@@ -349,10 +347,10 @@ export class SceneInitializer extends SceneBase {
 
 		this.orientationHelperPerspective.domElement.style.position = 'absolute';
 		this.orientationHelperOrthographic.domElement.style.position = 'absolute';
-		this.orientationHelperPerspective.domElement.style.right = '8px';
-		this.orientationHelperOrthographic.domElement.style.right = '8px';
-		this.orientationHelperPerspective.domElement.style.top = (8 + APP_HEADER_HEIGHT) + 'px';
-		this.orientationHelperOrthographic.domElement.style.top = (8 + APP_HEADER_HEIGHT) + 'px';
+		this.orientationHelperPerspective.domElement.style.right = '0px';
+		this.orientationHelperOrthographic.domElement.style.right = '0px';
+		this.orientationHelperPerspective.domElement.style.top = (0 + APP_HEADER_HEIGHT) + 'px';
+		this.orientationHelperOrthographic.domElement.style.top = (0 + APP_HEADER_HEIGHT) + 'px';
 
 		this.updateOrientationHelper();
 	};
@@ -631,6 +629,15 @@ export class SceneInitializer extends SceneBase {
 		const _animate = () => {
 			this.renderer.clearDepth(); // important!
 
+			// if dumping enabled
+			this.orbitControls.update();
+
+			if (this.orientationHelperOrthographic && this.orientationHelperPerspective)
+			{
+				this.orientationHelperOrthographic.update();
+				this.orientationHelperPerspective.update();
+			}
+
 			if (this.grid)
 			{
 				this.grid.mat.resolution.set(window.innerWidth, window.innerHeight);
@@ -670,9 +677,6 @@ export class SceneInitializer extends SceneBase {
 			}, 1000);
 
 			this.stats.update();
-
-			// if dumping enabled
-			this.orbitControls.update();
 
 			/*if (this.isTransformWorking) {
         requestAnimationFrame(_animate);

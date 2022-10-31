@@ -23,6 +23,7 @@ export const ToolButtonStyled = observer((props: {
 			height: size,
 			backgroundColor: props.selected ? colors.interact.neutral : colors.background.dark,
 			transition: 'all 0.3s',
+			boxShadow: '0px 0px 0px 1px ' + colors.background.darkest,
 			color: props.selected ? colors.background.white : colors.background.light,
 			'&:hover': {
 				backgroundColor: props.hoverColor ?? colors.interact.neutral

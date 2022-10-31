@@ -39,6 +39,13 @@ export const darkTheme = createTheme({
 				},
 			},
 		},
+		MuiDivider: {
+			styleOverrides: {
+				root: {
+					borderColor: colors.background.darkest
+				}
+			}
+		}
 	},
 });
 

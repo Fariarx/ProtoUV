@@ -1,7 +1,7 @@
 import { Restore } from './Libs/Restore';
 
 export const _default = {
-	version: 4,
+	version: 5,
 	versionPrinterConfigs: 4,
 	settings: {
 		ui: {

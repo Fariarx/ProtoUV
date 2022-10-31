@@ -7,14 +7,15 @@ import { bridge } from './Shared/Globals';
 import { FlexBoxColumn, FlexBoxRow } from './Shared/Styled/FlexBox';
 import { Sizes } from './Shared/Styled/Sizes';
 
+export const APP_BOTTOM_HEIGHT_PX =  Sizes.twentyFour;
+
 export const LineBottomApp = observer(() => {
 	const app = AppStore.instance;
 
 	return <FlexBoxColumn sx={{
 		position: 'absolute',
-		height: Sizes.twentyFour,
+		height: APP_BOTTOM_HEIGHT_PX,
 		bottom: 0,
-		opacity: config.ui.opacity,
 		userSelect: 'none',
 	}}>
 		<Divider />

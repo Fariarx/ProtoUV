@@ -9,10 +9,10 @@ import { SnackbarProvider } from 'notistack';
 import { Route, MemoryRouter as Router, Routes } from 'react-router-dom';
 import './AppStore';
 import { AppStore, Log, Pages } from './AppStore';
+import { APP_BOTTOM_HEIGHT_PX, LineBottomApp } from './BottomApp';
 import { ConfiguratorAutoApp } from './Configurator/ConfiguratorAutoApp';
 import { ConfiguratorManuallyApp } from './Configurator/ConfiguratorManuallyApp';
 import { HeaderApp } from './HeaderApp';
-import { LineBottomApp } from './LineBottomApp';
 import { DragAndDropApp } from './Main/Components/DragAndDropApp';
 import { ToolsApp } from './Main/Components/ToolsApp';
 import { ViewChangeApp } from './Main/Components/ViewChange/ViewChangeApp';
@@ -32,21 +32,34 @@ const Main = observer(() => {
 			<ThemeProvider theme={darkTheme}>
 				<CssBaseline enableColorScheme />
 				<HeaderApp />
-				<Divider color={colors.background.dark}/>
 
 				<AnimationFade in={AppStore.getState() === Pages.Main}>
 					<FlexBoxRow>
-						<FlexBoxColumn>
-							<FlexBoxRow>
-								<FlexBoxRow>
-									<ToolsApp/>
-									<ViewChangeApp/>
-									<SceneApp />
-								</FlexBoxRow>
+						<FlexBoxRow>
+							<SceneApp />
+							<Divider  orientation="vertical" />
+							<FlexBoxRow sx={{
+								width: '400px',
+								height: 'calc(100% - ' + APP_BOTTOM_HEIGHT_PX + ')',
+								background: colors.background.dark,
+							}}>
+								<FlexBoxColumn sx={{
+									width: '5px',
+									transition: '0.5s ease-out',
+									cursor: 'col-resize',
+									':hover': {
+										backgroundColor: colors.interact.touch,
+										width: Sizes.eight
+									}
+								}}>
+
+								</FlexBoxColumn>
 							</FlexBoxRow>
-							<LineBottomApp/>
-						</FlexBoxColumn>
+						</FlexBoxRow>
+						<ToolsApp/>
+						<ViewChangeApp/>
 						<ConsoleApp />
+						<LineBottomApp/>
 						<DragAndDropApp open={AppStore.instance.dropFile} />
 					</FlexBoxRow>
 				</AnimationFade>

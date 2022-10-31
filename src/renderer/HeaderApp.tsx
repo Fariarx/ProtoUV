@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { Box, ButtonGroup, IconButton, MenuItem, Typography, styled } from '@mui/material';
+import { Box, ButtonGroup, Divider, IconButton, MenuItem, Typography, styled } from '@mui/material';
 import { VscChromeClose } from '@react-icons/all-files/vsc/VscChromeClose';
 import { VscChromeMaximize } from '@react-icons/all-files/vsc/VscChromeMaximize';
 import { VscChromeMinimize } from '@react-icons/all-files/vsc/VscChromeMinimize';
@@ -27,76 +27,82 @@ export const HeaderApp = observer(() => {
 		width: '100%',
 		height: APP_HEADER_HEIGHT_PX,
 		background: colors.background.dark,
-		position: 'absolute',
-		display: 'flex',
-		flexDirection: 'row',
-		justifyContent: 'flex-end',
-		userSelect: 'none',
+		position: 'absolute'
 	}}>
-		<FlexBoxRowFit>
-			<Typography variant={'subtitle2'} sx={{
-				marginTop: Sizes.three,
-				marginLeft: Sizes.eight,
-				color: colors.background.white,
-				textShadow: '1px 1px 2px ' + colors.logo.main
-			}}>
+		<Box sx={{
+			width: '100%',
+			height: '100%',
+			display: 'flex',
+			flexDirection: 'row',
+			justifyContent: 'flex-end',
+			userSelect: 'none',
+		}}>
+			<FlexBoxRowFit>
+				<Typography variant={'subtitle2'} sx={{
+					marginTop: Sizes.three,
+					marginLeft: Sizes.eight,
+					color: colors.background.white,
+					textShadow: '1px 1px 2px ' + colors.logo.main
+				}}>
         Proto
-			</Typography>
-			<LogoIcon/>
-		</FlexBoxRowFit>
-		<AnimationGrow in={AppStore.getState() === Pages.Main}>
-			<FlexBoxRow sx={{ width: 'fit-content' }}>
-				<FlexBoxRow sx={{ width: 'fit-content', marginLeft: Sizes.eight }}>
-					<MenuHeaderItem name={'File'} store={store} binds={[{
-						name: 'Open',
-						func: () => { bridge.openFileDialog().filePaths.forEach((filePath: string) =>
-							AppStore.sceneStore.handleLoadFile(filePath)); }
-					},{
-						name: 'Save',
-						func: emptyFunc
-					}]}/>
-					<MenuHeaderItem name={'Help'} store={store} binds={[{
-						name: 'Open settings folder',
-						func: () => bridge.shell.openPath(bridge.userData())
-					}, {
-						name: 'About',
-						func: emptyFunc
-					}]}/>
+				</Typography>
+				<LogoIcon/>
+			</FlexBoxRowFit>
+			<AnimationGrow in={AppStore.getState() === Pages.Main}>
+				<FlexBoxRow sx={{ width: 'fit-content' }}>
+					<FlexBoxRow sx={{ width: 'fit-content', marginLeft: Sizes.eight }}>
+						<MenuHeaderItem name={'File'} store={store} binds={[{
+							name: 'Open',
+							func: () => { bridge.openFileDialog().filePaths.forEach((filePath: string) =>
+								AppStore.sceneStore.handleLoadFile(filePath)); }
+						},{
+							name: 'Save',
+							func: emptyFunc
+						}]}/>
+						<MenuHeaderItem name={'Help'} store={store} binds={[{
+							name: 'Open settings folder',
+							func: () => bridge.shell.openPath(bridge.userData())
+						}, {
+							name: 'About',
+							func: emptyFunc
+						}]}/>
+					</FlexBoxRow>
 				</FlexBoxRow>
+			</AnimationGrow>
+			<FlexBoxRow
+				onDoubleClick={bridge.maximize}
+				sx={{
+					width: '100%',
+					height: '100%',
+					'-webkit-app-region': 'drag',
+				}}>
 			</FlexBoxRow>
-		</AnimationGrow>
-		<FlexBoxRow
-			onDoubleClick={bridge.maximize}
-			sx={{
-				width: '100%',
-				height: '100%',
-				'-webkit-app-region': 'drag',
-			}}>
-		</FlexBoxRow>
-		<ButtonGroup >
-			<IconButtonSmall onClick={bridge.minimize} sx={{
-				borderRadius: 0,
-				width: Sizes.multiply(Sizes.twentyFour, 1.5)
-			}}>
-				<VscChromeMinimize color={colors.typography.background} transform={'scale(0.8)'}/>
-			</IconButtonSmall>
-			<IconButtonSmall onClick={bridge.maximize} sx={{
-				borderRadius: 0,
-				width: Sizes.multiply(Sizes.twentyFour, 1.5)
-			}}>
-				<VscChromeMaximize color={colors.typography.background} transform={'scale(0.8)'}/>
-			</IconButtonSmall>
-			<IconButtonSmall onClick={bridge.close} sx={{
-				'&:hover':{
-					backgroundColor: colors.interact.danger,
-					color: colors.background.white
-				},
-				borderRadius: 0,
-				width: Sizes.multiply(Sizes.twentyFour, 1.5)
-			}}>
-				<VscChromeClose color={colors.typography.background} transform={'scale(0.8)'}/>
-			</IconButtonSmall>
-		</ButtonGroup>
+			<ButtonGroup >
+				<IconButtonSmall onClick={bridge.minimize} sx={{
+					borderRadius: 0,
+					width: Sizes.multiply(Sizes.twentyFour, 1.5)
+				}}>
+					<VscChromeMinimize color={colors.typography.background} transform={'scale(0.8)'}/>
+				</IconButtonSmall>
+				<IconButtonSmall onClick={bridge.maximize} sx={{
+					borderRadius: 0,
+					width: Sizes.multiply(Sizes.twentyFour, 1.5)
+				}}>
+					<VscChromeMaximize color={colors.typography.background} transform={'scale(0.8)'}/>
+				</IconButtonSmall>
+				<IconButtonSmall onClick={bridge.close} sx={{
+					'&:hover':{
+						backgroundColor: colors.interact.danger,
+						color: colors.background.white
+					},
+					borderRadius: 0,
+					width: Sizes.multiply(Sizes.twentyFour, 1.5)
+				}}>
+					<VscChromeClose color={colors.typography.background} transform={'scale(0.8)'}/>
+				</IconButtonSmall>
+			</ButtonGroup>
+		</Box>
+		<Divider/>
 	</Box>;
 });
 

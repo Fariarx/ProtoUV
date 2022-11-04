@@ -10,5 +10,8 @@ export const SubscribersMouseDown: ((e: any) => void)[] = [];
 window.addEventListener('mouseup', (e: any) => SubscribersMouseUp.forEach(x => x(e)));
 export const SubscribersMouseUp: ((e: any) => void)[] = [];
 
+window.addEventListener('mousemove', (e: any) => SubscribersMouseMove.forEach(x => x(e)));
+export const SubscribersMouseMove: ((e: any) => void)[] = [];
+
 window.addEventListener('resize', (e: any) => SubscribersWindowResize.forEach(x => x(e)));
 export const SubscribersWindowResize: ((e: any) => void)[] = [];

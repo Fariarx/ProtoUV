@@ -4,7 +4,7 @@ import { AppStore, Log } from '../../AppStore';
 export class SceneApp extends Component<any, any> {
 	mount: HTMLDivElement | null = null;
 
-	public constructor(props: {}) {
+	public constructor(public props: { width: number } | any) {
 		super(props);
 	}
 
@@ -17,12 +17,13 @@ export class SceneApp extends Component<any, any> {
 	}
 
 	render() {
+
 		return (
 			<div
 				onWheel={(evt) =>
 					AppStore.sceneStore.handleOnZoom(evt)}
 				style={{
-					width: '80%',
+					width: '100%',
 					height: '100%'
 				}}>
 				<div style={{

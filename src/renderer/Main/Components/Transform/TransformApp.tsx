@@ -4,7 +4,7 @@ import { Md3DRotation } from '@react-icons/all-files/md/Md3DRotation';
 import { observer } from 'mobx-react';
 import { container } from 'tsyringe';
 import { TransformEnum } from '../../../Shared/Libs/Types';
-import { ToolButtonStyled } from '../ToolButtonStyled';
+import { ToolButtonStyled } from '../ToolsLeft/ToolButtonStyled';
 import { TransformStore } from './TransformStore';
 
 const scale = 'scale(1.1)';

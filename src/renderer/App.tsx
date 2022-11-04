@@ -1,7 +1,6 @@
 import '@fontsource/roboto/300.css';
 import {
 	CssBaseline,
-	Divider,
 	ThemeProvider
 } from '@mui/material';
 import { observer } from 'mobx-react';
@@ -9,16 +8,16 @@ import { SnackbarProvider } from 'notistack';
 import { Route, MemoryRouter as Router, Routes } from 'react-router-dom';
 import './AppStore';
 import { AppStore, Log, Pages } from './AppStore';
-import { APP_BOTTOM_HEIGHT_PX, LineBottomApp } from './BottomApp';
+import { LineBottomApp } from './BottomApp';
 import { ConfiguratorAutoApp } from './Configurator/ConfiguratorAutoApp';
 import { ConfiguratorManuallyApp } from './Configurator/ConfiguratorManuallyApp';
 import { HeaderApp } from './HeaderApp';
-import { DragAndDropApp } from './Main/Components/DragAndDropApp';
-import { ToolsApp } from './Main/Components/ToolsApp';
+import { DragAndDropApp } from './Main/Components/DranAndDrop/DragAndDropApp';
+import { ToolsLeftApp } from './Main/Components/ToolsLeft/ToolsLeftApp';
+import { ToolsTabApp } from './Main/Components/ToolsTab/ToolsTabApp';
 import { ViewChangeApp } from './Main/Components/ViewChange/ViewChangeApp';
 import { ConsoleApp } from './Main/Console/ConsoleApp';
 import { SceneApp } from './Main/Scene/SceneApp';
-import { colors } from './Shared/Config';
 import { AnimationFade, AnimationGrow } from './Shared/Styled/Animation';
 import { FlexBoxColumn, FlexBoxRow } from './Shared/Styled/FlexBox';
 import { Sizes } from './Shared/Styled/Sizes';
@@ -36,31 +35,10 @@ const Main = observer(() => {
 				<AnimationFade in={AppStore.getState() === Pages.Main}>
 					<FlexBoxRow>
 						<FlexBoxRow>
-							<SceneApp />
-							<FlexBoxRow
-								onMouseDown={() => {
-
-								}}
-								sx={{
-									width: '400px',
-									height: 'calc(100% - ' + APP_BOTTOM_HEIGHT_PX + ')',
-									background: colors.background.dark,
-									borderLeft: '1px solid ' + colors.background.darkest
-								}}>
-								<FlexBoxColumn sx={{
-									width: '5px',
-									transition: '0.5s ease-out',
-									cursor: 'col-resize',
-									':hover': {
-										backgroundColor: colors.interact.touch,
-										width: Sizes.eight
-									}
-								}}>
-
-								</FlexBoxColumn>
-							</FlexBoxRow>
+							<SceneApp/>
+							<ToolsTabApp/>
 						</FlexBoxRow>
-						<ToolsApp/>
+						<ToolsLeftApp/>
 						<ViewChangeApp/>
 						<ConsoleApp />
 						<LineBottomApp/>

@@ -37,12 +37,16 @@ const Main = observer(() => {
 					<FlexBoxRow>
 						<FlexBoxRow>
 							<SceneApp />
-							<Divider  orientation="vertical" />
-							<FlexBoxRow sx={{
-								width: '400px',
-								height: 'calc(100% - ' + APP_BOTTOM_HEIGHT_PX + ')',
-								background: colors.background.dark,
-							}}>
+							<FlexBoxRow
+								onMouseDown={() => {
+
+								}}
+								sx={{
+									width: '400px',
+									height: 'calc(100% - ' + APP_BOTTOM_HEIGHT_PX + ')',
+									background: colors.background.dark,
+									borderLeft: '1px solid ' + colors.background.darkest
+								}}>
 								<FlexBoxColumn sx={{
 									width: '5px',
 									transition: '0.5s ease-out',

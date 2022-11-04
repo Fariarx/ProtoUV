@@ -27,7 +27,8 @@ export const HeaderApp = observer(() => {
 		width: '100%',
 		height: APP_HEADER_HEIGHT_PX,
 		background: colors.background.dark,
-		position: 'absolute'
+		position: 'absolute',
+		borderBottom: '1px solid ' + colors.background.darkest
 	}}>
 		<Box sx={{
 			width: '100%',
@@ -102,7 +103,6 @@ export const HeaderApp = observer(() => {
 				</IconButtonSmall>
 			</ButtonGroup>
 		</Box>
-		<Divider/>
 	</Box>;
 });
 

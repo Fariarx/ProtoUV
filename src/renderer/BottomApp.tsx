@@ -16,12 +16,12 @@ export const LineBottomApp = observer(() => {
 		position: 'absolute',
 		height: APP_BOTTOM_HEIGHT_PX,
 		bottom: 0,
-		userSelect: 'none',
+		userSelect: 'none'
 	}}>
-		<Divider />
 		<FlexBoxRow sx={{
 			background: colors.background.dark,
 			justifyContent: 'flex-end',
+			borderTop: '1px solid ' + colors.background.darkest
 		}}>
 			<Text>
 				{'Project directory: '} {/*Директория первого файла*/}

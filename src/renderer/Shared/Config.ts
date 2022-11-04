@@ -1,7 +1,7 @@
 import { Restore } from './Libs/Restore';
 
 export const _default = {
-	version: 5,
+	version: 4,
 	versionPrinterConfigs: 4,
 	settings: {
 		ui: {
@@ -18,9 +18,9 @@ export const _default = {
 			},
 			background:{
 				black:'#000',
-				darkest:'#232323',
+				darkest:'#1f1f1f',
 				dark:'#2d2d2d',
-				heavy:'#3B3F40',
+				heavy:'#3a3b3b',
 				common:'#444444',
 				commonest:'#565656',
 				warm:'#808080',

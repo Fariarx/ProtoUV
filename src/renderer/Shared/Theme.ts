@@ -50,5 +50,5 @@ export const darkTheme = createTheme({
 });
 
 export const UpdateScheme = () => {
-	document.body.style.background = colors.background.heavy;
+	document.body.style.background = colors.background.commonest;
 };

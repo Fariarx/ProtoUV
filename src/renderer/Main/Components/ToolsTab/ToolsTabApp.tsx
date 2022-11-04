@@ -1,11 +1,12 @@
+import { Stack, Typography } from '@mui/material';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import { container } from 'tsyringe';
 import { APP_HEADER_HEIGHT_PX } from '../../../HeaderApp';
 import { colors } from '../../../Shared/Config';
-import { SubscribersMouseDown, SubscribersMouseMove, SubscribersMouseUp } from '../../../Shared/Libs/Listerners';
-import { FlexBoxColumn, FlexBoxRow } from '../../../Shared/Styled/FlexBox';
+import { SubscribersMouseMove, SubscribersMouseUp } from '../../../Shared/Libs/Listerners';
+import { FlexBox, FlexBoxColumn, FlexBoxRow } from '../../../Shared/Styled/FlexBox';
 import { Sizes } from '../../../Shared/Styled/Sizes';
 import { ToolsTabStore } from './ToolsTabStore';
 
@@ -17,7 +18,10 @@ export const ToolsTabApp = observer(() => {
 			runInAction(() => {
 				if (store.resize) {
 					const width = (1 - (e.clientX / window.innerWidth)) * window.innerWidth;
-					store.width = width - 4;
+					if (width > 0)
+					{
+						store.width = width - 4;
+					}
 				}
 			});
 		});
@@ -32,13 +36,16 @@ export const ToolsTabApp = observer(() => {
 			maxWidth: '400px',
 			minWidth: '200px',
 			height: '400px',
-			background: colors.background.dark,
-			border: '1px solid ' + colors.background.commonest,
+			background: colors.background.heavy,
+			border: '1px solid ' + colors.background.darkest,
 			position: 'absolute',
 			right: Sizes.eight,
 			top: Sizes.sum(APP_HEADER_HEIGHT_PX, Sizes.eight),
-			borderRadius: Sizes.four
+			borderRadius: Sizes.eight,
+			padding: Sizes.four,
+			paddingLeft: 0
 		}}>
+
 		<FlexBoxColumn
 			onMouseDown={() => {
 				store.resize = true;
@@ -53,6 +60,62 @@ export const ToolsTabApp = observer(() => {
 				}
 			}}>
 
+		</FlexBoxColumn>
+
+		<FlexBoxColumn>
+			<FlexBoxRow sx={{
+				width: '100%',
+				height: '200px',
+				backgroundColor: colors.background.dark,
+				borderRadius: Sizes.four,
+				border: '1px solid ' + colors.background.darkest
+			}}>
+
+			</FlexBoxRow>
+			<Stack mt={Sizes.four} spacing={Sizes.four} direction='row'>
+				<FlexBox sx={{
+					width: 'fit-content',
+					height: 'fit-content',
+					pl: Sizes.eight, pr: Sizes.eight,
+					backgroundColor: colors.background.common,
+					borderRadius: Sizes.four,
+					border: '1px solid ' + colors.background.darkest,
+					userSelect: 'none',
+					transition: '0.2s ease-out',
+					':hover': {
+						backgroundColor: colors.interact.neutral1,
+						border: '1px solid ' + colors.interact.touch,
+					},
+					':active': {
+						backgroundColor: colors.interact.touch1,
+					}
+				}}>
+					<Typography variant='caption' color={colors.background.light}>
+            Select all
+					</Typography>
+				</FlexBox>
+				<FlexBox sx={{
+					width: 'fit-content',
+					height: 'fit-content',
+					pl: Sizes.eight, pr: Sizes.eight,
+					backgroundColor: colors.background.common,
+					borderRadius: Sizes.four,
+					border: '1px solid ' + colors.background.darkest,
+					userSelect: 'none',
+					transition: '0.2s ease-out',
+					':hover': {
+						backgroundColor: colors.interact.neutral1,
+						border: '1px solid ' + colors.interact.touch,
+					},
+					':active': {
+						backgroundColor: colors.interact.touch1,
+					}
+				}}>
+					<Typography variant='caption' color={colors.background.light}>
+            Clear select
+					</Typography>
+				</FlexBox>
+			</Stack>
 		</FlexBoxColumn>
 	</FlexBoxRow>;
 });

@@ -13,6 +13,7 @@ export const ToolButtonStyled = observer((props: {
   clickColor?: string;
   hoverColor?: string;
   mini?: boolean;
+  sx?: any;
 }) => {
 	const size = Sizes.multiply(Sizes.eight, 4);
 
@@ -21,7 +22,7 @@ export const ToolButtonStyled = observer((props: {
 			...flexChildrenCenter,
 			width: props.mini ? Sizes.sum(size, Sizes.sixteen) : Sizes.sum(size, size),
 			height: size,
-			backgroundColor: props.selected ? colors.interact.neutral : colors.background.dark,
+			backgroundColor: props.selected ? colors.interact.neutral : colors.background.heavy,
 			transition: 'all 0.3s',
 			boxShadow: '0px 0px 0px 1px ' + colors.background.darkest,
 			color: props.selected ? colors.background.white : colors.background.light,
@@ -31,7 +32,8 @@ export const ToolButtonStyled = observer((props: {
 			'&:active': {
 				backgroundColor: props.clickColor ?? colors.interact.touch,
 				transform: 'translateY(-1px)'
-			}
+			},
+			...props.sx
 		}}>
 			{props.children}
 		</FlexBoxColumnFit>

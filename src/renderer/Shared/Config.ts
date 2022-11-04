@@ -36,7 +36,7 @@ export const _default = {
 				danger:'#fb594f',
 			},
 			scene:{
-				colorBackgroundScene:'#2f2f2f',
+				colorBackgroundScene:'#4b4b4b',
 				colorBackgroundSceneBottom:'#6c6c6c',
 				colorBackground:'#1d1d1d',
 				color1:'#2a2a2a',
@@ -60,5 +60,3 @@ const storage = new Restore({
 export const saveConfig = () => storage.fullSave();
 export const config = storage.get('settings') as typeof _default.settings;
 export const colors = (storage.get('settings') as typeof _default.settings).colors;
-
-console.log(colors);

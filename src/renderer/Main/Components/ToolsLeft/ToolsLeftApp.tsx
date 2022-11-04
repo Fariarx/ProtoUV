@@ -10,7 +10,7 @@ export const ToolsLeftApp = () => {
 			width: 'fit-content',
 			flexDirection: 'column',
 			position: 'absolute',
-			top: Sizes.sum(APP_HEADER_HEIGHT_PX, Sizes.fortyEight),
+			top: Sizes.sum(APP_HEADER_HEIGHT_PX, Sizes.eight),
 			left: 0,
 		}}>
 		<TransformApp/>

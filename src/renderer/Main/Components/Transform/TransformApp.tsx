@@ -16,7 +16,10 @@ export const TransformApp = observer(() => {
 		<ToolButtonStyled description={'move'}
 			mini={store.state !== TransformEnum.Move}
 			selected={store.state === TransformEnum.Move}
-			onClick={() => store.changeState(TransformEnum.Move)}>
+			onClick={() => store.changeState(TransformEnum.Move)}
+			sx={{
+				borderRadius: '0px 8px 0px 0px'
+			}}>
 			<BsArrowsMove transform={scale}/>
 		</ToolButtonStyled>
 		<ToolButtonStyled description={'rotate'}
@@ -28,7 +31,10 @@ export const TransformApp = observer(() => {
 		<ToolButtonStyled description={'scale'}
 			mini={store.state !== TransformEnum.Scale}
 			selected={store.state === TransformEnum.Scale}
-			onClick={() => store.changeState(TransformEnum.Scale)}>
+			onClick={() => store.changeState(TransformEnum.Scale)}
+			sx={{
+				borderRadius: '0px 0px 8px 0px'
+			}}>
 			<FiCode transform={scale}/>
 		</ToolButtonStyled>
 	</>;

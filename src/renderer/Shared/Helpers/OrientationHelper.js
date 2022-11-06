@@ -361,7 +361,7 @@ var OrientationHelper = function ( camera, controls, options, labels ) {
 
 				ctx.beginPath();
 				ctx.fillStyle = background;
-				ctx.rect( 0, 0, side, side );
+				ctx.rect( 1, 1, side - 2, side -2 );
 				ctx.fill();
 				ctx.fillStyle = color;
 				ctx.textAlign = 'center';
@@ -427,12 +427,12 @@ var OrientationHelper = function ( camera, controls, options, labels ) {
 		var lightsGroup = new Group();
 		lightsGroup.name = 'orientation-helper-lights';
 
-		var light = new DirectionalLight( '#dbeafa', 1.5 );
-		light.position.set( 500, 300, - 500 );
+		var light = new DirectionalLight( '#dbeafa', 2 );
+		light.position.set( 500, 400, - 500 );
 		lightsGroup.add( light );
 
-		light = new DirectionalLight( '#deccfa', 1.5 );
-		light.position.set( - 500, - 300, 500 );
+		light = new DirectionalLight( '#deccfa', 2 );
+		light.position.set( - 500, - 400, 500 );
 		lightsGroup.add( light );
 
 		lightsGroup.add( new AmbientLight( '#777888', 1.5 ) );

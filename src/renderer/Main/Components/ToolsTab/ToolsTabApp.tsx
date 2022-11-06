@@ -15,6 +15,9 @@ import { FlexBox, FlexBoxColumn, FlexBoxRow, flexChildrenCenter, flexSelfCenter 
 import { Sizes } from '../../../Shared/Styled/Sizes';
 import { ToolsTabStore } from './ToolsTabStore';
 
+export const TOOLS_TAB_MIN_SIZE = 200;
+export const TOOLS_TAB_MAX_SIZE = 400;
+
 export const ToolsTabApp = observer(() => {
 	const store = container.resolve(ToolsTabStore);
 
@@ -22,11 +25,18 @@ export const ToolsTabApp = observer(() => {
 		SubscribersMouseMove.push((e) => {
 			runInAction(() => {
 				if (store.resize) {
-					const width = (1 - (e.clientX / window.innerWidth)) * window.innerWidth;
-					if (width >= 0)
+					let width = (1 - (e.clientX / window.innerWidth)) * window.innerWidth;
+					if (width < TOOLS_TAB_MIN_SIZE)
 					{
-						store.width = width - 4;
+						width = TOOLS_TAB_MIN_SIZE;
 					}
+					if (width > TOOLS_TAB_MAX_SIZE)
+					{
+						width = TOOLS_TAB_MAX_SIZE;
+					}
+
+					store.width = width - 4;
+					AppStore.sceneStore.updateOrientationHelper();
 				}
 			});
 		});
@@ -40,8 +50,6 @@ export const ToolsTabApp = observer(() => {
 	return <FlexBoxRow
 		sx={{
 			width: store.width + 'px',
-			maxWidth: '400px',
-			minWidth: '200px',
 			height: `calc(100% - ${APP_HEADER_HEIGHT_PX} - ${APP_BOTTOM_HEIGHT_PX})`,
 			background: colors.background.heavy,
 			borderLeft: '1px solid ' + colors.background.darkest,

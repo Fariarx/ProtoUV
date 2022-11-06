@@ -10,6 +10,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader';
 import { Key } from 'ts-keycode-enum';
+import { container } from 'tsyringe';
 import { AppStore, Log } from '../../AppStore';
 import { APP_HEADER_HEIGHT } from '../../HeaderApp';
 import { config, saveConfig } from '../../Shared/Config';
@@ -19,7 +20,7 @@ import * as OrientationHelper from '../../Shared/Helpers/OrientationHelper';
 import { SubscribersKeyPressed, isKeyPressed } from '../../Shared/Libs/Keys';
 import { SubscribersDoubleMouseClick, SubscribersMouseDown, SubscribersMouseUp, SubscribersWindowResize } from '../../Shared/Libs/Listerners';
 import { AppEventEnum, AppEventMoveObject, AppEventSelectionChanged, TransformEnum } from '../../Shared/Libs/Types';
-import { TransformStore } from '../Components/Transform/TransformStore';
+import { ToolsTabStore } from '../Components/ToolsTab/ToolsTabStore';
 import { SceneObject } from './Entities/SceneObject';
 import { SceneBase } from './SceneBase';
 
@@ -548,6 +549,9 @@ export class SceneInitializer extends SceneBase {
 			this.orientationHelperPerspective.domElement.style.display = !isPerspective ? 'none' : 'block';
 			this.orientationHelperOrthographic[isPerspective ? 'deactivate' : 'activate']();
 			this.orientationHelperPerspective[!isPerspective ? 'deactivate' : 'activate']();
+
+			this.orientationHelperOrthographic.domElement.style.right = container.resolve(ToolsTabStore).width + 'px';
+			this.orientationHelperPerspective.domElement.style.right = container.resolve(ToolsTabStore).width + 'px';
 		}
 	};
 	public handleLoadFile = (file: string) => {

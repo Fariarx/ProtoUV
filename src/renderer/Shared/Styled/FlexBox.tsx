@@ -32,7 +32,7 @@ export const flexSelfCenter = {
 };
 
 export const RisizibleFlexBox = (props: {
-  children: JSX.Element[];
+  children: JSX.Element[] | JSX.Element | any;
   flexBoxProps: any;
   onResize: (width: number, height: number) => void;
 }) => {

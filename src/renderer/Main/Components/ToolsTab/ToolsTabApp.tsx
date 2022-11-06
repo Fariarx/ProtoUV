@@ -93,6 +93,25 @@ const SceneItems = observer(() => {
 		config.ui.sizes.sceneItemList = h;
 		saveConfig();
 	}}>
+		{AppStore.sceneStore.objects.length === 0 && <FlexBoxRow sx={{
+			textOverflow: 'ellipsis',
+			width: '-webkit-fill-available',
+			height: Sizes.twentyFour,
+			backgroundColor: colors.background.heavy ,
+			pr: Sizes.four,
+			m: Sizes.four, mb: 0,
+			userSelect: 'none',
+			borderRadius: Sizes.two,
+			placeContent: 'center',
+		}}>
+			<Typography variant='caption' color={colors.background.light} sx={{
+				...flexSelfCenter,
+				whiteSpace: 'nowrap',
+				marginTop: '1px'
+			}}>
+					_______ Empty _______
+			</Typography>
+		</FlexBoxRow>}
 		{AppStore.sceneStore.objects.map((x, key) => {
 			return <FlexBoxRow key={key} sx={{
 				textOverflow: 'ellipsis',

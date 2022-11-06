@@ -1,11 +1,15 @@
 import { Restore } from './Libs/Restore';
 
 export const _default = {
-	version: 4,
+	version: 6,
 	versionPrinterConfigs: 4,
 	settings: {
 		ui: {
 			opacity: 0.5,
+			sizes: {
+				toolsTab: 215,
+				sceneItemList: 200
+			}
 		},
 		scene:{
 			transformAlignToPlane: true,

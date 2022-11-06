@@ -1,5 +1,6 @@
 import { makeAutoObservable } from 'mobx';
 import { singleton } from 'tsyringe';
+import { config } from '../../../Shared/Config';
 
 @singleton()
 export class ToolsTabStore {
@@ -7,6 +8,6 @@ export class ToolsTabStore {
 		makeAutoObservable(this);
 	}
 
-	public width = 215;
+	public width = config.ui.sizes.toolsTab;
 	public resize = false;
 }

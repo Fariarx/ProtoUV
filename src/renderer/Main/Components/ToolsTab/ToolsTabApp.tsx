@@ -1,7 +1,7 @@
 import { Stack, Typography } from '@mui/material';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useEffect } from 'react';
+import { createRef, useEffect } from 'react';
 import { AppStore } from 'renderer/AppStore';
 import { APP_BOTTOM_HEIGHT_PX } from 'renderer/BottomApp';
 import { SceneObject } from 'renderer/Main/Scene/Entities/SceneObject';
@@ -9,9 +9,9 @@ import { isKeyPressed } from 'renderer/Shared/Libs/Keys';
 import { Key } from 'ts-keycode-enum';
 import { container } from 'tsyringe';
 import { APP_HEADER_HEIGHT_PX } from '../../../HeaderApp';
-import { colors } from '../../../Shared/Config';
+import { colors, config, saveConfig } from '../../../Shared/Config';
 import { SubscribersMouseMove, SubscribersMouseUp } from '../../../Shared/Libs/Listerners';
-import { FlexBox, FlexBoxColumn, FlexBoxRow, flexChildrenCenter, flexSelfCenter } from '../../../Shared/Styled/FlexBox';
+import { FlexBox, FlexBoxColumn, FlexBoxRow, RisizibleFlexBox, flexChildrenCenter, flexSelfCenter } from '../../../Shared/Styled/FlexBox';
 import { Sizes } from '../../../Shared/Styled/Sizes';
 import { ToolsTabStore } from './ToolsTabStore';
 
@@ -43,6 +43,8 @@ export const ToolsTabApp = observer(() => {
 		SubscribersMouseUp.push(() => {
 			runInAction(() => {
 				store.resize = false;
+				config.ui.sizes.toolsTab = store.width;
+				saveConfig();
 			});
 		});
 	}, []);
@@ -74,12 +76,21 @@ export const ToolsTabApp = observer(() => {
 });
 
 const SceneItems = observer(() => {
-	return <FlexBoxColumn sx={{
-		width: '100%',
-		height: '200px',
-		backgroundColor: colors.background.dark,
-		borderRadius: Sizes.two,
-		boxShadow: 'inset 0px 0px 5px 0px ' + colors.background.darkest,
+	return <RisizibleFlexBox flexBoxProps={{
+		sx: {
+			width: '100%',
+			minHeight: '100px',
+			maxHeight: '40%',
+			height: config.ui.sizes.sceneItemList + 'px',
+			backgroundColor: colors.background.dark,
+			borderRadius: Sizes.two,
+			boxShadow: 'inset 0px 0px 5px 0px ' + colors.background.darkest,
+			resize: 'vertical',
+			overflow: 'auto'
+		}
+	}} onResize={(_, h) => {
+		config.ui.sizes.sceneItemList = h;
+		saveConfig();
 	}}>
 		{AppStore.sceneStore.objects.map((x, key) => {
 			return <FlexBoxRow key={key} sx={{
@@ -130,7 +141,7 @@ const SceneItems = observer(() => {
 				</Typography>
 			</FlexBoxRow>;
 		})}
-	</FlexBoxColumn>;
+	</RisizibleFlexBox>;
 });
 
 const Button = (props: {

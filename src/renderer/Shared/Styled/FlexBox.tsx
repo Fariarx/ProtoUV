@@ -1,4 +1,5 @@
 import { Box, styled } from '@mui/material';
+import { ReactChildren, createRef, useEffect } from 'react';
 
 export const FlexBox = styled(Box)({
 	display: 'flex',
@@ -28,4 +29,35 @@ export const flexChildrenCenter = {
 export const flexSelfCenter = {
 	alignSelf: 'center',
 	justifySelf: 'center'
+};
+
+export const RisizibleFlexBox = (props: {
+  children: JSX.Element[];
+  flexBoxProps: any;
+  onResize: (width: number, height: number) => void;
+}) => {
+	const ref = createRef();
+
+	useEffect(() => {
+		(ref?.current as any).addEventListener('resize', (event: any) => props.onResize(event.detail.width, event.detail.height));
+		const observer = new MutationObserver(checkResize);
+		observer.observe(ref?.current as any, { attributes: true, attributeOldValue: true, attributeFilter: ['style'] });
+	}, [ref]);
+	const checkResize = (mutations: any) => {
+		const el = mutations[0].target;
+		const w = el.clientWidth;
+		const h = el.clientHeight;
+
+		const isChange = mutations
+			.map((m: any) => `${m.oldValue}`)
+			.some((prev: any) => prev.indexOf(`width: ${w}px`) === -1 || prev.indexOf(`height: ${h}px`) === -1);
+
+		if (!isChange) { return; }
+		const event = new CustomEvent('resize', { detail: { width: w, height: h } });
+		el.dispatchEvent(event);
+	};
+
+	return <FlexBox ref={ref} {...props.flexBoxProps}>
+		{props.children}
+	</FlexBox>;
 };

@@ -30,7 +30,7 @@ export const ToolButtonStyled = observer((props: {
 				backgroundColor: props.hoverColor ?? colors.interact.neutral
 			},
 			'&:active': {
-				backgroundColor: props.clickColor ?? colors.interact.touch,
+				backgroundColor: props.clickColor ?? colors.interact.touch1,
 				transform: 'translateY(-1px)'
 			},
 			...props.sx

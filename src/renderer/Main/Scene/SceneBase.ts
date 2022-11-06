@@ -1,3 +1,4 @@
+import { observable } from 'mobx';
 import {
 	DirectionalLight, DoubleSide,
 	FrontSide, Group,
@@ -73,11 +74,13 @@ export abstract class SceneBase {
 	public printer?: Printer;
 
 	public scene: Scene = new Scene();
-	public objects: SceneObject[] = [];
 	public groupSelected: SceneObject[] = [];
 	public decorations: Group = new Group();
 	public transformObjectGroup: Object3D = new Object3D();
 	public transformGroupMarker: Object3D = new Object3D();
+
+	@observable
+	public objects: SceneObject[] = [];
 
 	public grid!: SceneGrid;
 	public gridSize: Vector3 = new Vector3(1, 1, 1);
@@ -111,35 +114,35 @@ export abstract class SceneBase {
 			},
 			vertexShader: `varying vec2 vUv;
 
-    void main() {
-        vUv = uv;
+		void main() {
+				vUv = uv;
 
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-    }`,
+				gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+		}`,
 			fragmentShader: `varying vec2 vUv;
-    uniform vec3 u_color;
-    uniform vec3 u_color_limit;
-    uniform float u_padding_x;
-    uniform float u_padding_y;
+		uniform vec3 u_color;
+		uniform vec3 u_color_limit;
+		uniform float u_padding_x;
+		uniform float u_padding_y;
 
-    void main() {
-        if (vUv.x < u_padding_x || vUv.y < u_padding_y || vUv.x > 1. - u_padding_x || vUv.y > 1. - u_padding_y) {
-            gl_FragColor = vec4(u_color_limit, 1.0);
-        } else {
-            gl_FragColor = vec4(u_color, 1.0);
-        }
-    }`
+		void main() {
+				if (vUv.x < u_padding_x || vUv.y < u_padding_y || vUv.x > 1. - u_padding_x || vUv.y > 1. - u_padding_y) {
+						gl_FragColor = vec4(u_color_limit, 1.0);
+				} else {
+						gl_FragColor = vec4(u_color, 1.0);
+				}
+		}`
 		});
 	};
 }
 
 export type SceneGrid = {
-  obj: any;
-  mat: LineMaterial;
-  dispose: Function;
+	obj: any;
+	mat: LineMaterial;
+	dispose: Function;
 };
 
 export type MaterialForScene = {
-  normal: Material;
-  select: Material;
+	normal: Material;
+	select: Material;
 };

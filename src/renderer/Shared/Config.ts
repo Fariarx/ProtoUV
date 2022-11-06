@@ -17,7 +17,7 @@ export const _default = {
 				background:'#aaaaaa'
 			},
 			background:{
-				black:'#000',
+				black:'#0e0e0e',
 				darkest:'#1f1f1f',
 				dark:'#2d2d2d',
 				heavy:'#3a3b3b',
@@ -31,7 +31,8 @@ export const _default = {
 				touch:'#4984fd',
 				neutral:'#4168c0',
 				touch1:'#614ed3',
-				neutral1:'#5241c0',
+				neutral1:'#4738a5',
+				neutral2:'#5241c0',
 				warning:'#ffbd39',
 				danger:'#fb594f',
 			},

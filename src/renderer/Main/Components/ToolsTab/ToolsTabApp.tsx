@@ -2,11 +2,13 @@ import { Stack, Typography } from '@mui/material';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
+import { AppStore } from 'renderer/AppStore';
+import { APP_BOTTOM_HEIGHT_PX } from 'renderer/BottomApp';
 import { container } from 'tsyringe';
 import { APP_HEADER_HEIGHT_PX } from '../../../HeaderApp';
 import { colors } from '../../../Shared/Config';
 import { SubscribersMouseMove, SubscribersMouseUp } from '../../../Shared/Libs/Listerners';
-import { FlexBox, FlexBoxColumn, FlexBoxRow } from '../../../Shared/Styled/FlexBox';
+import { FlexBox, FlexBoxColumn, FlexBoxRow, flexChildrenCenter, flexSelfCenter } from '../../../Shared/Styled/FlexBox';
 import { Sizes } from '../../../Shared/Styled/Sizes';
 import { ToolsTabStore } from './ToolsTabStore';
 
@@ -18,7 +20,7 @@ export const ToolsTabApp = observer(() => {
 			runInAction(() => {
 				if (store.resize) {
 					const width = (1 - (e.clientX / window.innerWidth)) * window.innerWidth;
-					if (width > 0)
+					if (width >= 0)
 					{
 						store.width = width - 4;
 					}
@@ -26,7 +28,9 @@ export const ToolsTabApp = observer(() => {
 			});
 		});
 		SubscribersMouseUp.push(() => {
-			store.resize = false;
+			runInAction(() => {
+				store.resize = false;
+			});
 		});
 	}, []);
 
@@ -35,87 +39,123 @@ export const ToolsTabApp = observer(() => {
 			width: store.width + 'px',
 			maxWidth: '400px',
 			minWidth: '200px',
-			height: '400px',
+			height: `calc(100% - ${APP_HEADER_HEIGHT_PX} - ${APP_BOTTOM_HEIGHT_PX})`,
 			background: colors.background.heavy,
-			border: '1px solid ' + colors.background.darkest,
+			borderLeft: '1px solid ' + colors.background.darkest,
 			position: 'absolute',
-			right: Sizes.eight,
-			top: Sizes.sum(APP_HEADER_HEIGHT_PX, Sizes.eight),
-			borderRadius: Sizes.eight,
-			padding: Sizes.four,
-			paddingLeft: 0
+			top: APP_HEADER_HEIGHT_PX,
+			bottom: APP_BOTTOM_HEIGHT_PX,
+			right: 0,
+			padding: Sizes.four
 		}}>
-
-		<FlexBoxColumn
-			onMouseDown={() => {
-				store.resize = true;
-			}}
-			sx={{
-				width: '5px',
-				transition: '0.5s ease-out',
-				cursor: 'col-resize',
-				':hover': {
-					backgroundColor: colors.interact.touch,
-					width: Sizes.eight
-				}
-			}}>
-
-		</FlexBoxColumn>
-
+		<ResizePanel store={store} />
 		<FlexBoxColumn>
-			<FlexBoxRow sx={{
-				width: '100%',
-				height: '200px',
-				backgroundColor: colors.background.dark,
-				borderRadius: Sizes.four,
-				border: '1px solid ' + colors.background.darkest
+			<SceneItems/>
+			<Stack direction='row' sx={{
+				flexWrap: 'wrap'
 			}}>
-
-			</FlexBoxRow>
-			<Stack mt={Sizes.four} spacing={Sizes.four} direction='row'>
-				<FlexBox sx={{
-					width: 'fit-content',
-					height: 'fit-content',
-					pl: Sizes.eight, pr: Sizes.eight,
-					backgroundColor: colors.background.common,
-					borderRadius: Sizes.four,
-					border: '1px solid ' + colors.background.darkest,
-					userSelect: 'none',
-					transition: '0.2s ease-out',
-					':hover': {
-						backgroundColor: colors.interact.neutral1,
-						border: '1px solid ' + colors.interact.touch,
-					},
-					':active': {
-						backgroundColor: colors.interact.touch1,
-					}
-				}}>
-					<Typography variant='caption' color={colors.background.light}>
-            Select all
-					</Typography>
-				</FlexBox>
-				<FlexBox sx={{
-					width: 'fit-content',
-					height: 'fit-content',
-					pl: Sizes.eight, pr: Sizes.eight,
-					backgroundColor: colors.background.common,
-					borderRadius: Sizes.four,
-					border: '1px solid ' + colors.background.darkest,
-					userSelect: 'none',
-					transition: '0.2s ease-out',
-					':hover': {
-						backgroundColor: colors.interact.neutral1,
-						border: '1px solid ' + colors.interact.touch,
-					},
-					':active': {
-						backgroundColor: colors.interact.touch1,
-					}
-				}}>
-					<Typography variant='caption' color={colors.background.light}>
-            Clear select
-					</Typography>
-				</FlexBox>
+				<Button text='Select all'/>
+				<Button text='Clear select'/>
+				<Button text='Delete'/>
 			</Stack>
 		</FlexBoxColumn>
 	</FlexBoxRow>;
 });
+
+const SceneItems = observer(() => {
+	return <FlexBoxColumn sx={{
+		width: '100%',
+		height: '200px',
+		backgroundColor: colors.background.dark,
+		borderRadius: Sizes.two,
+		boxShadow: 'inset 0px 0px 5px 0px ' + colors.background.darkest,
+	}}>
+		{AppStore.sceneStore.objects.map((x, key) => {
+			return <FlexBoxRow key={key} sx={{
+				textOverflow: 'ellipsis',
+				width: '-webkit-fill-available',
+				height: Sizes.twentyFour,
+				backgroundColor: x.isSelected
+					? colors.background.heavy
+					: 'unset',
+				pr: Sizes.four,
+				m: Sizes.four, mb: 0,
+				userSelect: 'none',
+				borderRadius: Sizes.two,
+				transition: '0.4s all',
+			}}>
+				<FlexBoxRow sx={{
+					padding: Sizes.four,
+					width: Sizes.twentyFour,
+					height: Sizes.twentyFour,
+					...flexChildrenCenter
+				}}>
+					<FlexBox sx={{
+						border: '1px solid ' + colors.background.darkest,
+						backgroundColor: x.isSelected ? colors.interact.touch : colors.interact.warning,
+						borderRadius: '100%',
+						width: x.isSelected ? Sizes.twelve : Sizes.eight,
+						height: x.isSelected ? Sizes.twelve : Sizes.eight,
+						transition: '0.4s all',
+					}}>
+
+					</FlexBox>
+				</FlexBoxRow>
+				<Typography variant='caption' color={colors.background.light} sx={{
+					...flexSelfCenter,
+					whiteSpace: 'nowrap',
+					overflow: 'hidden',
+					textOverflow: 'ellipsis',
+					marginTop: '1px'
+				}}>
+					{key + ' : ' + x.name}
+				</Typography>
+			</FlexBoxRow>;
+		})}
+	</FlexBoxColumn>;
+});
+
+const Button = (props: {
+  text: string;
+}) => {
+	return <FlexBox sx={{
+		width: 'fit-content',
+		height: 'fit-content',
+		pl: Sizes.eight, pr: Sizes.eight,
+		mr: Sizes.four, mt: Sizes.four,
+		backgroundColor: colors.background.common,
+		borderRadius: Sizes.four,
+		border: '1px solid ' + colors.background.darkest,
+		userSelect: 'none',
+		transition: '0.2s ease-out',
+		':hover': {
+			backgroundColor: colors.interact.neutral1,
+			border: '1px solid ' + colors.interact.touch,
+		},
+		':active': {
+			backgroundColor: colors.interact.touch1,
+		}
+	}}>
+		<Typography variant='caption' color={colors.background.light}>
+			{props.text}
+		</Typography>
+	</FlexBox>;
+};
+
+const ResizePanel = (props: { store: ToolsTabStore }) => {
+	return <FlexBoxColumn
+		onMouseDown={() => {
+			props.store.resize = true;
+		}}
+		sx={{
+			marginLeft: Sizes.negative(Sizes.four),
+			width: '6px',
+			transition: '0.5s ease-out',
+			cursor: 'col-resize',
+			position: 'absolute',
+			':hover': {
+				backgroundColor: colors.interact.touch,
+				width: Sizes.eight
+			}
+		}}/>;
+};

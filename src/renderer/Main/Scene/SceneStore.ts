@@ -1,3 +1,4 @@
+import { makeObservable } from 'mobx';
 import { Mesh, PCFSoftShadowMap, PlaneGeometry, Scene, Vector2, Vector3 } from 'three';
 import { Line2 } from 'three/examples/jsm/lines/Line2';
 import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry';
@@ -15,6 +16,7 @@ export class SceneStore extends SceneInitializer {
 		this.setup();
 		this.updateCameraLookPosition();
 		this.animate();
+		makeObservable(this);
 	}
 
 	public setup() {

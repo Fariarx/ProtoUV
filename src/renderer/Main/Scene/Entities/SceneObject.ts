@@ -1,18 +1,14 @@
+import { action, makeObservable, observable } from 'mobx';
 import { AppEventEnum, AppEventMoveObject, TransformEnum } from 'renderer/Shared/Libs/Types';
 import {
-	Box3,
-	BoxHelper,
 	BufferGeometry,
-	LineSegments,
-	Matrix4,
 	Mesh,
 	Vector3,
-	WireframeGeometry
 } from 'three';
 import { AppStore } from '../../../AppStore';
 import { Dispatch } from '../../../Shared/Events';
-import { ThreeHelper } from '../../../Shared/Helpers/Three';
 import { SceneStore } from '../SceneStore';
+import { linearGenerator } from './../../../Shared/Libs/Tools';
 
 export class SceneObject {
 	name: string;
@@ -25,7 +21,9 @@ export class SceneObject {
 	center: Vector3;
 	size: Vector3 = new Vector3();
 	sceneStore: SceneStore;
-	isSelected: boolean;
+
+	@observable
+		isSelected: boolean;
 
 	public settings = {
 		wireframe: false,
@@ -35,20 +33,12 @@ export class SceneObject {
 	private wasSelected: boolean;
 
 	constructor(geometry: BufferGeometry,
-		name: string,
+		filePath: string,
 		objs: SceneObject[],
 		selected = false,
 		sceneStore: SceneStore = AppStore.sceneStore)
 	{
-		let index = 0;
-		let sceneName = index + ' : ' + name;
-
-		while (SceneObject.GetByName(objs, sceneName) !== null) {
-			objs[index].name = sceneName;
-			sceneName = ++index + ' : ' + name;
-		}
-
-		this.name = sceneName;
+		this.name = (filePath.split('\\').pop()?.split('.').shift() ?? 'undefined');
 		this.sceneStore = sceneStore;
 		this.geometry = geometry;
 		this.geometry.scale(0.1, 0.1, 0.1);
@@ -63,24 +53,27 @@ export class SceneObject {
 
 		this.isSelected = this.wasSelected = selected;
 		this.Update();
+
+		makeObservable(this);
 	}
 
-	UpdateSelection = () => {
-		if (this.wasSelected !== this.isSelected) {
-			this.wasSelected = this.isSelected;
-		}
+	@action
+		UpdateSelection = () => {
+			if (this.wasSelected !== this.isSelected) {
+				this.wasSelected = this.isSelected;
+			}
 
-		if (this.isSelected) {
-			this.mesh.material = this.sceneStore.materialForObjects.select;
-		} else {
-			this.mesh.material = this.sceneStore.materialForObjects.normal;
-		}
+			if (this.isSelected) {
+				this.mesh.material = this.sceneStore.materialForObjects.select;
+			} else {
+				this.mesh.material = this.sceneStore.materialForObjects.normal;
+			}
 
-		return {
-			now: this.isSelected,
-			was: this.wasSelected
+			return {
+				now: this.isSelected,
+				was: this.wasSelected
+			};
 		};
-	};
 
 	Update = () => {
 		this.UpdateSelection();

@@ -3,7 +3,7 @@ import { Mesh, Vector3 } from 'three';
 import { AppStore } from '../AppStore';
 import { SceneObject } from './../Main/Scene/Entities/SceneObject';
 import { config } from './Config';
-import { AppEvent, AppEventAddObject, AppEventArguments, AppEventEnum, AppEventMoveObject, TransformEnum } from './Libs/Types';
+import { AppEvent, AppEventAddObject, AppEventArguments, AppEventDeleteObject, AppEventEnum, AppEventMoveObject, TransformEnum } from './Libs/Types';
 
 export const Dispatch = (name: AppEventEnum, args: typeof AppEventArguments) => {
 	const message = {
@@ -25,6 +25,9 @@ const Handler = (message: any) => {
 	switch (message.name) {
 		case AppEventEnum.ADD_OBJECT:
 			objectAdd(message);
+			break;
+		case AppEventEnum.DELETE_OBJECT:
+			objectDelete(message);
 			break;
 		case AppEventEnum.TRANSFORM_OBJECT:
 			objectTransform(message);
@@ -62,8 +65,9 @@ const objectAdd = (message: AppEvent) => {
 	scene.objects.push(args!.object);
 	args!.object.AddToScene(true);
 	args!.object.AlignToPlaneXZ(scene.gridSize);
+	args!.object.AlignToPlanePreparedToPrint();
 	args!.object.AlignToPlaneY();
-  args!.object.AlignToPlanePreparedToPrint();
+  args!.object.AlignByOtherSceneItems();
   scene.updateSelectionChanged();
   scene.updateTransformControls();
   scene.animate();
@@ -78,6 +82,12 @@ const objectAdd = (message: AppEvent) => {
 
   	app.fileCount = scene.objects.length;
   });
+};
+
+const objectDelete = (message: AppEvent) => {
+	const args = message.args as AppEventDeleteObject;
+
+	args.object.Dispose();
 };
 
 const objectTransform = (message: AppEvent) => {

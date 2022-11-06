@@ -1,5 +1,5 @@
-import { action, makeObservable, observable } from 'mobx';
-import { AppEventEnum, AppEventMoveObject, TransformEnum } from 'renderer/Shared/Libs/Types';
+import { action, makeObservable, observable, runInAction } from 'mobx';
+import { AppEventDeleteObject, AppEventEnum, AppEventMoveObject, TransformEnum } from 'renderer/Shared/Libs/Types';
 import {
 	BufferGeometry,
 	Mesh,
@@ -8,7 +8,6 @@ import {
 import { AppStore } from '../../../AppStore';
 import { Dispatch } from '../../../Shared/Events';
 import { SceneStore } from '../SceneStore';
-import { linearGenerator } from './../../../Shared/Libs/Tools';
 
 export class SceneObject {
 	name: string;
@@ -18,6 +17,10 @@ export class SceneObject {
 
 	minY: Vector3;
 	maxY: Vector3;
+	minX: Vector3;
+	maxX: Vector3;
+	minZ: Vector3;
+	maxZ: Vector3;
 	center: Vector3;
 	size: Vector3 = new Vector3();
 	sceneStore: SceneStore;
@@ -57,23 +60,22 @@ export class SceneObject {
 		makeObservable(this);
 	}
 
-	@action
-		UpdateSelection = () => {
-			if (this.wasSelected !== this.isSelected) {
-				this.wasSelected = this.isSelected;
-			}
+	UpdateSelection = () => {
+		if (this.wasSelected !== this.isSelected) {
+			this.wasSelected = this.isSelected;
+		}
 
-			if (this.isSelected) {
-				this.mesh.material = this.sceneStore.materialForObjects.select;
-			} else {
-				this.mesh.material = this.sceneStore.materialForObjects.normal;
-			}
+		if (this.isSelected) {
+			this.mesh.material = this.sceneStore.materialForObjects.select;
+		} else {
+			this.mesh.material = this.sceneStore.materialForObjects.normal;
+		}
 
-			return {
-				now: this.isSelected,
-				was: this.wasSelected
-			};
+		return {
+			now: this.isSelected,
+			was: this.wasSelected
 		};
+	};
 
 	Update = () => {
 		this.UpdateSelection();
@@ -125,8 +127,12 @@ export class SceneObject {
 			}
 		}
 
+		this.minX = minXPoint;
+		this.maxX = maxXPoint;
 		this.minY = minYPoint;
 		this.maxY = maxYPoint;
+		this.minZ = minZPoint;
+		this.maxZ = maxZPoint;
 
 		this.center.set(
 			(maxXPoint.x + minXPoint.x) / 2,
@@ -177,31 +183,74 @@ export class SceneObject {
 		const size = this.size.clone();
 		const rotation = this.mesh.rotation.clone();
 
-		this.mesh.rotation.set(Math.PI / 2, 0, 0);
-		this.UpdateSize();
-		if(this.size.x > size.x)
+		for (let x = 0.5; x <= 4; x+=0.5)
 		{
-			size.set(this.size.x, this.size.y, this.size.z);
-			rotation.set(Math.PI / 2, 0, 0);
+			this.mesh.rotation.set(Math.PI / x, 0, 0);
+			this.UpdateSize();
+
+			if (this.size.x > size.x || this.size.z > size.z)
+			{
+				size.setX(this.size.x).setZ(this.size.z);
+				rotation.set(this.mesh.rotation.x, this.mesh.rotation.y, this.mesh.rotation.z);
+			}
 		}
 
-		this.mesh.rotation.set(Math.PI / 3, 0, 0);
-		this.UpdateSize();
-		if(this.size.x > size.x)
-		{
-			size.set(this.size.x, this.size.y, this.size.z);
-			rotation.set(Math.PI / 2, 0, 0);
-		}
+		this.mesh.rotation.set(-rotation.x, -rotation.y, -rotation.z);
+	};
 
-		this.mesh.rotation.set(Math.PI / 4, 0, 0);
-		this.UpdateSize();
-		if(this.size.x > size.x)
-		{
-			size.set(this.size.x, this.size.y, this.size.z);
-			rotation.set(Math.PI / 2, 0, 0);
-		}
+	AlignByOtherSceneItems = () => {
+		const randomFactorX = Math.random() > 0.5 ? -1 : 1;
+		const randomFactorZ = Math.random() > 0.5 ? -1 : 1;
 
-		this.mesh.rotation.set(rotation.x, rotation.y, rotation.z);
+		const checkIntersectionWithOtherByX = () => {
+			return this.sceneStore.objects.find(obj => {
+				if (obj.mesh.uuid === this.mesh.uuid)
+				{
+					return false;
+				}
+
+				return (randomFactorX > 0
+					? obj.minX.x <= this.minX.x && this.minX.x <= obj.maxX.x
+					: obj.minX.x <= this.maxX.x && this.maxX.x <= obj.maxX.x);
+			});
+		};
+
+		const checkIntersectionWithOtherByZ = () => {
+			return this.sceneStore.objects.find(obj => {
+				if (obj.mesh.uuid === this.mesh.uuid)
+				{
+					return false;
+				}
+
+				return (randomFactorZ > 0
+					? obj.minZ.z <= this.minZ.z && this.minZ.z <= obj.maxZ.z
+					: obj.minZ.z <= this.maxZ.z && this.maxZ.z <= obj.maxZ.z);
+			});
+		};
+
+		if (Math.random() > 0.5)
+		{
+			while(this.sceneStore.objects.length > 1 && checkIntersectionWithOtherByX())
+			{
+				this.mesh.position.set(
+					this.mesh.position.x + randomFactorX * this.size.x / 7.7,
+					this.mesh.position.y,
+					this.mesh.position.z
+				);
+				this.UpdateSize();
+			}
+		}
+		else {
+			while(this.sceneStore.objects.length > 1 && checkIntersectionWithOtherByZ())
+			{
+				this.mesh.position.set(
+					this.mesh.position.x,
+					this.mesh.position.y,
+					this.mesh.position.z + randomFactorZ * this.size.z / 7.7
+				);
+				this.UpdateSize();
+			}
+		}
 	};
 
 	IsEqual3dObject(_mesh: THREE.Mesh) {
@@ -209,9 +258,13 @@ export class SceneObject {
 	}
 
 	Dispose() {
-		this.sceneStore.groupSelected.splice(this.sceneStore.objects.findIndex(x => x.name === this.name), 1);
-		this.sceneStore.objects.splice(this.sceneStore.objects.findIndex(x => x.name === this.name), 1);
-		this.mesh.clear();
+		runInAction(() => {
+			this.sceneStore.scene.remove(this.mesh);
+			this.sceneStore.groupSelected.splice(this.sceneStore.objects.findIndex(x => x.mesh.uuid === this.mesh.uuid), 1);
+			this.sceneStore.objects.splice(this.sceneStore.objects.findIndex(x => x.mesh.uuid === this.mesh.uuid), 1);
+			this.geometry.dispose();
+			this.mesh.clear();
+		});
 	}
 
 	static SearchIndexByMesh(objs: SceneObject[], _mesh: THREE.Mesh) {
@@ -349,11 +402,21 @@ export class SceneObject {
 	static SelectObjsDelete = () => {
 		if (AppStore.sceneStore.groupSelected.length ) {
 			for (const sceneObject of AppStore.sceneStore.groupSelected) {
-				sceneObject.Dispose();
+				Dispatch(AppEventEnum.DELETE_OBJECT, {
+					object: sceneObject,
+				} as AppEventDeleteObject);
 			}
 		}
 
-		AppStore.sceneStore.transformControls.detach();
+		if (AppStore.sceneStore.objects.length > 0)
+		{
+			AppStore.sceneStore.objects[0].isSelected = true;
+			AppStore.sceneStore.updateSelectionChanged();
+		}
+		else {
+			AppStore.sceneStore.transformControls.detach();
+		}
+
 		AppStore.sceneStore.animate();
 	};
 
@@ -361,8 +424,16 @@ export class SceneObject {
 		if (AppStore.sceneStore.groupSelected.length) {
 			for (const sceneObject of AppStore.sceneStore.groupSelected) {
 				sceneObject.isSelected = false;
-				sceneObject.UpdateSelection();
 			}
+		}
+
+		AppStore.sceneStore.updateSelectionChanged();
+		AppStore.sceneStore.animate();
+	};
+
+	static SelectAllObjects = () => {
+		for (const sceneObject of AppStore.sceneStore.objects) {
+			sceneObject.isSelected = true;
 		}
 
 		AppStore.sceneStore.updateSelectionChanged();

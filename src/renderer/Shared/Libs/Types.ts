@@ -5,12 +5,18 @@ export enum AppEventEnum {
   SELECT_TRANSFORM_MODE,
   SELECT_MENU_STEP,
   ADD_OBJECT,
+  DELETE_OBJECT,
   SELECTION_CHANGED,
   TRANSFORM_OBJECT,
   SELECT_SUPPORTS_MODE
 }
 
-export declare const AppEventArguments: AppEventAddObject | AppEventMoveObject | AppEventSelectionChanged | undefined;
+export declare const AppEventArguments:
+  AppEventAddObject
+  | AppEventMoveObject
+  | AppEventSelectionChanged
+  | AppEventDeleteObject
+  | undefined;
 
 export type AppEvent = {
   name: AppEventEnum;
@@ -38,6 +44,10 @@ export type AppEventMoveObject = {
 export type AppEventAddObject = {
   object: SceneObject;
   source: string | undefined;
+};
+
+export type AppEventDeleteObject = {
+  object: SceneObject;
 };
 
 export enum TransformEnum {

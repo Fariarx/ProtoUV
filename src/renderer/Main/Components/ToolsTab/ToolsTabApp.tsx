@@ -4,6 +4,9 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import { AppStore } from 'renderer/AppStore';
 import { APP_BOTTOM_HEIGHT_PX } from 'renderer/BottomApp';
+import { SceneObject } from 'renderer/Main/Scene/Entities/SceneObject';
+import { isKeyPressed } from 'renderer/Shared/Libs/Keys';
+import { Key } from 'ts-keycode-enum';
 import { container } from 'tsyringe';
 import { APP_HEADER_HEIGHT_PX } from '../../../HeaderApp';
 import { colors } from '../../../Shared/Config';
@@ -54,9 +57,9 @@ export const ToolsTabApp = observer(() => {
 			<Stack direction='row' sx={{
 				flexWrap: 'wrap'
 			}}>
-				<Button text='Select all'/>
-				<Button text='Clear select'/>
-				<Button text='Delete'/>
+				<Button text='Select all' action={() => SceneObject.SelectAllObjects()}/>
+				<Button text='Clear select' action={() => SceneObject.DeselectAllObjects()}/>
+				<Button text='Delete' action={() => SceneObject.SelectObjsDelete()}/>
 			</Stack>
 		</FlexBoxColumn>
 	</FlexBoxRow>;
@@ -83,6 +86,13 @@ const SceneItems = observer(() => {
 				userSelect: 'none',
 				borderRadius: Sizes.two,
 				transition: '0.4s all',
+			}} onClick={() => {
+				if (!isKeyPressed(Key.Shift))
+				{
+					SceneObject.DeselectAllObjects();
+				}
+				x.isSelected = !x.isSelected;
+				AppStore.sceneStore.updateSelectionChanged();
 			}}>
 				<FlexBoxRow sx={{
 					padding: Sizes.four,
@@ -117,8 +127,9 @@ const SceneItems = observer(() => {
 
 const Button = (props: {
   text: string;
+  action: () => void;
 }) => {
-	return <FlexBox sx={{
+	return <FlexBox onClick={props.action} sx={{
 		width: 'fit-content',
 		height: 'fit-content',
 		pl: Sizes.eight, pr: Sizes.eight,

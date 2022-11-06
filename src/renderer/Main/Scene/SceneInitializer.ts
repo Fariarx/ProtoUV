@@ -561,7 +561,7 @@ export class SceneInitializer extends SceneBase {
 		const result = AppStore.sceneStore.file3dLoad(file, function (geometry: BufferGeometry, path: string) {
 			Dispatch(AppEventEnum.ADD_OBJECT, {
 				source: path,
-				object: new SceneObject(geometry, file, AppStore.sceneStore.objects, true)
+				object: new SceneObject(geometry, file, true)
 			});
 		});
 

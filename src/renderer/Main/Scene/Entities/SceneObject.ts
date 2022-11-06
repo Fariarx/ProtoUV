@@ -37,7 +37,6 @@ export class SceneObject {
 
 	constructor(geometry: BufferGeometry,
 		filePath: string,
-		objs: SceneObject[],
 		selected = false,
 		sceneStore: SceneStore = AppStore.sceneStore)
 	{
@@ -52,6 +51,10 @@ export class SceneObject {
 
 		this.minY = new Vector3();
 		this.maxY = new Vector3();
+		this.minX = new Vector3();
+		this.maxX = new Vector3();
+		this.minZ = new Vector3();
+		this.maxZ = new Vector3();
 		this.center = new Vector3();
 
 		this.isSelected = this.wasSelected = selected;

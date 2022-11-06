@@ -364,6 +364,7 @@ export class SceneInitializer extends SceneBase {
 		});
 	};
 	public setupMouse = () => {
+		const vectorMouseRaycaster = new Vector3();
 		const vectorMouseUp = new Vector3();
 		const vectorMouseDown = new Vector3();
 
@@ -371,29 +372,31 @@ export class SceneInitializer extends SceneBase {
 
 		SubscribersMouseDown.push((e) => {
 			clickTime = Date.now();
-			vectorMouseUp.set(
-				(e.clientX / window.innerWidth) * 2 - 1,
-				- ((e.clientY - APP_HEADER_HEIGHT) / window.innerHeight) * 2 + 1,
-				0.5);
+			vectorMouseDown.set(
+				(e.clientX / window.innerWidth) * window.innerWidth,
+				(e.clientY / window.innerHeight) * window.innerHeight, 0);
 		});
 
 		SubscribersMouseUp.push(e => {
 			const clickTimeMillis = clickTime === null ? 0 : Date.now() - clickTime;
 
-			vectorMouseUp.set((e.clientX / window.innerWidth) * 2 - 1,
-				- ((e.clientY - APP_HEADER_HEIGHT) / window.innerHeight) * 2 + 1,
-				0.5);
+			vectorMouseUp.set(
+				(e.clientX / window.innerWidth) * window.innerWidth,
+				(e.clientY / window.innerHeight) * window.innerHeight, 0);
 
-			if (e.button !== 0 || !this.printer || clickTimeMillis > 200
-        || Math.abs(vectorMouseDown.x - vectorMouseUp.x) > 50
-        || Math.abs(vectorMouseDown.y - vectorMouseUp.y) > 50
-        || clickTimeMillis > 500) {
+			if (e.button !== 0 || !this.printer || clickTimeMillis > 250
+        || Math.abs(vectorMouseDown.x - vectorMouseUp.x) > 15
+        || Math.abs(vectorMouseDown.y - vectorMouseUp.y) > 15) {
 				return;
 			}
 
+			vectorMouseRaycaster.set((e.clientX / window.innerWidth) * 2 - 1,
+				- ((e.clientY - APP_HEADER_HEIGHT) / window.innerHeight) * 2 + 1,
+				0.5);
+
 			const raycaster = new Raycaster();
 
-			raycaster.setFromCamera(vectorMouseUp, AppStore.sceneStore.activeCamera);
+			raycaster.setFromCamera(vectorMouseRaycaster, AppStore.sceneStore.activeCamera);
 
 			const intersects = raycaster.intersectObjects(SceneObject.GetMeshesFromObjs(AppStore.sceneStore.objects), false);
 

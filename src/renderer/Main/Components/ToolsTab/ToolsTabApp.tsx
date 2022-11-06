@@ -86,6 +86,7 @@ const SceneItems = observer(() => {
 			borderRadius: Sizes.two,
 			boxShadow: 'inset 0px 0px 5px 0px ' + colors.background.darkest,
 			resize: 'vertical',
+			flexDirection: 'column',
 			overflow: 'auto'
 		}
 	}} onResize={(_, h) => {

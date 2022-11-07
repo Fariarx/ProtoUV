@@ -126,7 +126,7 @@ const SceneItems = observer(() => {
 				borderRadius: Sizes.two,
 				transition: '0.4s all',
 			}} onClick={() => {
-				if (!isKeyPressed(Key.Shift))
+				if (!isKeyPressed(Key.Shift) && !isKeyPressed(Key.Ctrl))
 				{
 					SceneObject.DeselectAllObjects();
 				}

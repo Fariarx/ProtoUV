@@ -17,7 +17,7 @@ export const ToolButtonStyled = observer((props: {
 }) => {
 	const size = Sizes.multiply(Sizes.eight, 4);
 
-	return <Tooltip title={props.description} arrow placement="right">
+	return <Tooltip title={props.description} arrow placement="right" PopperProps={{ sx: { display: props.selected ? 'none' : 'block' } }}>
 		<FlexBoxColumnFit onClick={props.onClick} sx={{
 			...flexChildrenCenter,
 			width: props.mini ? Sizes.sum(size, Sizes.sixteen) : Sizes.sum(size, size),

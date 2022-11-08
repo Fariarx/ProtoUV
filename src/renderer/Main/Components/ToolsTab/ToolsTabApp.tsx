@@ -1,7 +1,7 @@
-import { Stack, Typography } from '@mui/material';
+import { Box,  Stack, Typography } from '@mui/material';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { createRef, useEffect } from 'react';
+import {  useEffect } from 'react';
 import { AppStore } from 'renderer/AppStore';
 import { APP_BOTTOM_HEIGHT_PX } from 'renderer/BottomApp';
 import { SceneObject } from 'renderer/Main/Scene/Entities/SceneObject';
@@ -11,7 +11,7 @@ import { container } from 'tsyringe';
 import { APP_HEADER_HEIGHT_PX } from '../../../HeaderApp';
 import { colors, config, saveConfig } from '../../../Shared/Config';
 import { SubscribersMouseMove, SubscribersMouseUp } from '../../../Shared/Libs/Listerners';
-import { FlexBox, FlexBoxColumn, FlexBoxRow, RisizibleFlexBox, flexChildrenCenter, flexSelfCenter } from '../../../Shared/Styled/FlexBox';
+import { FlexBox, FlexBoxColumn, FlexBoxRow, FlexBoxRowFit, RisizibleFlexBox, flexChildrenCenter, flexSelfCenter } from '../../../Shared/Styled/FlexBox';
 import { Sizes } from '../../../Shared/Styled/Sizes';
 import { ToolsTabStore } from './ToolsTabStore';
 
@@ -75,6 +75,66 @@ export const ToolsTabApp = observer(() => {
 	</FlexBoxRow>;
 });
 
+const Transform = () => {
+	return <Stack spacing={Sizes.four} mb={Sizes.four} sx={{
+		padding: Sizes.four,
+		backgroundColor: colors.background.dark
+	}}>
+		<FlexBoxRowFit sx={{
+			border: '2px solid ' + colors.interact.warning,
+			borderRadius: Sizes.four,
+			overflow: 'hidden',
+		}}>
+			<TransformEdit color={colors.scene.x} text='X' textEnd='cm'/>
+			<TransformEdit color={colors.scene.y} text='Y' textEnd='cm' margin/>
+			<TransformEdit color={colors.scene.z} text='Z' textEnd='cm' margin/>
+		</FlexBoxRowFit>
+		<FlexBoxRowFit>
+			<TransformEdit color={colors.scene.x} text='X' textEnd='°'/>
+			<TransformEdit color={colors.scene.y} text='Y' textEnd='°' margin/>
+			<TransformEdit color={colors.scene.z} text='Z' textEnd='°' margin/>
+		</FlexBoxRowFit>
+		<FlexBoxRowFit>
+			<TransformEdit color={colors.scene.x} text='X' textEnd='%'/>
+			<TransformEdit color={colors.scene.y} text='Y' textEnd='%' margin/>
+			<TransformEdit color={colors.scene.z} text='Z' textEnd='%' margin/>
+		</FlexBoxRowFit>
+	</Stack>;
+};
+
+const TransformEdit = (props: { margin?:boolean, color:string, text: string, textEnd: string }) => {
+	return <FlexBoxRow sx={{
+		backgroundColor: colors.background.heavy,
+		flexGrow: 1,
+		height: Sizes.sum(Sizes.sixteen, Sizes.four),
+		marginLeft: props.margin ? Sizes.four : 'unset',
+		transition: '500ms all',
+		overflow: 'hidden',
+	}}>
+		<FlexBox sx={{
+			width: 'fit-content',
+			height: Sizes.sum(Sizes.sixteen, Sizes.four),
+			backgroundColor: props.color,
+			padding: Sizes.four,
+			...flexChildrenCenter
+		}}>
+			<Typography variant='caption' color={colors.background.light}>
+				{props.text}
+			</Typography>
+		</FlexBox>
+		<FlexBox sx={{
+			width: '100%',
+			height: Sizes.sum(Sizes.sixteen, Sizes.four),
+			backgroundColor: colors.background.dark,
+			marginLeft: '2px',
+		}}>
+			<Typography variant='caption' color={colors.background.light}>
+				{10.000001}
+			</Typography>
+		</FlexBox>
+	</FlexBoxRow>;
+};
+
 const SceneItems = observer(() => {
 	return <RisizibleFlexBox flexBoxProps={{
 		sx: {
@@ -84,7 +144,7 @@ const SceneItems = observer(() => {
 			height: config.ui.sizes.sceneItemList + 'px',
 			backgroundColor: colors.background.dark,
 			borderRadius: Sizes.two,
-			boxShadow: 'inset 0px 0px 5px 0px ' + colors.background.darkest,
+			border: '1px solid ' + colors.background.darkest,
 			resize: 'vertical',
 			flexDirection: 'column',
 			overflow: 'auto'
@@ -93,11 +153,10 @@ const SceneItems = observer(() => {
 		config.ui.sizes.sceneItemList = h;
 		saveConfig();
 	}}>
-		{AppStore.sceneStore.objects.length === 0 && <FlexBoxRow sx={{
+		{/* {AppStore.sceneStore.objects.length === 0 && <FlexBoxRow sx={{
 			textOverflow: 'ellipsis',
 			width: '-webkit-fill-available',
 			height: Sizes.twentyFour,
-			backgroundColor: colors.background.heavy ,
 			pr: Sizes.four,
 			m: Sizes.four, mb: 0,
 			userSelect: 'none',
@@ -111,7 +170,7 @@ const SceneItems = observer(() => {
 			}}>
 					_______ Empty _______
 			</Typography>
-		</FlexBoxRow>}
+		</FlexBoxRow>} */}
 		{AppStore.sceneStore.objects.map((x, key) => {
 			return <FlexBoxRow key={key} sx={{
 				textOverflow: 'ellipsis',

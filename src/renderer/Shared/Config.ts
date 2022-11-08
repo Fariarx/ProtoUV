@@ -1,7 +1,7 @@
 import { Restore } from './Libs/Restore';
 
 export const _default = {
-	version: 6,
+	version: 9,
 	versionPrinterConfigs: 4,
 	settings: {
 		ui: {
@@ -47,6 +47,9 @@ export const _default = {
 				color1:'#2a2a2a',
 				workingPlaneLimitColor:'rgba(169, 110, 105, 1)',
 				workingPlaneColor:'rgba(109, 112, 117, 1)',
+				x: '#8f4747',
+				y: '#548540',
+				z: '#444b88',
 			},
 			logo: {
 				main: '#5e48ff'

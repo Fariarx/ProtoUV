@@ -7,6 +7,8 @@ import { TransformEnum } from '../../../Shared/Libs/Types';
 export class TransformStore {
 	private _state: TransformEnum;
 
+	public anchorElement: (EventTarget & HTMLElement) | null = null;
+
 	public get state() {
 		return this._state;
 	}

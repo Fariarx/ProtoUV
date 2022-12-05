@@ -74,7 +74,10 @@ export abstract class SceneBase {
 	public printer?: Printer;
 
 	public scene: Scene = new Scene();
+
+	@observable
 	public groupSelected: SceneObject[] = [];
+
 	public decorations: Group = new Group();
 	public transformObjectGroup: Object3D = new Object3D();
 	public transformGroupMarker: Object3D = new Object3D();
@@ -90,6 +93,8 @@ export abstract class SceneBase {
 	public lightFromCamera!: DirectionalLight;
 	public orbitControls!: OrbitControls;
 	public transformControls!: TransformControls;
+	public transformControlsUpdate!: () => void;
+	public transformControlsDragging!: (event: { value: boolean } | any) => void;
 	public orientationHelperPerspective: any;
 	public orientationHelperOrthographic: any;
 

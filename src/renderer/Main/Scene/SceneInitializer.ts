@@ -1,5 +1,5 @@
 import { Transform } from '@mui/icons-material';
-import { runInAction } from 'mobx';
+import { action, runInAction } from 'mobx';
 import { WheelEvent } from 'React';
 import {
 	AmbientLight, ArrowHelper, BufferGeometry,
@@ -192,30 +192,7 @@ export class SceneInitializer extends SceneBase {
 		this.scene.add(this.transformObjectGroup);
 		this.scene.add(this.transformGroupMarker);
 
-		this.transformControls.addEventListener( 'dragging-changed', function ( event ) {
-			AppStore.sceneStore.orbitControls.enabled = !event.value;
-
-			if (event.value) {
-				AppStore.sceneStore.transformGroupMarker.position.set(
-					AppStore.sceneStore.transformObjectGroup.position.x,
-					AppStore.sceneStore.transformObjectGroup.position.y,
-					AppStore.sceneStore.transformObjectGroup.position.z);
-				AppStore.sceneStore.transformGroupMarker.rotation.set(
-					AppStore.sceneStore.transformObjectGroup.rotation.x,
-					AppStore.sceneStore.transformObjectGroup.rotation.y,
-					AppStore.sceneStore.transformObjectGroup.rotation.z);
-				AppStore.sceneStore.transformGroupMarker.scale.set(
-					AppStore.sceneStore.transformObjectGroup.scale.x,
-					AppStore.sceneStore.transformObjectGroup.scale.y,
-					AppStore.sceneStore.transformObjectGroup.scale.z);
-			}
-			else {
-				SceneObject.SelectObjsAlignY();
-			}
-
-			AppStore.sceneStore.animate();
-		});
-		this.transformControls.addEventListener( 'change', () => {
+		this.transformControlsUpdate = () => {
 			const transformObj = this.transformObjectGroup;
 			const transformMarker = this.transformGroupMarker;
 
@@ -305,7 +282,34 @@ export class SceneInitializer extends SceneBase {
 			} else {
 				Log('Error of \'change\': transformObj is null or this.sceneStore.groupSelected.length = 0');
 			}
-		});
+		};
+		this.transformControlsDragging = (event) => {
+			AppStore.sceneStore.orbitControls.enabled = !event.value;
+
+			if (event.value) {
+				AppStore.sceneStore.transformGroupMarker.position.set(
+					AppStore.sceneStore.transformObjectGroup.position.x,
+					AppStore.sceneStore.transformObjectGroup.position.y,
+					AppStore.sceneStore.transformObjectGroup.position.z);
+				AppStore.sceneStore.transformGroupMarker.rotation.set(
+					AppStore.sceneStore.transformObjectGroup.rotation.x,
+					AppStore.sceneStore.transformObjectGroup.rotation.y,
+					AppStore.sceneStore.transformObjectGroup.rotation.z);
+				AppStore.sceneStore.transformGroupMarker.scale.set(
+					AppStore.sceneStore.transformObjectGroup.scale.x,
+					AppStore.sceneStore.transformObjectGroup.scale.y,
+					AppStore.sceneStore.transformObjectGroup.scale.z);
+			}
+			else {
+				SceneObject.SelectObjsAlignY();
+				runInAction(() =>
+					AppStore.sceneStore.groupSelected = [...AppStore.sceneStore.groupSelected]);
+			}
+
+			AppStore.sceneStore.animate();
+		};
+		this.transformControls.addEventListener( 'dragging-changed', this.transformControlsDragging);
+		this.transformControls.addEventListener( 'change', this.transformControlsUpdate);
 	};
 	public setupCanvas = (canvas: HTMLDivElement | null) => {
 		this.stats.domElement.style.marginTop = '400px';
@@ -681,7 +685,7 @@ export class SceneInitializer extends SceneBase {
 				{
 					this.outlineEffectRenderer.renderOutline(this.scene, this.activeCamera);
 				}
-			}, 1000);
+			}, 100);
 
 			this.stats.update();
 

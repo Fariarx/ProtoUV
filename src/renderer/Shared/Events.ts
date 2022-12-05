@@ -31,6 +31,7 @@ const Handler = (message: any) => {
 			break;
 		case AppEventEnum.TRANSFORM_OBJECT:
 			objectTransform(message);
+			console.log(message);
 			break;
 	}
 

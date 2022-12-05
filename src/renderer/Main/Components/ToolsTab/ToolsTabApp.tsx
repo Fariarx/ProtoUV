@@ -1,4 +1,4 @@
-import { Box,  Stack, Typography } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import {  useEffect } from 'react';
@@ -11,7 +11,7 @@ import { container } from 'tsyringe';
 import { APP_HEADER_HEIGHT_PX } from '../../../HeaderApp';
 import { colors, config, saveConfig } from '../../../Shared/Config';
 import { SubscribersMouseMove, SubscribersMouseUp } from '../../../Shared/Libs/Listerners';
-import { FlexBox, FlexBoxColumn, FlexBoxRow, FlexBoxRowFit, RisizibleFlexBox, flexChildrenCenter, flexSelfCenter } from '../../../Shared/Styled/FlexBox';
+import { FlexBox, FlexBoxColumn, FlexBoxRow, RisizibleFlexBox, flexChildrenCenter, flexSelfCenter } from '../../../Shared/Styled/FlexBox';
 import { Sizes } from '../../../Shared/Styled/Sizes';
 import { ToolsTabStore } from './ToolsTabStore';
 
@@ -74,66 +74,6 @@ export const ToolsTabApp = observer(() => {
 		</FlexBoxColumn>
 	</FlexBoxRow>;
 });
-
-const Transform = () => {
-	return <Stack spacing={Sizes.four} mb={Sizes.four} sx={{
-		padding: Sizes.four,
-		backgroundColor: colors.background.dark
-	}}>
-		<FlexBoxRowFit sx={{
-			border: '2px solid ' + colors.interact.warning,
-			borderRadius: Sizes.four,
-			overflow: 'hidden',
-		}}>
-			<TransformEdit color={colors.scene.x} text='X' textEnd='cm'/>
-			<TransformEdit color={colors.scene.y} text='Y' textEnd='cm' margin/>
-			<TransformEdit color={colors.scene.z} text='Z' textEnd='cm' margin/>
-		</FlexBoxRowFit>
-		<FlexBoxRowFit>
-			<TransformEdit color={colors.scene.x} text='X' textEnd='°'/>
-			<TransformEdit color={colors.scene.y} text='Y' textEnd='°' margin/>
-			<TransformEdit color={colors.scene.z} text='Z' textEnd='°' margin/>
-		</FlexBoxRowFit>
-		<FlexBoxRowFit>
-			<TransformEdit color={colors.scene.x} text='X' textEnd='%'/>
-			<TransformEdit color={colors.scene.y} text='Y' textEnd='%' margin/>
-			<TransformEdit color={colors.scene.z} text='Z' textEnd='%' margin/>
-		</FlexBoxRowFit>
-	</Stack>;
-};
-
-const TransformEdit = (props: { margin?:boolean, color:string, text: string, textEnd: string }) => {
-	return <FlexBoxRow sx={{
-		backgroundColor: colors.background.heavy,
-		flexGrow: 1,
-		height: Sizes.sum(Sizes.sixteen, Sizes.four),
-		marginLeft: props.margin ? Sizes.four : 'unset',
-		transition: '500ms all',
-		overflow: 'hidden',
-	}}>
-		<FlexBox sx={{
-			width: 'fit-content',
-			height: Sizes.sum(Sizes.sixteen, Sizes.four),
-			backgroundColor: props.color,
-			padding: Sizes.four,
-			...flexChildrenCenter
-		}}>
-			<Typography variant='caption' color={colors.background.light}>
-				{props.text}
-			</Typography>
-		</FlexBox>
-		<FlexBox sx={{
-			width: '100%',
-			height: Sizes.sum(Sizes.sixteen, Sizes.four),
-			backgroundColor: colors.background.dark,
-			marginLeft: '2px',
-		}}>
-			<Typography variant='caption' color={colors.background.light}>
-				{10.000001}
-			</Typography>
-		</FlexBox>
-	</FlexBoxRow>;
-};
 
 const SceneItems = observer(() => {
 	return <RisizibleFlexBox flexBoxProps={{

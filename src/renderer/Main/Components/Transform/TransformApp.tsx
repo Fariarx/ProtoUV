@@ -87,9 +87,34 @@ const TransformPopperContent = observer(() => {
 			text={'X'}
 			value={position.x}
 			textEnd='cm'
+			marginTop
 			updateValue={value => {
 				scene.transformControlsDragging({ value: true });
 				scene.transformObjectGroup.position.setX(value);
+				scene.transformControlsUpdate();
+				scene.transformControlsDragging({ value: false });
+			}}/>
+		<TransformNumberValue
+			color={colors.scene.y}
+			text={'Y'}
+			value={position.y}
+			textEnd='cm'
+			marginTop
+			updateValue={value => {
+				scene.transformControlsDragging({ value: true });
+				scene.transformObjectGroup.position.setY(value);
+				scene.transformControlsUpdate();
+				scene.transformControlsDragging({ value: false });
+			}}/>
+		<TransformNumberValue
+			color={colors.scene.z}
+			text={'Z'}
+			value={position.z}
+			textEnd='cm'
+			marginTop
+			updateValue={value => {
+				scene.transformControlsDragging({ value: true });
+				scene.transformObjectGroup.position.setZ(value);
 				scene.transformControlsUpdate();
 				scene.transformControlsDragging({ value: false });
 			}}/>
@@ -122,7 +147,7 @@ const TransformNumberValue = observer((props: {
 		display: 'flex',
 		justifyContent: 'space-between',
 		overflow: 'hidden',
-		marginTop: props.marginTop ? Sizes.eight : 'unset'
+		marginTop: props.marginTop ? Sizes.four : 'unset'
 	}}>
 		<Box sx={{
 			width: Sizes.twentyFour,

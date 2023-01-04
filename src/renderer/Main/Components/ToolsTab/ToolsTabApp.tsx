@@ -56,7 +56,7 @@ export const ToolsTabApp = observer(() => {
 		sx={{
 			width: store.width + 'px',
 			height: `calc(100% - ${APP_HEADER_HEIGHT_PX} - ${APP_BOTTOM_HEIGHT_PX})`,
-			opacity: 0.8,
+			opacity: config.ui.opacity,
 			position: 'absolute',
 			top: APP_HEADER_HEIGHT_PX,
 			bottom: APP_BOTTOM_HEIGHT_PX,

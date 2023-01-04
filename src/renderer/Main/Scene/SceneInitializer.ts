@@ -358,8 +358,8 @@ export class SceneInitializer extends SceneBase {
 		this.orientationHelperOrthographic.domElement.style.position = 'absolute';
 		this.orientationHelperPerspective.domElement.style.right = '0px';
 		this.orientationHelperOrthographic.domElement.style.right = '0px';
-		this.orientationHelperPerspective.domElement.style.top = (0 + APP_HEADER_HEIGHT) + 'px';
-		this.orientationHelperOrthographic.domElement.style.top = (0 + APP_HEADER_HEIGHT) + 'px';
+		this.orientationHelperPerspective.domElement.style.top = (36 + APP_HEADER_HEIGHT) + 'px';
+		this.orientationHelperOrthographic.domElement.style.top = (36 + APP_HEADER_HEIGHT) + 'px';
 
 		this.updateOrientationHelper();
 	};

@@ -1,7 +1,10 @@
-import { Stack, Typography } from '@mui/material';
+import { IconButton, Stack, Typography } from '@mui/material';
+import { RiCheckboxIndeterminateLine } from '@react-icons/all-files/ri/RiCheckboxIndeterminateLine';
+import { RiCheckboxLine } from '@react-icons/all-files/ri/RiCheckboxLine';
+import { RiDeleteBinLine } from '@react-icons/all-files/ri/RiDeleteBinLine';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import {  useEffect } from 'react';
+import {  ReactChild, useEffect } from 'react';
 import { AppStore } from 'renderer/AppStore';
 import { APP_BOTTOM_HEIGHT_PX } from 'renderer/BottomApp';
 import { SceneObject } from 'renderer/Main/Scene/Entities/SceneObject';
@@ -15,7 +18,7 @@ import { FlexBox, FlexBoxColumn, FlexBoxRow, RisizibleFlexBox, flexChildrenCente
 import { Sizes } from '../../../Shared/Styled/Sizes';
 import { ToolsTabStore } from './ToolsTabStore';
 
-export const TOOLS_TAB_MIN_SIZE = 200;
+export const TOOLS_TAB_MIN_SIZE = 150;
 export const TOOLS_TAB_MAX_SIZE = 400;
 
 export const ToolsTabApp = observer(() => {
@@ -53,23 +56,26 @@ export const ToolsTabApp = observer(() => {
 		sx={{
 			width: store.width + 'px',
 			height: `calc(100% - ${APP_HEADER_HEIGHT_PX} - ${APP_BOTTOM_HEIGHT_PX})`,
-			background: colors.background.heavy,
-			borderLeft: '1px solid ' + colors.background.heavy,
+			opacity: 0.8,
 			position: 'absolute',
 			top: APP_HEADER_HEIGHT_PX,
 			bottom: APP_BOTTOM_HEIGHT_PX,
-			right: 0,
-			padding: Sizes.four
+			right: 0
 		}}>
 		<ResizePanel store={store} />
 		<FlexBoxColumn>
 			<SceneItems/>
 			<Stack direction='row' sx={{
-				flexWrap: 'wrap'
+				p: Sizes.four,
+				backgroundColor: colors.background.heavy,
+				flexWrap: 'wrap',
+				borderRadius: '0 0 0 4px',
+				borderLeft: '1px solid ' + colors.background.dark,
+				borderBottom: '1px solid ' + colors.background.dark
 			}}>
-				<Button text='Select all' action={() => SceneObject.SelectAllObjects()}/>
-				<Button text='Clear select' action={() => SceneObject.DeselectAllObjects()}/>
-				<Button text='Delete' action={() => SceneObject.SelectObjsDelete()}/>
+				<Button text='Select all' action={() => SceneObject.SelectAllObjects()} icon={<RiCheckboxLine/>}/>
+				<Button text='Clear select' action={() => SceneObject.DeselectAllObjects()} icon={<RiCheckboxIndeterminateLine/>}/>
+				<Button text='Delete' action={() => SceneObject.SelectObjsDelete()} icon={<RiDeleteBinLine/>}/>
 			</Stack>
 		</FlexBoxColumn>
 	</FlexBoxRow>;
@@ -79,11 +85,10 @@ const SceneItems = observer(() => {
 	return <RisizibleFlexBox flexBoxProps={{
 		sx: {
 			width: '100%',
-			minHeight: '100px',
+			minHeight: '150px',
 			maxHeight: '40%',
 			height: config.ui.sizes.sceneItemList + 'px',
 			backgroundColor: colors.background.dark,
-			borderRadius: Sizes.two,
 			border: '1px solid ' + colors.background.darkest,
 			resize: 'vertical',
 			flexDirection: 'column',
@@ -149,12 +154,13 @@ const SceneItems = observer(() => {
 
 					</FlexBox>
 				</FlexBoxRow>
-				<Typography variant='caption' color={colors.background.light} sx={{
+				<Typography color={colors.background.light} sx={{
 					...flexSelfCenter,
 					whiteSpace: 'nowrap',
 					overflow: 'hidden',
 					textOverflow: 'ellipsis',
-					marginTop: '1px'
+					marginTop: '1px',
+					fontSize: '11px'
 				}}>
 					{key + ' : ' + x.name}
 				</Typography>
@@ -166,29 +172,11 @@ const SceneItems = observer(() => {
 const Button = (props: {
   text: string;
   action: () => void;
+  icon: ReactChild;
 }) => {
-	return <FlexBox onClick={props.action} sx={{
-		width: 'fit-content',
-		height: 'fit-content',
-		pl: Sizes.eight, pr: Sizes.eight,
-		mr: Sizes.four, mt: Sizes.four,
-		backgroundColor: colors.background.common,
-		borderRadius: Sizes.four,
-		border: '1px solid ' + colors.background.darkest,
-		userSelect: 'none',
-		transition: '0.2s ease-out',
-		':hover': {
-			backgroundColor: colors.interact.neutral1,
-			border: '1px solid ' + colors.interact.touch,
-		},
-		':active': {
-			backgroundColor: colors.interact.touch1,
-		}
-	}}>
-		<Typography variant='caption' color={colors.background.light}>
-			{props.text}
-		</Typography>
-	</FlexBox>;
+	return <IconButton size='small' aria-label={props.text} onClick={props.action}>
+		{props.icon}
+	</IconButton>;
 };
 
 const ResizePanel = (props: { store: ToolsTabStore }) => {
@@ -202,6 +190,7 @@ const ResizePanel = (props: { store: ToolsTabStore }) => {
 			transition: '0.5s ease-out',
 			cursor: 'col-resize',
 			position: 'absolute',
+			userSelect: 'none',
 			':hover': {
 				backgroundColor: colors.interact.touch,
 				width: Sizes.eight

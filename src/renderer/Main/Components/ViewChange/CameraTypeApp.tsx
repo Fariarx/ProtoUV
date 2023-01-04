@@ -10,6 +10,7 @@ export const CameraTypeApp = () => {
 	const [isPerspective, setterIsPerspective] = useState(config.scene.setStartupPerspectiveCamera);
 
 	return <IconButton
+		size='small'
 		onClick={() => {
 			AppStore.sceneStore.updateCameraType(!isPerspective);
 			setterIsPerspective(!isPerspective);

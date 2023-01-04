@@ -32,12 +32,12 @@ var OrientationHelper = function ( camera, controls, options, labels ) {
 	var scope = this;
 
 	var _options = Object.assign( {
-		width: 100,
-		height: 100,
+		width: 85,
+		height: 85,
 		className: '',
 		backgroundColor: '#444',
 		backgroundOpacity: 0,
-		cameraFov: 50,
+		cameraFov: 45,
 		cameraNear: 1,
 		cameraFar: 1000,
 		cameraDistance: 150,

@@ -7,8 +7,8 @@ import { CameraTypeApp } from './CameraTypeApp';
 
 export const ViewChangeApp = observer(() => {
 	return <Box sx={{
-		right: container.resolve(ToolsTabStore).width + 'px',
-		bottom: Sizes.twentyFour,
+		right: (container.resolve(ToolsTabStore).width + 6) + 'px',
+		top: Sizes.multiply(Sizes.twentyFour, 4),
 		position: 'absolute',
 		p: Sizes.eight
 	}}>

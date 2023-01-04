@@ -697,7 +697,7 @@ export class SceneInitializer extends SceneBase {
 				{
 					this.outlineEffectRenderer.renderOutline(this.scene, this.activeCamera);
 				}
-			}, 50);
+			}, 500);
 
 			this.stats.update();
 

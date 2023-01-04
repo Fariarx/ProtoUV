@@ -54,7 +54,7 @@ export const ToolsTabApp = observer(() => {
 			width: store.width + 'px',
 			height: `calc(100% - ${APP_HEADER_HEIGHT_PX} - ${APP_BOTTOM_HEIGHT_PX})`,
 			background: colors.background.heavy,
-			borderLeft: '1px solid ' + colors.background.darkest,
+			borderLeft: '1px solid ' + colors.background.heavy,
 			position: 'absolute',
 			top: APP_HEADER_HEIGHT_PX,
 			bottom: APP_BOTTOM_HEIGHT_PX,

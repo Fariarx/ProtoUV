@@ -5,7 +5,7 @@ export class ThreeHelper {
 	static DrawDirLine(origin: Vector3, dir: Vector3, length  = 100, scene: Scene = AppStore.sceneStore.scene)
 	{
 		const _dir = dir.clone().normalize();
-		const _origin = origin.clone().normalize();
+		const _origin = origin.clone();
 
 		const hex = 0xf27f00;
 

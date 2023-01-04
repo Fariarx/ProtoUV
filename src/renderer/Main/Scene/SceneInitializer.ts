@@ -21,6 +21,7 @@ import { SubscribersKeyPressed, isKeyPressed } from '../../Shared/Libs/Keys';
 import { SubscribersDoubleMouseClick, SubscribersMouseDown, SubscribersMouseUp, SubscribersWindowResize } from '../../Shared/Libs/Listerners';
 import { AppEventEnum, AppEventMoveObject, AppEventSelectionChanged, TransformEnum } from '../../Shared/Libs/Types';
 import { ToolsTabStore } from '../Components/ToolsTab/ToolsTabStore';
+import { ThreeHelper } from './../../Shared/Helpers/Three';
 import { SceneObject } from './Entities/SceneObject';
 import { SceneBase } from './SceneBase';
 
@@ -175,7 +176,7 @@ export class SceneInitializer extends SceneBase {
 		this.orbitControls = new OrbitControls(this.activeCamera, this.renderer.domElement);
 		this.orbitControls.object = this.activeCamera;
 		this.orbitControls.enableDamping = true;
-		this.orbitControls.dampingFactor = 0.4;
+		this.orbitControls.dampingFactor = 0.2;
 		this.orbitControls.update();
 		this.orbitControls.addEventListener( 'change', () => {
 			this.temp.wasChangeLook = true;
@@ -398,7 +399,7 @@ export class SceneInitializer extends SceneBase {
 			}
 
 			vectorMouseRaycaster.set((e.clientX / window.innerWidth) * 2 - 1,
-				- ((e.clientY - APP_HEADER_HEIGHT) / window.innerHeight) * 2 + 1,
+				- (e.clientY / window.innerHeight) * 2 + 1,
 				0.5);
 
 			const raycaster = new Raycaster();
@@ -411,7 +412,7 @@ export class SceneInitializer extends SceneBase {
 				return a.distance < b.distance ? -1 : 1;
 			});
 
-			if(intersects.length && intersects[0].face )
+			if(intersects.length && intersects[0].face)
 			{
 				const sceneObjIndex = SceneObject.SearchIndexByMesh(AppStore.sceneStore.objects, intersects[0].object as Mesh);
 				if (sceneObjIndex < 0)
@@ -655,6 +656,14 @@ export class SceneInitializer extends SceneBase {
 			if (this.grid)
 			{
 				this.grid.mat.resolution.set(window.innerWidth, window.innerHeight);
+			}
+
+			if (this.isFixedCenter)
+			{
+				this.orbitControls.target.set(this.gridSize.x / 2, 0, this.gridSize.z / 2);
+			}
+			else {
+				//this.orbitControls.target.setY(0);
 			}
 
 			this.lightFromCamera.position.set(this.activeCamera.position.x, this.activeCamera.position.y, this.activeCamera.position.z);

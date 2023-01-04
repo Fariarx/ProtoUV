@@ -22,7 +22,7 @@ export const _default = {
 			},
 			background:{
 				black:'#0e0e0e',
-				darkest:'#1f1f1f',
+				darkest:'#242424',
 				dark:'#2d2d2d',
 				heavy:'#3a3b3b',
 				common:'#444444',

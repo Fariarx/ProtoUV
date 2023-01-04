@@ -49,7 +49,7 @@ export const TransformApp = observer(() => {
 			sx={{ borderRadius: store.state === TransformEnum.Scale ? '0px 4px 4px 0px' : '0px 0px 2px 0px' }}>
 			<FiCode transform={scale}/>
 		</ToolButtonStyled>
-		<Popper open={!!store.anchorElement} anchorEl={store.anchorElement} placement='right-start'>
+		<Popper open={!!store.anchorElement && store.state !== TransformEnum.None} anchorEl={store.anchorElement} placement='right-start'>
 			<Grow in>
 				<Box sx={{
 					borderRadius: Sizes.four,
@@ -69,8 +69,6 @@ const TransformPopperContent = observer(() => {
 	const store = container.resolve(TransformStore);
 	const scene = container.resolve(SceneStore);
 	const position = SceneObject.CalculateGroupCenter(scene.groupSelected);
-
-	console.log(position);
 
 	return <>
 		<Typography variant='body1' sx={{

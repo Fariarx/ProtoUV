@@ -35,7 +35,7 @@ export abstract class SceneBase {
 
 	public materialLine = new LineMaterial({
 		color: 0xa1a1a1,
-		linewidth: 2
+		linewidth: 1.5
 	});
 
 	public materialsForScene = {

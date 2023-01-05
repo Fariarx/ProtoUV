@@ -76,9 +76,9 @@ const TransformPopperContent = observer(() => {
 		}}>
 			{EnumHelpers.valueOf(TransformEnum, store.state)}
 		</Typography>
-		<Divider sx={{
+		{/* <Divider sx={{
 			marginBottom: 1
-		}}/>
+		}}/> */}
 
 		<TransformNumberValue
 			color={colors.scene.x}

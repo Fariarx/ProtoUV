@@ -4,6 +4,7 @@ import { WheelEvent } from 'React';
 import {
 	AmbientLight, ArrowHelper, BufferGeometry,
 	DirectionalLight,
+	Euler,
 	Group, MathUtils, Mesh, Object3D, OrthographicCamera, PerspectiveCamera, Raycaster, Vector3
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
@@ -233,23 +234,16 @@ export class SceneInitializer extends SceneBase {
 						old = transformMarker.rotation;
 
 						if (!now.equals(old)) {
-							const differenceVector3 = new Vector3(old.x - now.x, old.y - now.y, old.z - now.z);
-
 							transformObj.rotation.set(now.x, now.y, now.z);
 							transformMarker.rotation.set(now.x, now.y, now.z);
 
 							for (const sceneObject of this.groupSelected) {
 								const oldPosition = sceneObject.mesh.rotation.clone();
-								const newPosition = sceneObject.mesh.rotation.clone();
-
-								newPosition.x -= differenceVector3.x;
-								newPosition.y -= differenceVector3.y;
-								newPosition.z -= differenceVector3.z;
 
 								Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
 									from: oldPosition,
-									to: newPosition,
-									sceneObject: sceneObject
+									to: transformObj.rotation.clone(),
+									sceneObject: sceneObject,
 								} as AppEventMoveObject);
 							}
 						}
@@ -259,30 +253,29 @@ export class SceneInitializer extends SceneBase {
 						old = transformMarker.scale;
 
 						if (!now.equals(old)) {
+							const sceneObject = this.groupSelected[this.groupSelected.length - 1];
 							const differenceVector3 = new Vector3(old.x - now.x, old.y - now.y, old.z - now.z);
+
+							const oldPosition = sceneObject.mesh.scale.clone();
+							const newPosition = sceneObject.mesh.scale.clone();
+
+							newPosition.x -= differenceVector3.x;
+							newPosition.y -= differenceVector3.y;
+							newPosition.z -= differenceVector3.z;
+
+							Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
+								from: oldPosition,
+								to: newPosition,
+								sceneObject: sceneObject
+							} as AppEventMoveObject);
 
 							transformObj.scale.set(now.x, now.y, now.z);
 							transformMarker.scale.set(now.x, now.y, now.z);
-
-							for (const sceneObject of this.groupSelected) {
-								const oldPosition = sceneObject.mesh.scale.clone();
-								const newPosition = sceneObject.mesh.scale.clone();
-
-								newPosition.x -= differenceVector3.x;
-								newPosition.y -= differenceVector3.y;
-								newPosition.z -= differenceVector3.z;
-
-								Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
-									from: oldPosition,
-									to: newPosition,
-									sceneObject: sceneObject
-								} as AppEventMoveObject);
-							}
 						}
 						break;
 				}
 			} else {
-				Log('Error of \'change\': transformObj is null or this.sceneStore.groupSelected.length = 0');
+				Log('Error of \'change\': transformObj is null or groupSelected.length = 0');
 			}
 
 			// trigger mobx update for ui
@@ -467,6 +460,7 @@ export class SceneInitializer extends SceneBase {
 		for (const object of AppStore.sceneStore.objects) {
 			if (object.isSelected) {
 				AppStore.sceneStore.groupSelected.push(object);
+
 			}
 
 			const state = object.UpdateSelection();
@@ -502,6 +496,12 @@ export class SceneInitializer extends SceneBase {
 			AppStore.sceneStore.transformControls.attach(AppStore.sceneStore.transformObjectGroup);
 			AppStore.sceneStore.transformControls.setMode(EnumHelpers
 				.valueOf(TransformEnum, AppStore.transform.state) as 'translate' | 'rotate' | 'scale');
+
+			const sceneObject = this.groupSelected[this.groupSelected.length - 1];
+			const transformObj = this.transformObjectGroup;
+			const transformMarker = this.transformGroupMarker;
+			transformObj.rotation.set(sceneObject.mesh.rotation.x, sceneObject.mesh.rotation.y, sceneObject.mesh.rotation.z);
+			transformMarker.rotation.set(sceneObject.mesh.rotation.x, sceneObject.mesh.rotation.y, sceneObject.mesh.rotation.z);
 		}
 		else {
 			AppStore.sceneStore.transformControls.detach();

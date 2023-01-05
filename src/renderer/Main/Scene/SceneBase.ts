@@ -76,9 +76,6 @@ export abstract class SceneBase {
 	public scene: Scene = new Scene();
 
 	@observable
-	public isFixedCenter = false;
-
-	@observable
 	public groupSelected: SceneObject[] = [];
 
 	public decorations: Group = new Group();

@@ -32,12 +32,12 @@ var OrientationHelper = function ( camera, controls, options, labels ) {
 	var scope = this;
 
 	var _options = Object.assign( {
-		width: 85,
-		height: 85,
+		width: 100,
+		height: 100,
 		className: '',
 		backgroundColor: '#444',
 		backgroundOpacity: 0,
-		cameraFov: 45,
+		cameraFov: 50,
 		cameraNear: 1,
 		cameraFar: 1000,
 		cameraDistance: 150,
@@ -361,7 +361,7 @@ var OrientationHelper = function ( camera, controls, options, labels ) {
 
 				ctx.beginPath();
 				ctx.fillStyle = background;
-				ctx.rect( 0.5, 0.5, side - 1, side -1 );
+				ctx.rect( 1, 1, side - 2, side -2 );
 				ctx.fill();
 				ctx.fillStyle = color;
 				ctx.textAlign = 'center';

@@ -1,4 +1,4 @@
-import { IconButton, Stack, Typography } from '@mui/material';
+import { IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import { RiCheckboxIndeterminateLine } from '@react-icons/all-files/ri/RiCheckboxIndeterminateLine';
 import { RiCheckboxLine } from '@react-icons/all-files/ri/RiCheckboxLine';
 import { RiDeleteBinLine } from '@react-icons/all-files/ri/RiDeleteBinLine';
@@ -73,9 +73,9 @@ export const ToolsTabApp = observer(() => {
 				borderLeft: '1px solid ' + colors.background.dark,
 				borderBottom: '1px solid ' + colors.background.dark
 			}}>
-				<Button text='Select all' action={() => SceneObject.SelectAllObjects()} icon={<RiCheckboxLine/>}/>
-				<Button text='Clear select' action={() => SceneObject.DeselectAllObjects()} icon={<RiCheckboxIndeterminateLine/>}/>
-				<Button text='Delete' action={() => SceneObject.SelectObjsDelete()} icon={<RiDeleteBinLine/>}/>
+				<Button text='Select all' action={() => SceneObject.SelectAllObjects()} icon={<RiCheckboxLine color={colors.background.light}/>}/>
+				<Button text='Clear select' action={() => SceneObject.DeselectAllObjects()} icon={<RiCheckboxIndeterminateLine color={colors.background.light}/>}/>
+				<Button text='Delete' action={() => SceneObject.SelectObjsDelete()} icon={<RiDeleteBinLine color={colors.background.light}/>}/>
 			</Stack>
 		</FlexBoxColumn>
 	</FlexBoxRow>;
@@ -174,9 +174,12 @@ const Button = (props: {
   action: () => void;
   icon: ReactChild;
 }) => {
-	return <IconButton size='small' aria-label={props.text} onClick={props.action}>
-		{props.icon}
-	</IconButton>;
+	return <Tooltip title={props.text} arrow placement="bottom"
+		PopperProps={{ sx: { userSelect: 'none' } }}>
+		<IconButton size='small' aria-label={props.text} onClick={props.action}>
+			{props.icon}
+		</IconButton>
+	</Tooltip>;
 };
 
 const ResizePanel = (props: { store: ToolsTabStore }) => {

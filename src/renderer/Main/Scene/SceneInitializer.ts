@@ -356,10 +356,10 @@ export class SceneInitializer extends SceneBase {
 
 		this.orientationHelperPerspective.domElement.style.position = 'absolute';
 		this.orientationHelperOrthographic.domElement.style.position = 'absolute';
-		this.orientationHelperPerspective.domElement.style.right = '0px';
-		this.orientationHelperOrthographic.domElement.style.right = '0px';
-		this.orientationHelperPerspective.domElement.style.top = (36 + APP_HEADER_HEIGHT) + 'px';
-		this.orientationHelperOrthographic.domElement.style.top = (36 + APP_HEADER_HEIGHT) + 'px';
+		this.orientationHelperPerspective.domElement.style.right = '0';
+		this.orientationHelperOrthographic.domElement.style.right = '0';
+		this.orientationHelperPerspective.domElement.style.top = (28 + APP_HEADER_HEIGHT) + 'px';
+		this.orientationHelperOrthographic.domElement.style.top = (28 + APP_HEADER_HEIGHT) + 'px';
 
 		this.updateOrientationHelper();
 	};
@@ -658,7 +658,7 @@ export class SceneInitializer extends SceneBase {
 				this.grid.mat.resolution.set(window.innerWidth, window.innerHeight);
 			}
 
-			if (this.isFixedCenter)
+			if (config.scene.isFixedCenter)
 			{
 				this.orbitControls.target.set(this.gridSize.x / 2, 0, this.gridSize.z / 2);
 			}

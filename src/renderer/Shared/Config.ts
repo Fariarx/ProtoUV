@@ -1,7 +1,7 @@
 import { Restore } from './Libs/Restore';
 
 export const _default = {
-	version: 2,
+	version: 3,
 	versionPrinterConfigs: 4,
 	settings: {
 		ui: {
@@ -14,6 +14,7 @@ export const _default = {
 		scene:{
 			transformAlignToPlane: true,
 			setStartupPerspectiveCamera: true,
+			isFixedCenter: true,
 			sharpness:.0001
 		},
 		colors: {

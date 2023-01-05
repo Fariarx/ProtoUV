@@ -4,13 +4,13 @@ import { container } from 'tsyringe';
 import { APP_HEADER_HEIGHT_PX } from '../../../HeaderApp';
 import { config } from '../../../Shared/Config';
 import { Sizes } from '../../../Shared/Styled/Sizes';
-import { ToolsTabStore } from '../ToolsTab/ToolsTabStore';
+import { ToolsRightStore } from '../ToolsRight/ToolsRightStore';
 import { CameraTypeApp } from './CameraTypeApp';
 import { LockLookAtCenterApp } from './LockLookAtCenterApp';
 
 export const ViewChangeApp = observer(() => {
 	return <Box sx={{
-		right: (container.resolve(ToolsTabStore).width + 22) + 'px',
+		right: (container.resolve(ToolsRightStore).width + 22) + 'px',
 		top: Sizes.sum(APP_HEADER_HEIGHT_PX, Sizes.eight),
 		position: 'absolute',
 		//border: '1px solid ' + colors.background.darkest,

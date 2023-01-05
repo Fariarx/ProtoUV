@@ -16,13 +16,13 @@ import { colors, config, saveConfig } from '../../../Shared/Config';
 import { SubscribersMouseMove, SubscribersMouseUp } from '../../../Shared/Libs/Listerners';
 import { FlexBox, FlexBoxColumn, FlexBoxRow, RisizibleFlexBox, flexChildrenCenter, flexSelfCenter } from '../../../Shared/Styled/FlexBox';
 import { Sizes } from '../../../Shared/Styled/Sizes';
-import { ToolsTabStore } from './ToolsTabStore';
+import { ToolsRightStore } from './ToolsRightStore';
 
 export const TOOLS_TAB_MIN_SIZE = 150;
 export const TOOLS_TAB_MAX_SIZE = 400;
 
-export const ToolsTabApp = observer(() => {
-	const store = container.resolve(ToolsTabStore);
+export const ToolsRightApp = observer(() => {
+	const store = container.resolve(ToolsRightStore);
 
 	useEffect(() => {
 		SubscribersMouseMove.push((e) => {
@@ -182,7 +182,7 @@ const Button = (props: {
 	</Tooltip>;
 };
 
-const ResizePanel = (props: { store: ToolsTabStore }) => {
+const ResizePanel = (props: { store: ToolsRightStore }) => {
 	return <FlexBoxColumn
 		onMouseDown={() => {
 			props.store.resize = true;

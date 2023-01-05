@@ -12,8 +12,8 @@ import { EnumHelpers } from 'renderer/Shared/Helpers/Enum';
 import { flexChildrenCenter } from 'renderer/Shared/Styled/FlexBox';
 import { Sizes } from 'renderer/Shared/Styled/Sizes';
 import { container } from 'tsyringe';
-import { AppEventEnum, TransformEnum } from '../../../Shared/Libs/Types';
-import { ToolButtonStyled } from '../ToolsLeft/ToolButtonStyled';
+import { AppEventEnum, TransformEnum } from '../../../../Shared/Libs/Types';
+import { ToolButtonStyled } from '../Shared/ToolButtonStyled';
 import { TransformStore } from './TransformStore';
 
 const scale = 'scale(1.1)';

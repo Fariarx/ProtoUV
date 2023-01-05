@@ -1,7 +1,7 @@
 import { APP_HEADER_HEIGHT_PX } from '../../../HeaderApp';
 import { FlexBoxRow } from '../../../Shared/Styled/FlexBox';
 import { Sizes } from '../../../Shared/Styled/Sizes';
-import { TransformApp } from '../Transform/TransformApp';
+import { TransformApp } from './Transform/TransformApp';
 
 export const ToolsLeftApp = () => {
 	return <FlexBoxRow

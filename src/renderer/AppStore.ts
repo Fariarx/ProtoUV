@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import { makeAutoObservable } from 'mobx';
 import { container, singleton } from 'tsyringe';
 import { HeaderStore } from './HeaderStore';
-import { TransformStore } from './Main/Components/Transform/TransformStore';
+import { TransformStore } from './Main/Components/ToolsLeft/Transform/TransformStore';
 import { ConsoleStore } from './Main/Console/ConsoleStore';
 import { SceneStore } from './Main/Scene/SceneStore';
 

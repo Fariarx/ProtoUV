@@ -21,7 +21,7 @@ import * as OrientationHelper from '../../Shared/Helpers/OrientationHelper';
 import { SubscribersKeyPressed, isKeyPressed } from '../../Shared/Libs/Keys';
 import { SubscribersDoubleMouseClick, SubscribersMouseDown, SubscribersMouseUp, SubscribersWindowResize } from '../../Shared/Libs/Listerners';
 import { AppEventEnum, AppEventMoveObject, AppEventSelectionChanged, TransformEnum } from '../../Shared/Libs/Types';
-import { ToolsTabStore } from '../Components/ToolsTab/ToolsTabStore';
+import { ToolsRightStore } from '../Components/ToolsRight/ToolsRightStore';
 import { ThreeHelper } from './../../Shared/Helpers/Three';
 import { SceneObject } from './Entities/SceneObject';
 import { SceneBase } from './SceneBase';
@@ -561,8 +561,8 @@ export class SceneInitializer extends SceneBase {
 			this.orientationHelperOrthographic[isPerspective ? 'deactivate' : 'activate']();
 			this.orientationHelperPerspective[!isPerspective ? 'deactivate' : 'activate']();
 
-			this.orientationHelperOrthographic.domElement.style.right = container.resolve(ToolsTabStore).width + 'px';
-			this.orientationHelperPerspective.domElement.style.right = container.resolve(ToolsTabStore).width + 'px';
+			this.orientationHelperOrthographic.domElement.style.right = container.resolve(ToolsRightStore).width + 'px';
+			this.orientationHelperPerspective.domElement.style.right = container.resolve(ToolsRightStore).width + 'px';
 		}
 	};
 	public handleLoadFile = (file: string) => {

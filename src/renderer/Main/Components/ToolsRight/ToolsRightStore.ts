@@ -3,7 +3,7 @@ import { singleton } from 'tsyringe';
 import { config } from '../../../Shared/Config';
 
 @singleton()
-export class ToolsTabStore {
+export class ToolsRightStore {
 	public constructor() {
 		makeAutoObservable(this);
 	}

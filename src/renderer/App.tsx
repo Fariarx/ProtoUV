@@ -12,7 +12,7 @@ import { LineBottomApp } from './BottomApp';
 import { ConfiguratorAutoApp } from './Configurator/ConfiguratorAutoApp';
 import { ConfiguratorManuallyApp } from './Configurator/ConfiguratorManuallyApp';
 import { HeaderApp } from './HeaderApp';
-import { DragAndDropApp } from './Main/Components/DranAndDrop/DragAndDropApp';
+import { DragAndDropApp } from './Main/Components/DragAndDrop/DragAndDropApp';
 import { ToolsLeftApp } from './Main/Components/ToolsLeft/ToolsLeftApp';
 import { ToolsTabApp } from './Main/Components/ToolsTab/ToolsTabApp';
 import { ViewChangeApp } from './Main/Components/ViewChange/ViewChangeApp';

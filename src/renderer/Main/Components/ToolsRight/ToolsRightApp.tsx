@@ -70,8 +70,8 @@ export const ToolsRightApp = observer(() => {
 				backgroundColor: colors.background.heavy,
 				flexWrap: 'wrap',
 				borderRadius: '0 0 0 4px',
-				borderLeft: '1px solid ' + colors.background.dark,
-				borderBottom: '1px solid ' + colors.background.dark
+				borderLeft: '1px solid ' + colors.background.darkest,
+				borderBottom: '1px solid ' + colors.background.darkest
 			}}>
 				<Button text='Select all' action={() => SceneObject.SelectAllObjects()} icon={<RiCheckboxLine color={colors.background.light}/>}/>
 				<Button text='Clear select' action={() => SceneObject.DeselectAllObjects()} icon={<RiCheckboxIndeterminateLine color={colors.background.light}/>}/>
@@ -89,7 +89,8 @@ const SceneItems = observer(() => {
 			maxHeight: '40%',
 			height: config.ui.sizes.sceneItemList + 'px',
 			backgroundColor: colors.background.dark,
-			border: '1px solid ' + colors.background.darkest,
+			borderLeft: '1px solid ' + colors.background.darkest,
+			borderBottom: '1px solid ' + colors.background.darkest,
 			resize: 'vertical',
 			flexDirection: 'column',
 			overflow: 'auto'

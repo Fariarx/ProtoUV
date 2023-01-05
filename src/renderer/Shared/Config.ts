@@ -13,7 +13,7 @@ export const _default = {
 		},
 		scene:{
 			transformAlignToPlane: true,
-			setStartupPerspectiveCamera: true,
+			setStartupPerspectiveCamera: false,
 			isFixedCenter: true,
 			sharpness:.0001
 		},

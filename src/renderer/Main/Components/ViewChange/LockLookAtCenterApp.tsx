@@ -9,7 +9,7 @@ import { colors } from '../../../Shared/Config';
 export const LockLookAtCenterApp = () => {
 	const [isActive, setterIsActive] = useState(config.scene.isFixedCenter);
 
-	return <Tooltip title={isActive ? 'look at center' : 'free look at'} arrow placement="bottom"
+	return <Tooltip title={isActive ? 'look at center' : 'free look'} arrow placement="bottom"
 		PopperProps={{ sx: { userSelect: 'none' } }}>
 		<IconButton
 			size='small'

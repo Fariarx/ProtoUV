@@ -1,10 +1,8 @@
-import { Transform } from '@mui/icons-material';
-import { action, runInAction } from 'mobx';
+import { runInAction } from 'mobx';
 import { WheelEvent } from 'React';
 import {
 	AmbientLight, ArrowHelper, BufferGeometry,
 	DirectionalLight,
-	Euler,
 	Group, MathUtils, Mesh, Object3D, OrthographicCamera, PerspectiveCamera, Raycaster, Vector3
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
@@ -22,7 +20,6 @@ import { SubscribersKeyPressed, isKeyPressed } from '../../Shared/Libs/Keys';
 import { SubscribersDoubleMouseClick, SubscribersMouseDown, SubscribersMouseUp, SubscribersWindowResize } from '../../Shared/Libs/Listerners';
 import { AppEventEnum, AppEventMoveObject, AppEventSelectionChanged, TransformEnum } from '../../Shared/Libs/Types';
 import { ToolsRightStore } from '../Components/ToolsRight/ToolsRightStore';
-import { ThreeHelper } from './../../Shared/Helpers/Three';
 import { SceneObject } from './Entities/SceneObject';
 import { SceneBase } from './SceneBase';
 
@@ -44,6 +41,8 @@ export class SceneInitializer extends SceneBase {
 		this.setupDropFile();
 		this.setupMouse();
 		this.setupKeyboard();
+
+		setTimeout(() => AppStore.sceneStore.handleLoadFile('C:\\Users\\admin\\Downloads\\Arcane_Jinx.stl'), 100);
 
 		Log('SceneComponents loaded!');
 	}

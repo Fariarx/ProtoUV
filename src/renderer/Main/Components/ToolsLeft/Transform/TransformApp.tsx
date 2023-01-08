@@ -6,15 +6,13 @@ import { observer } from 'mobx-react';
 import { createRef, useState } from 'react';
 import { SceneObject } from 'renderer/Main/Scene/Entities/SceneObject';
 import { SceneStore } from 'renderer/Main/Scene/SceneStore';
-import { scaleToMetric } from 'renderer/Main/Scene/Shared/SceneHelpers';
 import { colors, config } from 'renderer/Shared/Config';
 import { Dispatch } from 'renderer/Shared/Events';
-import { MaxNumber, MinNumber,   } from 'renderer/Shared/Globals';
 import { EnumHelpers } from 'renderer/Shared/Helpers/Enum';
-import { linearGenerator } from 'renderer/Shared/Libs/Tools';
 import { flexChildrenCenter } from 'renderer/Shared/Styled/FlexBox';
 import { Sizes } from 'renderer/Shared/Styled/Sizes';
 import { MathUtils } from 'three';
+import { Key } from 'ts-keycode-enum';
 import { container } from 'tsyringe';
 import { AppEventEnum, AppEventMoveObject, TransformEnum } from '../../../../Shared/Libs/Types';
 import { ToolButtonStyled } from '../Shared/ToolButtonStyled';
@@ -320,6 +318,22 @@ const TransformNumberValue = observer((props: {
 			</Typography>
 		</Box>
 		<input
+			onKeyUp={(event) => {
+				if (event.keyCode === Key.UpArrow || event.keyCode === Key.RightArrow || event.keyCode === Key.W)
+				{
+					const value = props.value + 1;
+					setChanging(value);
+					props.updateValue(value);
+          reference!.current!.value = value.toFixed(sharpness);
+				}
+				if (event.keyCode === Key.DownArrow || event.keyCode === Key.LeftArrow || event.keyCode === Key.S)
+				{
+					const value = props.value - 1;
+					setChanging(value);
+					props.updateValue(value);
+          reference!.current!.value = value.toFixed(sharpness);
+				}
+			}}
 			defaultValue={props.value.toFixed(sharpness)}
 			style={{
 				border: 'unset',

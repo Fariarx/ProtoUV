@@ -46,7 +46,7 @@ export class ConsoleStore {
 				this._isVisible = false, OPEN_TIMEOUT);
 		}
 
-		this.list.unshift(log);
+		this.list.push(log);
 
 		if (this.list.length > LOG_LIMIT_COUNT) {
 			this.list.splice(0, 1);

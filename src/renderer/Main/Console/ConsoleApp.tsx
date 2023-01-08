@@ -12,7 +12,7 @@ export const ConsoleApp = observer((props: {mt?: string, mb?: string}) => {
 	// #TODO Добавить окно для клика
 	return <Fade in={AppStore.console.isVisible}>
 		<Box
-			onDoubleClick={() => {
+			onClick={() => {
 				setSelectable(true);
 				setTimeout(() => setSelectable(false), 5000);
 			}}

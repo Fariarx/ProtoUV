@@ -1,4 +1,4 @@
-import { observable } from 'mobx';
+import { computed, observable } from 'mobx';
 import {
 	DirectionalLight, DoubleSide,
 	FrontSide, Group,
@@ -78,12 +78,17 @@ export abstract class SceneBase {
 	@observable
 	public groupSelected: SceneObject[] = [];
 
-	public decorations: Group = new Group();
-	public transformObjectGroup: Object3D = new Object3D();
-	public transformGroupMarker: Object3D = new Object3D();
+  @computed
+	public get groupSelectedLast () {
+		return this.groupSelected[this.groupSelected.length - 1];
+	}
+
+  public decorations: Group = new Group();
+  public transformObjectGroup: Object3D = new Object3D();
+  public transformGroupMarker: Object3D = new Object3D();
 
 	@observable
-	public objects: SceneObject[] = [];
+  public objects: SceneObject[] = [];
 
 	public grid!: SceneGrid;
 	public gridSize: Vector3 = new Vector3(1, 1, 1);

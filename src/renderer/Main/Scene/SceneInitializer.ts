@@ -188,9 +188,9 @@ export class SceneInitializer extends SceneBase {
 		this.transformControls = new TransformControls(this.activeCamera, this.renderer.domElement);
 		this.transformControls.setSize(0.8);
 		this.transformControls.setSpace('world');
-		this.transformControls.setTranslationSnap( 0.25 );
-		this.transformControls.setRotationSnap(MathUtils.degToRad( 15 ) );
-		this.transformControls.setScaleSnap( 0.0001 );
+		this.transformControls.setTranslationSnap( 0.5 );
+		this.transformControls.setRotationSnap(MathUtils.degToRad( 5 ) );
+		this.transformControls.setScaleSnap( 0.002 );
 		this.scene.add(this.transformControls);
 		this.scene.add(this.transformObjectGroup);
 		this.scene.add(this.transformGroupMarker);
@@ -253,7 +253,7 @@ export class SceneInitializer extends SceneBase {
 						old = transformMarker.scale;
 
 						if (!now.equals(old)) {
-							const sceneObject = this.groupSelected[this.groupSelected.length - 1];
+							const sceneObject = this.groupSelectedLast;
 							const differenceVector3 = new Vector3(old.x - now.x, old.y - now.y, old.z - now.z);
 
 							const oldPosition = sceneObject.mesh.scale.clone();

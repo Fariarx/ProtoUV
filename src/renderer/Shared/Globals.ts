@@ -9,3 +9,5 @@ BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
 BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;
 Mesh.prototype.raycast = acceleratedRaycast;
 
+export const MaxNumber = 999999999999999;
+export const MinNumber = -999999999999999;

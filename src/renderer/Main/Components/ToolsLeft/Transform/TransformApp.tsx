@@ -1,4 +1,4 @@
-import { Box,Divider,Grow,Input,Popper, Typography } from '@mui/material';
+import { Box,Divider,Grow,Input,Popper,Typography, capitalize } from '@mui/material';
 import { BsArrowsMove } from '@react-icons/all-files/bs/BsArrowsMove';
 import { FiCode } from '@react-icons/all-files/fi/FiCode';
 import { Md3DRotation } from '@react-icons/all-files/md/Md3DRotation';
@@ -6,13 +6,17 @@ import { observer } from 'mobx-react';
 import { createRef, useState } from 'react';
 import { SceneObject } from 'renderer/Main/Scene/Entities/SceneObject';
 import { SceneStore } from 'renderer/Main/Scene/SceneStore';
+import { scaleToMetric } from 'renderer/Main/Scene/Shared/SceneHelpers';
 import { colors, config } from 'renderer/Shared/Config';
 import { Dispatch } from 'renderer/Shared/Events';
+import { MaxNumber, MinNumber,   } from 'renderer/Shared/Globals';
 import { EnumHelpers } from 'renderer/Shared/Helpers/Enum';
+import { linearGenerator } from 'renderer/Shared/Libs/Tools';
 import { flexChildrenCenter } from 'renderer/Shared/Styled/FlexBox';
 import { Sizes } from 'renderer/Shared/Styled/Sizes';
+import { MathUtils } from 'three';
 import { container } from 'tsyringe';
-import { AppEventEnum, TransformEnum } from '../../../../Shared/Libs/Types';
+import { AppEventEnum, AppEventMoveObject, TransformEnum } from '../../../../Shared/Libs/Types';
 import { ToolButtonStyled } from '../Shared/ToolButtonStyled';
 import { TransformStore } from './TransformStore';
 
@@ -70,54 +74,212 @@ const TransformPopperContent = observer(() => {
 	const scene = container.resolve(SceneStore);
 	const position = SceneObject.CalculateGroupCenter(scene.groupSelected);
 
-	return <>
-		<Typography variant='body1' sx={{
-			textTransform: 'capitalize'
-		}}>
-			{EnumHelpers.valueOf(TransformEnum, store.state)}
-		</Typography>
-		{/* <Divider sx={{
-			marginBottom: 1
-		}}/> */}
+	if (!scene.groupSelected.length)
+	{
+		return <Typography variant='body1'>
+      Please, select object on the scene.
+		</Typography>;
+	}
 
-		<TransformNumberValue
-			color={colors.scene.x}
-			text={'X'}
-			value={position.x}
-			textEnd='cm'
-			marginTop
-			updateValue={value => {
-				scene.transformControlsDragging({ value: true });
-				scene.transformObjectGroup.position.setX(value);
-				scene.transformControlsUpdate();
-				scene.transformControlsDragging({ value: false });
-			}}/>
-		<TransformNumberValue
-			color={colors.scene.y}
-			text={'Y'}
-			value={position.y}
-			textEnd='cm'
-			marginTop
-			updateValue={value => {
-				scene.transformControlsDragging({ value: true });
-				scene.transformObjectGroup.position.setY(value);
-				scene.transformControlsUpdate();
-				scene.transformControlsDragging({ value: false });
-			}}/>
-		<TransformNumberValue
-			color={colors.scene.z}
-			text={'Z'}
-			value={position.z}
-			textEnd='cm'
-			marginTop
-			updateValue={value => {
-				scene.transformControlsDragging({ value: true });
-				scene.transformObjectGroup.position.setZ(value);
-				scene.transformControlsUpdate();
-				scene.transformControlsDragging({ value: false });
-			}}/>
-		{/* <TransformNumberValue color={colors.scene.y} text={'Y'} value={position.y.toFixed(sharpness)} textEnd='°' marginTop/>
-		<TransformNumberValue color={colors.scene.z} text={'Z'} value={position.z.toFixed(sharpness)} textEnd='%' marginTop/> */}
+	const header = <><Typography variant='body1'>
+		{capitalize(EnumHelpers.valueOf(TransformEnum, store.state))}
+	</Typography></>;
+
+	let body = undefined;
+
+	switch (store.state)
+	{
+		case TransformEnum.Move:
+			body = <>
+				<TransformNumberValue
+					color={colors.scene.x}
+					text={'X'}
+					value={position.x}
+					textEnd='cm'
+					marginTop
+					updateValue={value => {
+						scene.transformControlsDragging({ value: true });
+						for (const sceneObject of scene.groupSelected) {
+							Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
+								from: sceneObject.mesh.position.clone(),
+								to: sceneObject.mesh.position.clone().setX(value),
+								sceneObject: sceneObject
+							} as AppEventMoveObject);
+						}
+						scene.transformControlsUpdate();
+						scene.transformControlsDragging({ value: false });
+					}}/>
+				<TransformNumberValue
+					color={colors.scene.y}
+					text={'Y'}
+					value={position.y}
+					textEnd='cm'
+					marginTop
+					updateValue={value => {
+						scene.transformControlsDragging({ value: true });
+						for (const sceneObject of scene.groupSelected) {
+							Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
+								from: sceneObject.mesh.position.clone(),
+								to: sceneObject.mesh.position.clone().setY(value),
+								sceneObject: sceneObject
+							} as AppEventMoveObject);
+						}
+						scene.transformControlsUpdate();
+						scene.transformControlsDragging({ value: false });
+					}}/>
+				<TransformNumberValue
+					color={colors.scene.z}
+					text={'Z'}
+					value={position.z}
+					textEnd='cm'
+					marginTop
+					updateValue={value => {
+						scene.transformControlsDragging({ value: true });
+						for (const sceneObject of scene.groupSelected) {
+							Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
+								from: sceneObject.mesh.position.clone(),
+								to: sceneObject.mesh.position.clone().setZ(value),
+								sceneObject: sceneObject
+							} as AppEventMoveObject);
+						}
+						scene.transformControlsUpdate();
+						scene.transformControlsDragging({ value: false });
+					}}/>
+			</>;
+			break;
+
+		case TransformEnum.Rotate:
+			body = <>
+				<TransformNumberValue
+					color={colors.scene.x}
+					text={'X'}
+					value={scene.groupSelectedLast?.mesh?.rotation.x * 180 / Math.PI}
+					textEnd='o'
+					marginTop
+					updateValue={value => {
+						scene.transformControlsDragging({ value: true });
+						for (const sceneObject of scene.groupSelected) {
+							Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
+								from: sceneObject.mesh.rotation.clone(),
+								to: sceneObject.mesh.rotation.clone().set(MathUtils.degToRad(value),
+									sceneObject.mesh.rotation.y, sceneObject.mesh.rotation.z),
+								sceneObject: sceneObject
+							} as AppEventMoveObject);
+						}
+						scene.transformControlsUpdate();
+						scene.transformControlsDragging({ value: false });
+					}}/>
+				<TransformNumberValue
+					color={colors.scene.y}
+					text={'Y'}
+					value={scene.groupSelectedLast?.mesh?.rotation.y * 180 / Math.PI}
+					textEnd='o'
+					marginTop
+					updateValue={value => {
+						scene.transformControlsDragging({ value: true });
+						for (const sceneObject of scene.groupSelected) {
+							Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
+								from: sceneObject.mesh.rotation.clone(),
+								to: sceneObject.mesh.rotation.clone().set(sceneObject.mesh.rotation.x,
+									MathUtils.degToRad(value), sceneObject.mesh.rotation.z),
+								sceneObject: sceneObject
+							} as AppEventMoveObject);
+						}
+						scene.transformControlsUpdate();
+						scene.transformControlsDragging({ value: false });
+					}}/>
+				<TransformNumberValue
+					color={colors.scene.y}
+					text={'Z'}
+					value={scene.groupSelectedLast?.mesh?.rotation.z * 180 / Math.PI}
+					textEnd='o'
+					marginTop
+					updateValue={value => {
+						scene.transformControlsDragging({ value: true });
+						for (const sceneObject of scene.groupSelected) {
+							Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
+								from: sceneObject.mesh.rotation.clone(),
+								to: sceneObject.mesh.rotation.clone().set(sceneObject.mesh.rotation.x,
+									sceneObject.mesh.rotation.y, MathUtils.degToRad(value)),
+								sceneObject: sceneObject
+							} as AppEventMoveObject);
+						}
+						scene.transformControlsUpdate();
+						scene.transformControlsDragging({ value: false });
+					}}/>
+			</>;
+			break;
+
+		case TransformEnum.Scale:
+			body = <>
+				<TransformNumberValue
+					color={colors.scene.x}
+					text={'X'}
+					value={scene.groupSelectedLast?.mesh?.scale.x * 100}
+					textEnd='%'
+					marginTop
+					updateValue={number => {
+						scene.transformControlsDragging({ value: true });
+
+						const mesh = scene.groupSelectedLast?.mesh;
+
+						Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
+							from: mesh.scale.clone(),
+							to: mesh.scale.clone().set(number / 100,
+								mesh.scale.y, mesh.scale.z),
+							sceneObject: scene.groupSelectedLast
+						} as AppEventMoveObject);
+
+						scene.transformControlsUpdate();
+						scene.transformControlsDragging({ value: false });
+					}}/>
+				<TransformNumberValue
+					color={colors.scene.y}
+					text={'Y'}
+					value={scene.groupSelectedLast?.mesh?.scale.y * 100}
+					textEnd='%'
+					marginTop
+					updateValue={number => {
+						scene.transformControlsDragging({ value: true });
+
+						const mesh = scene.groupSelectedLast?.mesh;
+
+						Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
+							from: mesh.scale.clone(),
+							to: mesh.scale.clone().set(mesh.scale.x, number / 100, mesh.scale.z),
+							sceneObject: scene.groupSelectedLast
+						} as AppEventMoveObject);
+
+						scene.transformControlsUpdate();
+						scene.transformControlsDragging({ value: false });
+					}}/>
+				<TransformNumberValue
+					color={colors.scene.z}
+					text={'Z'}
+					value={scene.groupSelectedLast?.mesh?.scale.z * 100}
+					textEnd='%'
+					marginTop
+					updateValue={number => {
+						scene.transformControlsDragging({ value: true });
+
+						const mesh = scene.groupSelectedLast?.mesh;
+
+						Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
+							from: mesh.scale.clone(),
+							to: mesh.scale.clone().set(mesh.scale.x, mesh.scale.y, number / 100),
+							sceneObject: scene.groupSelectedLast
+						} as AppEventMoveObject);
+
+						scene.transformControlsUpdate();
+						scene.transformControlsDragging({ value: false });
+					}}/>
+			</>;
+			break;
+	}
+
+	return <>
+		{header}
+		{body}
 	</>;
 });
 

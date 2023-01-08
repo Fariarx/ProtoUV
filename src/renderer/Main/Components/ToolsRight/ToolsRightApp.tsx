@@ -70,8 +70,8 @@ export const ToolsRightApp = observer(() => {
 				backgroundColor: colors.background.heavy,
 				flexWrap: 'wrap',
 				borderRadius: '0 0 0 4px',
-				borderLeft: '1px solid ' + colors.background.darkest,
-				borderBottom: '1px solid ' + colors.background.darkest
+				borderLeft: '1px solid ' + colors.background.black,
+				borderBottom: '1px solid ' + colors.background.black
 			}}>
 				<Button text='Select all' action={() => SceneObject.SelectAllObjects()} icon={<RiCheckboxLine color={colors.background.light}/>}/>
 				<Button text='Clear select' action={() => SceneObject.DeselectAllObjects()} icon={<RiCheckboxIndeterminateLine color={colors.background.light}/>}/>
@@ -89,8 +89,11 @@ const SceneItems = observer(() => {
 			maxHeight: '40%',
 			height: config.ui.sizes.sceneItemList + 'px',
 			backgroundColor: colors.background.dark,
-			borderLeft: '1px solid ' + colors.background.darkest,
+			marginTop: '8px',
+			borderTop: '1px solid ' + colors.background.black,
+			borderLeft: '1px solid ' + colors.background.black,
 			borderBottom: '1px solid ' + colors.background.darkest,
+			borderRadius: '4px  0 0 0',
 			resize: 'vertical',
 			flexDirection: 'column',
 			overflow: 'auto'
@@ -123,7 +126,7 @@ const SceneItems = observer(() => {
 				width: '-webkit-fill-available',
 				height: Sizes.twentyFour,
 				backgroundColor: x.isSelected
-					? colors.background.heavy
+					? colors.background.commonest
 					: 'unset',
 				pr: Sizes.four,
 				m: Sizes.four, mb: 0,

@@ -15,7 +15,7 @@ import { MathUtils } from 'three';
 import { Key } from 'ts-keycode-enum';
 import { container } from 'tsyringe';
 import { AppEventEnum, AppEventMoveObject, TransformEnum } from '../../../../Shared/Libs/Types';
-import { ToolButtonStyled } from '../Shared/ToolButtonStyled';
+import { ToolButtonStyled } from '../Shared/ToolButton';
 import { TransformStore } from './TransformStore';
 
 const scale = 'scale(1.1)';

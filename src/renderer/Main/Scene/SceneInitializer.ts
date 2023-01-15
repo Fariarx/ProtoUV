@@ -508,6 +508,10 @@ export class SceneInitializer extends SceneBase {
 
 		this.animate();
 	};
+	public updateSupportsControls = () => {
+
+		this.animate();
+	};
 	public updateCameraLookPosition = () => {
 		this.activeCamera.lookAt(this.gridSize.x / 2, 0, this.gridSize.z / 2);
 		this.orthographicCamera.updateProjectionMatrix();
@@ -612,6 +616,9 @@ export class SceneInitializer extends SceneBase {
 				this.orbitControls.enableZoom = true;
 			}
 		}
+	};
+	public resetAnyTools = () => {
+		AppStore.transform.changeState(TransformEnum.None, true);
 	};
 
 	public animate = () => {

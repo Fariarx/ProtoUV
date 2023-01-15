@@ -56,3 +56,9 @@ export enum TransformEnum {
   Rotate = 'rotate',
   Scale = 'scale'
 }
+
+export enum SupportsEnum {
+  None = 'none',
+  Add = 'add',
+  Remove = 'remove',
+}

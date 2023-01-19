@@ -3,6 +3,7 @@ import { makeAutoObservable } from 'mobx';
 import { container, singleton } from 'tsyringe';
 import { HeaderStore } from './HeaderStore';
 import { TransformStore } from './Main/Components/ToolsLeft/Transform/TransformStore';
+import { PerformSupportsStore } from './Main/Components/ToolsRight/Supports/PerformSupportsStore';
 import { ConsoleStore } from './Main/Console/ConsoleStore';
 import { SceneStore } from './Main/Scene/SceneStore';
 
@@ -13,6 +14,7 @@ export class AppStore {
 	public static console = container.resolve(ConsoleStore);
 	public static sceneStore = container.resolve(SceneStore);
 	public static transform = container.resolve(TransformStore);
+	public static performSupports = container.resolve(PerformSupportsStore);
 	public static header = container.resolve(HeaderStore);
 
 	public static get instance() {

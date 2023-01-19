@@ -13,17 +13,17 @@ export class TransformStore {
 		return this._state;
 	}
 
-	public changeState = (state: TransformEnum, disableUpdate?: boolean) => {
-		AppStore.sceneStore.resetAnyTools();
+	public changeState = (state: TransformEnum, disableReset?: boolean) => {
+		if (!disableReset)
+		{
+			AppStore.sceneStore.resetAnyTools();
+		}
 
 		AppStore.transform._state = state === AppStore.transform._state
 			? TransformEnum.None
 			: state;
 
-		if (disableUpdate)
-		{
-			AppStore.sceneStore.updateTransformControls();
-		}
+		AppStore.sceneStore.updateTransformControls();
 	};
 
 	public constructor() {

@@ -18,7 +18,7 @@ import { EnumHelpers } from '../../Shared/Helpers/Enum';
 import * as OrientationHelper from '../../Shared/Helpers/OrientationHelper';
 import { SubscribersKeyPressed, isKeyPressed } from '../../Shared/Libs/Keys';
 import { SubscribersDoubleMouseClick, SubscribersMouseDown, SubscribersMouseUp, SubscribersWindowResize } from '../../Shared/Libs/Listerners';
-import { AppEventEnum, AppEventMoveObject, AppEventSelectionChanged, TransformEnum } from '../../Shared/Libs/Types';
+import { AppEventEnum, AppEventMoveObject, AppEventSelectionChanged, SupportsEnum, TransformEnum } from '../../Shared/Libs/Types';
 import { ToolsRightStore } from '../Components/ToolsRight/ToolsRightStore';
 import { SceneObject } from './Entities/SceneObject';
 import { SceneBase } from './SceneBase';
@@ -42,7 +42,7 @@ export class SceneInitializer extends SceneBase {
 		this.setupMouse();
 		this.setupKeyboard();
 
-		setTimeout(() => AppStore.sceneStore.handleLoadFile('C:\\Users\\admin\\Downloads\\Arcane_Jinx.stl'), 100);
+		setTimeout(() => AppStore.sceneStore.handleLoadFile('C:\\Users\\admin\\Downloads\\Old\\V7_Infinity_Cube_Hinge.stl'), 100);
 
 		Log('SceneComponents loaded!');
 	}
@@ -619,6 +619,7 @@ export class SceneInitializer extends SceneBase {
 	};
 	public resetAnyTools = () => {
 		AppStore.transform.changeState(TransformEnum.None, true);
+		AppStore.performSupports.changeState(SupportsEnum.None, true);
 	};
 
 	public animate = () => {

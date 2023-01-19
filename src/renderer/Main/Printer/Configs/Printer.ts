@@ -1,6 +1,7 @@
 import { Log } from 'renderer/AppStore';
 import { _default } from '../../../Shared/Config';
 import { bridge } from '../../../Shared/Globals';
+import { SupportPreset } from './Support';
 
 export class Printer {
 	name:string;
@@ -8,6 +9,9 @@ export class Printer {
 	Workspace: Workspace;
 	Resolution: Resolution;
 	PrintSettings: PrintSettings;
+
+	SupportPresets: SupportPreset[];
+	SupportPreset: SupportPreset;
 
 	workerData: any = {};
 
@@ -37,11 +41,15 @@ export class Printer {
 				LiftingHeight: 0,
 				LiftingSpeed: 0,
 			};
+			this.SupportPreset = SupportPreset.Default();
+			this.SupportPresets = [this.SupportPreset];
 		}
 		else {
 			this.Workspace = _settings.Workspace;
 			this.Resolution = _settings.Resolution;
 			this.PrintSettings = _settings.PrintSettings;
+			this.SupportPreset = _settings.SupportPreset;
+			this.SupportPresets = _settings.SupportPresets;
 		}
 	}
 
@@ -148,6 +156,8 @@ export interface PrinterConfig {
   Resolution: Resolution;
   Workspace: Workspace;
   PrintSettings: PrintSettings;
+  SupportPresets: SupportPreset[];
+  SupportPreset: SupportPreset;
 }
 export type Workspace = {
   SizeX: number;

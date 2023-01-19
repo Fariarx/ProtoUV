@@ -16,5 +16,21 @@
     "LiftingHeight": 3.5,
     "LiftingSpeed": 90,
     "DelayTime": 0
+  },
+  "SupportPresets": [
+    {
+      "Name": "Default",
+      "ConnectionSphere": 0.4,
+      "Head": 0.4,
+      "Body": 0.4,
+      "Platform": 3
+    }
+  ],
+  "SupportPreset": {
+    "Name": "Default",
+    "ConnectionSphere": 0.4,
+    "Head": 0.4,
+    "Body": 0.4,
+    "Platform": 3
   }
 }

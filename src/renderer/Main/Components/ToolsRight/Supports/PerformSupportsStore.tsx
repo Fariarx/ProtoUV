@@ -26,7 +26,10 @@ export class PerformSupportsStore {
 			? SupportsEnum.None
 			: state;
 
-		VoxelizationFreeSpace(AppStore.sceneStore.printer!, AppStore.sceneStore.groupSelectedLast.mesh);
+		VoxelizationFreeSpace({
+			Printer: AppStore.sceneStore.printer!,
+			Mesh: AppStore.sceneStore.groupSelectedLast.mesh,
+		});
 
 		AppStore.sceneStore.updateSupportsControls();
 	};

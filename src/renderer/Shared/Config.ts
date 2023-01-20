@@ -1,8 +1,8 @@
 import { Restore } from './Libs/Restore';
 
 export const _default = {
-	version: 5,
-	versionPrinterConfigs: 6,
+	version: 10,
+	versionPrinterConfigs: 10,
 	settings: {
 		ui: {
 			opacity: 0.8,

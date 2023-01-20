@@ -163,7 +163,7 @@ export class SceneObject {
 
 		Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
 			from: this.mesh.position.clone(),
-			to: this.mesh.position.clone().setY(-this.minY.y),
+			to: this.mesh.position.clone().setY(12),
 			sceneObject: this as SceneObject,
 			instrument: TransformEnum.Move
 		} as AppEventMoveObject);

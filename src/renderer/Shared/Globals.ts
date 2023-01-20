@@ -11,3 +11,6 @@ THREE.Mesh.prototype.raycast = acceleratedRaycast;
 
 export const MaxNumber = 999999999999999;
 export const MinNumber = -999999999999999;
+
+export const toUnits = (mm: number) =>  mm / 10;
+export const toMM = (units: number) => units * 10;

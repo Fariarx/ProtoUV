@@ -74,7 +74,7 @@ const TransformPopperContent = observer(() => {
 
 	if (!scene.groupSelected.length)
 	{
-		return <Typography variant='body1'>
+		return <Typography variant='body2'>
       Please, select object on the scene.
 		</Typography>;
 	}
@@ -187,7 +187,7 @@ const TransformPopperContent = observer(() => {
 						scene.transformControlsDragging({ value: false });
 					}}/>
 				<TransformNumberValue
-					color={colors.scene.y}
+					color={colors.scene.z}
 					text={'Z'}
 					value={scene.groupSelectedLast?.mesh?.rotation.z * 180 / Math.PI}
 					textEnd='o'

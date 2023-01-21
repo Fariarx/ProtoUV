@@ -3,7 +3,7 @@ import { Mesh, Vector3 } from 'three';
 import { AppStore } from '../AppStore';
 import { SceneObject } from './../Main/Scene/Entities/SceneObject';
 import { config } from './Config';
-import { AppEvent, AppEventAddObject, AppEventArguments, AppEventDeleteObject, AppEventEnum, AppEventMoveObject, TransformEnum } from './Libs/Types';
+import { AppEvent, AppEventAddObject, AppEventArguments, AppEventDeleteObject, AppEventEditSupports, AppEventEnum, AppEventMoveObject, TransformEnum } from './Libs/Types';
 
 export const Dispatch = (name: AppEventEnum, args: typeof AppEventArguments) => {
 	const message = {
@@ -31,6 +31,9 @@ const Handler = (message: any) => {
 			break;
 		case AppEventEnum.TRANSFORM_OBJECT:
 			objectTransform(message);
+			break;
+		case AppEventEnum.EDIT_SUPPORTS:
+			editSupports(message);
 			break;
 	}
 
@@ -149,4 +152,23 @@ const objectTransform = (message: AppEvent) => {
 	{
 		AppStore.sceneStore.animate();
 	}
+};
+
+const editSupports = (message: AppEvent) => {
+	const event = message.args as AppEventEditSupports;
+
+	console.log(event.object.supports);
+	if (event.object.supports?.length)
+	{
+		AppStore.sceneStore.removeSupports(event.object);
+	}
+
+	if (event.supports?.length)
+	{
+		AppStore.sceneStore.scene.add(...event.supports);
+	}
+
+	event.object.supports = event.supports;
+	event.object.AlignToPlaneY();
+	AppStore.sceneStore.animate();
 };

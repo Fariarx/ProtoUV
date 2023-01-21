@@ -42,9 +42,9 @@ export const ConfiguratorManuallyApp = observer(() => {
 			}}>
 				<NameField printer={printer}/>
 				<GridFields obj={printer.Resolution} name={'Resolution'}/>
-				<Divider sx={{ mt: Sizes.twelve, mb: Sizes.twelve, transform: 'translateY(12px)' }}/>
+				<Divider sx={{ mt: Sizes.twelve, mb: Sizes.twelve, transform: 'translateY(12px)', borderColor: colors.background.heavy }}/>
 				<GridFields obj={printer.Workspace} name={'Workspace'}/>
-				<Divider sx={{ mt: Sizes.twelve, mb: Sizes.twelve, transform: 'translateY(12px)' }}/>
+				<Divider sx={{ mt: Sizes.twelve, mb: Sizes.twelve, transform: 'translateY(12px)', borderColor: colors.background.heavy }}/>
 				<GridFields obj={printer.PrintSettings} name={'Print Settings'}/>
 				<ButtonGroup variant="outlined" sx={{
 					width: Sizes.multiply(Sizes.twentyFour, 12),

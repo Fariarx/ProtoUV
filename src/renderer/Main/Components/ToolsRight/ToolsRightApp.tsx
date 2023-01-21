@@ -57,15 +57,18 @@ export const ToolsRightApp = observer(() => {
 	return <FlexBoxRow
 		sx={{
 			width: store.width + 'px',
-			height: `calc(100% - ${APP_HEADER_HEIGHT_PX} - ${APP_BOTTOM_HEIGHT_PX})`,
+			height: 'fit-content',
 			opacity: config.ui.opacity,
 			position: 'absolute',
 			top: APP_HEADER_HEIGHT_PX,
 			bottom: APP_BOTTOM_HEIGHT_PX,
-			right: 0
+			pointerEvents: 'none',
+			right: 0,
 		}}>
 		<ResizePanel store={store} />
-		<FlexBoxColumn>
+		<FlexBoxColumn sx={{
+			pointerEvents: 'auto',
+		}}>
 			<ListObjects/>
 			<PerformSupportsApp/>
 		</FlexBoxColumn>
@@ -78,6 +81,7 @@ const ResizePanel = (props: { store: ToolsRightStore }) => {
 			props.store.resize = true;
 		}}
 		sx={{
+			pointerEvents: 'auto',
 			marginLeft: Sizes.negative(Sizes.four),
 			width: '6px',
 			transition: '0.5s ease-out',

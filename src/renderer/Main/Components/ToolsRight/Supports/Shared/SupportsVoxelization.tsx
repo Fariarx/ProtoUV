@@ -44,7 +44,7 @@ export const VoxelizationFreeSpace = (mesh: Mesh, printer: Printer) => {
 		mesh.geometry.computeBoundsTree();
 	}
 
-	AppStore.sceneStore.scene.add(probeMeshBox);
+	//AppStore.sceneStore.scene.add(probeMeshBox);
 
 	const result: VoxelizationResult = {
 		PositionsProbe: []
@@ -77,7 +77,6 @@ export const VoxelizationFreeSpace = (mesh: Mesh, printer: Printer) => {
 
 					if (intersection.length)
 					{
-						//)
 						const min = _.minBy(intersection
 							.filter(s => !!s.face && !result.PositionsProbe.some(y => y.Touchpoint && y.Touchpoint.distanceTo(s.point) < body * 4)), r => r.distance);
 						if (min)
@@ -91,14 +90,14 @@ export const VoxelizationFreeSpace = (mesh: Mesh, printer: Printer) => {
 				}
 			}
 
-			AppStore.sceneStore.scene.add(probeMeshBox.clone());
-			AppStore.sceneStore.animate();
+			//AppStore.sceneStore.scene.add(probeMeshBox.clone());
+			//AppStore.sceneStore.animate();
 
 			//angle = normal!.angleTo(new Vector3(0, -1, 0)) * (180 / Math.PI);
 
 			if (minIntersection && minIntersection.face)
 			{
-				ThreeHelper.DrawPoint(minIntersection.point);
+				//ThreeHelper.DrawPoint(minIntersection.point);
 
 				const normalMatrix = new THREE.Matrix3().getNormalMatrix( mesh.matrixWorld );
 				const normalAngle = minIntersection.face.normal.clone().applyMatrix3( normalMatrix ).normalize().angleTo(new Vector3(0, -1, 0)) * (180 / Math.PI);

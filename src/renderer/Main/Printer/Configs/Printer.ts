@@ -51,9 +51,14 @@ export class Printer {
 			this.SupportPreset = _settings.SupportPreset;
 			this.SupportPresets = _settings.SupportPresets;
 		}
+
+		if (!this.SupportPreset)
+		{
+			this.SupportPreset = this.SupportPresets[0];
+		}
 	}
 
-	static DEFAULT_CONFIG_NAME = 'Voxelab Proxima 6';
+	static DEFAULT_CONFIG_NAME = 'Default Printer';
 	static CHANGED_DIR = '\\ChangedConfigsV';
 	static CONFIG_DIR = '.\\src\\renderer\\Main\\Printer\\Configs\\Default\\';
 

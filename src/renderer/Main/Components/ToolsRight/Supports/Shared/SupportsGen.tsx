@@ -5,26 +5,28 @@ import { CatmullRomCurve3, CylinderGeometry, ExtrudeGeometry, Material, Mesh, Me
 import { SupportsRays } from './SupportsRays';
 import { VoxelizationFreeSpace } from './SupportsVoxelization';
 
-export const _platformHeight = 0.6;
-
-export const SupportsGenerator = (printer: Printer, meshes: Mesh[]) => {
+export const SupportsGenerator = (printer: Printer, mesh: Mesh, meshes: Mesh[]) => {
 	const voxelization = VoxelizationFreeSpace(
-		AppStore.sceneStore.groupSelectedLast.mesh,
-    AppStore.sceneStore.printer!
+		mesh,
+		printer
 	);
 
-	voxelization.PositionsProbe.find(x => {
+	const _supports = [] as Mesh[];
+
+	voxelization.PositionsProbe.forEach(x => {
 		if (x.Touchpoint)
 		{
 			x.Path = SupportsRays(meshes, printer, x);
 
 			if (x.Path)
 			{
-				_supportCreator(x.Path, x.Touchpoint, printer);
+				_supports.push(
+					_supportCreator(x.Path, x.Touchpoint, printer));
 			}
 		}
-		return false;
 	});
+
+	return _supports;
 };
 
 const _supportCreator = (
@@ -35,8 +37,8 @@ const _supportCreator = (
 	const head = toUnits(printer.SupportPreset.Head);
 	const connectionSphere = toUnits(printer.SupportPreset.ConnectionSphere);
 	const body = toUnits(printer.SupportPreset.Body);
-	const platformWidth = toUnits(printer.SupportPreset.Platform);
-	const platformHeight = toUnits(_platformHeight);
+	const platformWidth = toUnits(printer.SupportPreset.PlatformWidth);
+	const platformHeight = toUnits(printer.SupportPreset.PlatformHeight);
 	const spline = new CatmullRomCurve3(path);
 	const material = new MeshLambertMaterial( { color: 0xb00000, wireframe: false } );
 	const extrudeSettings = {
@@ -66,7 +68,7 @@ const _supportCreator = (
 	mesh1.add(createCylinder(material, path[0], to, to.distanceTo(path[0]), body, head).mesh);
 	mesh1.add(createContactSphere(material, to, connectionSphere).mesh);
 
-	AppStore.sceneStore.scene.add( mesh1 );
+	return mesh1;
 };
 
 const createCylinder = (

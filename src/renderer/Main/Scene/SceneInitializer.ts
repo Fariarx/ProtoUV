@@ -568,6 +568,14 @@ export class SceneInitializer extends SceneBase {
 			this.orientationHelperPerspective.domElement.style.right = container.resolve(ToolsRightStore).width + 'px';
 		}
 	};
+	public removeSupports = (obj: SceneObject) => {
+		console.log('222');
+		if (obj.supports?.length)
+		{
+			this.scene.remove(...obj.supports);
+			console.log('123');
+		}
+	};
 	public handleLoadFile = (file: string) => {
 		const result = AppStore.sceneStore.file3dLoad(file, function (geometry: BufferGeometry, path: string) {
 			Dispatch(AppEventEnum.ADD_OBJECT, {

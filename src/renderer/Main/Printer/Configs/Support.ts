@@ -1,7 +1,8 @@
 export class SupportPreset
 {
 	public static Default = () => {
-		return new SupportPreset('Default', 0.4, 0.4, 0.4, 3, 10, 3, 0, 3);
+		return new SupportPreset('Default',
+			0.5, 0.4, 0.5, 0.8, 3, 56, 3, 0.8, 10, 3, 1, 5);
 	};
 
 	public constructor(
@@ -10,10 +11,14 @@ export class SupportPreset
     public ConnectionSphere: number,
     public Head: number,
     public Body: number,
-    public Platform: number,
+    public Indent: number,
+    public RetreatFromTheWalls: number,
+    public Angle: number,
+    public PlatformWidth: number,
+    public PlatformHeight: number,
     public Density: number,
     public Rays: number,
-    public Deepening: number,
-    public StickingDistance: number)
+    public Sticking: number,
+    public Lifting: number,)
 	{ }
 }

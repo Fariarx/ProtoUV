@@ -1,16 +1,9 @@
-import console from 'console';
 import _ from 'lodash';
-import { AppStore } from 'renderer/AppStore';
 import { Printer } from 'renderer/Main/Printer/Configs/Printer';
 import { toUnits } from 'renderer/Shared/Globals';
 import { ThreeHelper } from 'renderer/Shared/Helpers/Three';
-import { CatmullRomCurve3, CircleGeometry, CylinderGeometry, ExtrudeGeometry, Float32BufferAttribute, Group, Intersection, Material, Mesh, MeshLambertMaterial, Object3D, Quaternion, Raycaster, Vector3 } from 'three';
+import { CircleGeometry, Float32BufferAttribute, Group, Intersection, Mesh, Object3D, Raycaster, Vector3 } from 'three';
 import { PositionProbe } from './SupportsVoxelization';
-
-export const _indent = 0.8;
-export const _retreatFromTheWalls = 4;
-export const maxAngle = 58;
-export const distanceStep = .05;
 
 const down = new Vector3(Math.PI / 2, 0, Math.PI / 2);
 const toAngle = (normal: Vector3) => normal!.angleTo(new Vector3(0, -1, 0)) * (180 / Math.PI);
@@ -22,8 +15,8 @@ const getRayDirection = (ray: Object3D) => {
 
 export const SupportsRays = (meshes: Mesh[], printer: Printer, probe: PositionProbe) => {
 	const body = toUnits(printer.SupportPreset.Body);
-	const indent = toUnits(_indent);
-	const retreatFromTheWalls = toUnits(_retreatFromTheWalls);
+	const indent = toUnits(printer.SupportPreset.Indent);
+	const retreatFromTheWalls = toUnits(printer.SupportPreset.RetreatFromTheWalls);
 
 	rays = !rays || printer.SupportPreset.Body !== rays.size_mm + retreatFromTheWalls
 		? defineRaysObj(printer.SupportPreset.Body + retreatFromTheWalls)
@@ -38,7 +31,7 @@ export const SupportsRays = (meshes: Mesh[], printer: Printer, probe: PositionPr
 		rays?.groupFocused.position.set(from.x, from.y, from.z);
 
 		const goodRay = rays?.arrayBeam.find(ray => {
-			if (Math.ceil(ray.angle) > maxAngle)
+			if (Math.ceil(ray.angle) > printer.SupportPreset.Angle)
 			{
 				return false;
 			}

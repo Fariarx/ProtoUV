@@ -21,10 +21,6 @@ export class PerformSupportsStore {
 	public changeState = (state: SupportsEnum, disableReset?: boolean) => {
 		if (!disableReset) {
 			AppStore.sceneStore.resetAnyTools();
-
-			SupportsGenerator(
-        AppStore.sceneStore.printer!,
-        AppStore.sceneStore.objects.map(obj => obj.mesh));
 		}
 
 		this._state = state === this._state

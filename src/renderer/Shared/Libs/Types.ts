@@ -1,4 +1,4 @@
-import { Euler, Vector3 } from 'three';
+import { Euler, Mesh, Vector3 } from 'three';
 import { SceneObject } from '../../Main/Scene/Entities/SceneObject';
 
 export enum AppEventEnum {
@@ -8,7 +8,8 @@ export enum AppEventEnum {
   DELETE_OBJECT,
   SELECTION_CHANGED,
   TRANSFORM_OBJECT,
-  SELECT_SUPPORTS_MODE
+  SELECT_SUPPORTS_MODE,
+  EDIT_SUPPORTS
 }
 
 export declare const AppEventArguments:
@@ -16,6 +17,7 @@ export declare const AppEventArguments:
   | AppEventMoveObject
   | AppEventSelectionChanged
   | AppEventDeleteObject
+  | AppEventEditSupports
   | undefined;
 
 export type AppEvent = {
@@ -62,3 +64,8 @@ export enum SupportsEnum {
   Add = 'add',
   Remove = 'remove',
 }
+
+export type AppEventEditSupports = {
+  object: SceneObject;
+  supports: Mesh[] | undefined;
+};

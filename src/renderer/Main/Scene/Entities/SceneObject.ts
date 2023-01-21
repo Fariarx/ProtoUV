@@ -1,4 +1,5 @@
 import { action, makeObservable, observable, runInAction } from 'mobx';
+import { toUnits } from 'renderer/Shared/Globals';
 import { AppEventDeleteObject, AppEventEnum, AppEventMoveObject, TransformEnum } from 'renderer/Shared/Libs/Types';
 import {
 	BufferGeometry,
@@ -24,6 +25,7 @@ export class SceneObject {
 	center: Vector3;
 	size: Vector3 = new Vector3();
 	sceneStore: SceneStore;
+	supports?: Mesh[];
 
 	@observable
 		isSelected: boolean;
@@ -163,7 +165,9 @@ export class SceneObject {
 
 		Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
 			from: this.mesh.position.clone(),
-			to: this.mesh.position.clone().setY(12),
+			to: this.mesh.position.clone().setY(this.supports !== undefined && this.sceneStore.printer
+				? -this.minY.y + toUnits(this.sceneStore.printer.SupportPreset.Lifting)
+				: -this.minY.y),
 			sceneObject: this as SceneObject,
 			instrument: TransformEnum.Move
 		} as AppEventMoveObject);

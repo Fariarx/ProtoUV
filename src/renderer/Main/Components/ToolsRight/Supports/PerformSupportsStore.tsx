@@ -30,6 +30,23 @@ export class PerformSupportsStore {
 			? SupportsEnum.None
 			: state;
 
+		if (state === SupportsEnum.Add)
+		{
+			if (! AppStore.sceneStore.groupSelectedLast.supports)
+			{
+				AppStore.sceneStore.groupSelectedLast.supports = [];
+				AppStore.sceneStore.groupSelectedLast.AlignToPlaneY();
+			}
+		}
+		else {
+			if (AppStore.sceneStore.groupSelectedLast.supports
+          && AppStore.sceneStore.groupSelectedLast.supports.length === 0)
+			{
+				AppStore.sceneStore.groupSelectedLast.supports = undefined;
+				AppStore.sceneStore.groupSelectedLast.AlignToPlaneY();
+			}
+		}
+
 		AppStore.sceneStore.orbitControls.enableRotate = this._state !== SupportsEnum.Remove;
 		AppStore.sceneStore.updateSupportsControls();
 	};

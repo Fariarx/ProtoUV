@@ -28,13 +28,13 @@ export const PerformSupportsApp = observer(() => {
 		<ToolButton
 			text='add support tool'
 			isActive={AppStore.performSupports.state === SupportsEnum.Add}
-			onClick={() => AppStore.performSupports.changeState(SupportsEnum.Add)}>
+			onClick={() => AppStore.performSupports.changeState(  SupportsEnum.Add)}>
 			<MdAddCircleOutline transform='scale(1.1)' color={colors.background.light}/>
 		</ToolButton>
 		<ToolButton
 			text='remove support tool'
 			isActive={AppStore.performSupports.state === SupportsEnum.Remove}
-			onClick={() => AppStore.performSupports.changeState(SupportsEnum.Remove)}>
+			onClick={() => AppStore.performSupports.changeState( SupportsEnum.Remove)}>
 			<MdRemoveCircleOutline transform='scale(1.1)' color={colors.background.light}/>
 		</ToolButton>
 		<ToolButton

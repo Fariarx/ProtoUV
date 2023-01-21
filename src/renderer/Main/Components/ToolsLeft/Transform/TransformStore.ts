@@ -14,12 +14,14 @@ export class TransformStore {
 	}
 
 	public changeState = (state: TransformEnum, disableReset?: boolean) => {
+		const isReset = state === this._state;
+
 		if (!disableReset)
 		{
 			AppStore.sceneStore.resetAnyTools();
 		}
 
-		AppStore.transform._state = state === AppStore.transform._state
+		AppStore.transform._state = isReset
 			? TransformEnum.None
 			: state;
 

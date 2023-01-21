@@ -40,7 +40,7 @@ const _supportCreator = (
 	const platformWidth = toUnits(printer.SupportPreset.PlatformWidth);
 	const platformHeight = toUnits(printer.SupportPreset.PlatformHeight);
 	const spline = new CatmullRomCurve3(path);
-	const material = new MeshLambertMaterial( { color: 0xb00000, wireframe: false } );
+	const material = AppStore.sceneStore.materialForSupports.normal;
 	const extrudeSettings = {
 		steps: 100,
 		bevelEnabled: false,

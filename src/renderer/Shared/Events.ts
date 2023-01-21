@@ -163,18 +163,19 @@ const objectTransform = (message: AppEvent) => {
 const editSupports = (message: AppEvent) => {
 	const event = message.args as AppEventEditSupports;
 
-	if (event.object.supports?.length)
-	{
-		AppStore.sceneStore.removeSupports(event.object);
-	}
+	event.oldSupports = event.object.supports;
+
+	AppStore.sceneStore.removeSupports(event.object);
 
 	if (event.supports?.length)
 	{
+		event.object.supports = event.supports;
 		AppStore.sceneStore.scene.add(...event.supports);
 	}
+	else {
+		event.object.supports = undefined;
+	}
 
-	event.oldSupports = event.object.supports;
-	event.object.supports = event.supports;
 	event.object.AlignToPlaneY(true);
 	AppStore.sceneStore.animate();
 };

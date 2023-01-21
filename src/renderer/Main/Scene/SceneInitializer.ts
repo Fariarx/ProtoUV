@@ -17,7 +17,7 @@ import { Dispatch } from '../../Shared/Events';
 import { EnumHelpers } from '../../Shared/Helpers/Enum';
 import * as OrientationHelper from '../../Shared/Helpers/OrientationHelper';
 import { SubscribersKeyPressed, isKeyPressed } from '../../Shared/Libs/Keys';
-import { SubscribersDoubleMouseClick, SubscribersMouseDown, SubscribersMouseUp, SubscribersWindowResize } from '../../Shared/Libs/Listerners';
+import { SubscribersDoubleMouseClick, SubscribersMouseDown, SubscribersMouseMove, SubscribersMouseUp, SubscribersWindowResize } from '../../Shared/Libs/Listerners';
 import { AppEventEnum, AppEventMoveObject, AppEventSelectionChanged, SupportsEnum, TransformEnum } from '../../Shared/Libs/Types';
 import { ToolsRightStore } from '../Components/ToolsRight/ToolsRightStore';
 import { SceneObject } from './Entities/SceneObject';
@@ -369,8 +369,17 @@ export class SceneInitializer extends SceneBase {
 		const vectorMouseDown = new Vector3();
 
 		let clickTime: number | null = null;
+		let isMouseDown = false;
 
 		SubscribersMouseDown.push((e) => {
+			isMouseDown = true;
+
+			if (AppStore.performSupports.state === SupportsEnum.Remove)
+			{
+				AppStore.performSupports.MouseMove(e, isMouseDown);
+				return;
+			}
+
 			clickTime = Date.now();
 			vectorMouseDown.set(
 				(e.clientX / window.innerWidth) * window.innerWidth,
@@ -378,6 +387,14 @@ export class SceneInitializer extends SceneBase {
 		});
 
 		SubscribersMouseUp.push(e => {
+			isMouseDown = false;
+
+			if (AppStore.performSupports.state === SupportsEnum.Remove)
+			{
+				AppStore.performSupports.MouseMove(e, isMouseDown);
+				return;
+			}
+
 			const clickTimeMillis = clickTime === null ? 0 : Date.now() - clickTime;
 
 			vectorMouseUp.set(
@@ -442,6 +459,14 @@ export class SceneInitializer extends SceneBase {
 
 				AppStore.sceneStore.updateSelectionChanged();
 				AppStore.sceneStore.animate();
+			}
+		});
+
+		SubscribersMouseMove.push(e => {
+			if (AppStore.performSupports.state === SupportsEnum.Remove)
+			{
+				AppStore.performSupports.MouseMove(e, isMouseDown);
+				return;
 			}
 		});
 
@@ -569,11 +594,10 @@ export class SceneInitializer extends SceneBase {
 		}
 	};
 	public removeSupports = (obj: SceneObject) => {
-		console.log('222');
 		if (obj.supports?.length)
 		{
 			this.scene.remove(...obj.supports);
-			console.log('123');
+			obj.supports = undefined;
 		}
 	};
 	public handleLoadFile = (file: string) => {

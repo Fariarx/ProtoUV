@@ -26,6 +26,7 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
+import { SupportsRemoveCircleApp } from './Main/Components/ToolsRight/Supports/Shared/SupportsRemoveCircleApp';
 
 UpdateScheme();
 
@@ -33,6 +34,7 @@ const Main = observer(() => {
 	return <FlexBoxColumn sx={{ opacity: AppStore.instance.ready ? '1' : '0' }}>
 		<SnackbarProvider maxSnack={3}>
 			<ThemeProvider theme={darkTheme}>
+				<SupportsRemoveCircleApp/>
 				<CssBaseline enableColorScheme />
 				<HeaderApp />
 

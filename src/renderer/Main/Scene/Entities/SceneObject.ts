@@ -329,6 +329,14 @@ export class SceneObject {
 		return arr;
 	}
 
+	static GetSupportMeshesFromObjs(objs: SceneObject[]): THREE.Mesh[] {
+		const arr: THREE.Mesh[] = objs.flatMap(function (element) {
+			return element.supports ?? [];
+		});
+
+		return arr;
+	}
+
 	static GetByName(objs: SceneObject[], name: string): SceneObject | null {
 		let _element: SceneObject | null = null;
 

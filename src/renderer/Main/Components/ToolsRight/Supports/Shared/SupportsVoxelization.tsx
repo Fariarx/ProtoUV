@@ -1,0 +1,138 @@
+import _ from 'lodash';
+import { AppStore } from 'renderer/AppStore';
+import { Printer } from 'renderer/Main/Printer/Configs/Printer';
+import { toUnits } from 'renderer/Shared/Globals';
+import { ThreeHelper } from 'renderer/Shared/Helpers/Three';
+import { BoxGeometry, Matrix4, Mesh, MeshStandardMaterial, Raycaster, Vector3 } from 'three';
+import * as THREE from 'three';
+import {  acceleratedRaycast, computeBoundsTree, disposeBoundsTree } from 'three-mesh-bvh';
+
+export const VoxelizationFreeSpace = (mesh: Mesh, printer: Printer) => {
+	const preset = printer.SupportPreset;
+	const body = toUnits(preset.Body) ;
+	const voxelSizes = new Vector3(body * preset.Density, 1, body * preset.Density);
+
+	const printerCubeSize = new Vector3(
+		Math.ceil(printer.Workspace.SizeX * 0.1) + voxelSizes.x,
+		printer.Workspace.Height * 0.1,
+		Math.ceil(printer.Workspace.SizeY * 0.1) + voxelSizes.z);
+	const material = new MeshStandardMaterial({
+		metalness: 0.1,
+		transparent: true,
+		opacity: 0.4,
+		premultipliedAlpha: true
+	});
+	const probeBox = new THREE.Box3();
+	const raycaster = new Raycaster();
+	const probeMeshBox = new Mesh(new BoxGeometry(voxelSizes.x, voxelSizes.y, voxelSizes.z), material);
+	probeMeshBox.updateMatrixWorld();
+	probeBox.setFromObject(probeMeshBox);
+	raycaster.ray.direction.set(0, 1, 0);
+
+	if (!mesh.geometry.boundsTree)
+	{
+		mesh.geometry.computeBoundsTree = computeBoundsTree;
+		mesh.geometry.disposeBoundsTree = disposeBoundsTree;
+		mesh.raycast = acceleratedRaycast;
+		mesh.geometry.computeBoundsTree();
+	}
+
+	AppStore.sceneStore.scene.add(probeMeshBox);
+
+	const result: VoxelizationResult = {
+		PositionsProbe: []
+	};
+
+	const performVoxel = (x: number, y: number, z: number) => {
+		probeMeshBox.position.set(x, y, z);
+		probeMeshBox.updateMatrixWorld();
+
+		const transformMatrix = new Matrix4()
+			.copy(mesh.matrixWorld)
+			.invert()
+			.multiply(probeMeshBox.matrixWorld);
+
+		const probe = mesh.geometry.boundsTree!.intersectsBox(probeBox, transformMatrix);
+
+		if (probe)
+		{
+			let distance = 0;
+			let point: Vector3 | null = null;
+			let normal: Vector3 | null = null;
+			let angle =0 ;
+
+			for (let q = x - voxelSizes.x / 2; q <= x + voxelSizes.x / 2; q += voxelSizes.x / preset.Rays)
+			{
+				for (let w = z - voxelSizes.z / 2; w <= z + voxelSizes.z / 2; w += voxelSizes.z / preset.Rays)
+				{
+					raycaster.ray.origin.set(q, y - voxelSizes.y / 2, w);
+
+					const intersection: THREE.Intersection<THREE.Object3D<THREE.Event>>[] = [];
+
+					mesh.raycast(raycaster, intersection);
+
+					intersection.every(x => {
+						if (!point || x.distance < distance)
+						{
+							if (x.face && !result.PositionsProbe.some(y => y.Touchpoint && y.Touchpoint.distanceTo(x.point) < body * 4))
+							{
+								distance = x.distance;
+								point = x.point;
+								normal = x.face.normal.applyQuaternion(mesh.quaternion);
+								//ThreeHelper.DrawDirLine(x.point, normal);
+								//console.log(normal );
+							}
+						}
+					});
+				}
+			}
+
+			AppStore.sceneStore.scene.add(probeMeshBox.clone());
+			AppStore.sceneStore.animate();
+
+			angle = normal!.angleTo(new Vector3(0, -1, 0)) * (180 / Math.PI);
+
+			if (point && angle < 90)
+			{
+				ThreeHelper.DrawPoint(point);
+				result.PositionsProbe.push({
+					Touchpoint: point,
+					Position: new Vector3(x, y, z),
+					IsIntersecting: probe,
+					TouchpointNormal: normal!
+				});
+				return;
+			}
+		}
+
+		result.PositionsProbe.push({
+			Position: new Vector3(x, y, z),
+			IsIntersecting: probe
+		});
+	};
+
+	for (let y = 0; y <= printerCubeSize.y; y += voxelSizes.y)
+	{
+		for (let x = 0; x <= printerCubeSize.x; x += voxelSizes.x )
+		{
+			for (let z = 0; z <= printerCubeSize.z; z += voxelSizes.z )
+			{
+				performVoxel(x, y, z);
+			}
+		}
+	}
+
+	return result;
+};
+
+type VoxelizationResult = {
+	PositionsProbe: PositionProbe[];
+};
+
+export type PositionProbe = {
+  TouchpointNormal?: Vector3;
+  Touchpoint?: Vector3;
+  Position: Vector3;
+  IsIntersecting: boolean;
+  Path?: Vector3[];
+};

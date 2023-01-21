@@ -2,7 +2,8 @@ import { makeAutoObservable } from 'mobx';
 import { AppStore } from 'renderer/AppStore';
 import { SupportsEnum } from 'renderer/Shared/Libs/Types';
 import { singleton } from 'tsyringe';
-import { VoxelizationFreeSpace } from './Shared/SupportsGen';
+import { SupportsGenerator } from './Shared/SupportsGen';
+import { VoxelizationFreeSpace } from './Shared/SupportsVoxelization';
 
 @singleton()
 export class PerformSupportsStore {
@@ -20,16 +21,15 @@ export class PerformSupportsStore {
 	public changeState = (state: SupportsEnum, disableReset?: boolean) => {
 		if (!disableReset) {
 			AppStore.sceneStore.resetAnyTools();
+
+			SupportsGenerator(
+        AppStore.sceneStore.printer!,
+        AppStore.sceneStore.objects.map(obj => obj.mesh));
 		}
 
 		this._state = state === this._state
 			? SupportsEnum.None
 			: state;
-
-		VoxelizationFreeSpace({
-			Printer: AppStore.sceneStore.printer!,
-			Mesh: AppStore.sceneStore.groupSelectedLast.mesh,
-		});
 
 		AppStore.sceneStore.updateSupportsControls();
 	};

@@ -8,7 +8,6 @@ import { VoxelizationFreeSpace } from './SupportsVoxelization';
 export const _platformHeight = 0.6;
 
 export const SupportsGenerator = (printer: Printer, meshes: Mesh[]) => {
-
 	const voxelization = VoxelizationFreeSpace(
 		AppStore.sceneStore.groupSelectedLast.mesh,
     AppStore.sceneStore.printer!

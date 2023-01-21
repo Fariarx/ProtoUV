@@ -3,14 +3,14 @@ import { AppStore } from 'renderer/AppStore';
 import { Printer } from 'renderer/Main/Printer/Configs/Printer';
 import { toUnits } from 'renderer/Shared/Globals';
 import { ThreeHelper } from 'renderer/Shared/Helpers/Three';
-import { BoxGeometry, Matrix4, Mesh, MeshStandardMaterial, Raycaster, Vector3 } from 'three';
+import { BoxGeometry, Intersection, Matrix4, Mesh, MeshStandardMaterial, Raycaster, Vector3 } from 'three';
 import * as THREE from 'three';
 import {  acceleratedRaycast, computeBoundsTree, disposeBoundsTree } from 'three-mesh-bvh';
 
 export const VoxelizationFreeSpace = (mesh: Mesh, printer: Printer) => {
 	const preset = printer.SupportPreset;
 	const body = toUnits(preset.Body) ;
-	const voxelSizes = new Vector3(body * preset.Density, 1, body * preset.Density);
+	const voxelSizes = new Vector3(body * preset.Density, Math.min(toUnits(preset.Density), 1), body * preset.Density);
 
 	const printerCubeSize = new Vector3(
 		Math.ceil(printer.Workspace.SizeX * 0.1) + voxelSizes.x,
@@ -24,6 +24,13 @@ export const VoxelizationFreeSpace = (mesh: Mesh, printer: Printer) => {
 	});
 	const probeBox = new THREE.Box3();
 	const raycaster = new Raycaster();
+	raycaster.params.Line = {
+		threshold: 0.05
+	};
+	raycaster.params.Points = {
+		threshold: 0.05
+	};
+
 	const probeMeshBox = new Mesh(new BoxGeometry(voxelSizes.x, voxelSizes.y, voxelSizes.z), material);
 	probeMeshBox.updateMatrixWorld();
 	probeBox.setFromObject(probeMeshBox);
@@ -56,10 +63,7 @@ export const VoxelizationFreeSpace = (mesh: Mesh, printer: Printer) => {
 
 		if (probe)
 		{
-			let distance = 0;
-			let point: Vector3 | null = null;
-			let normal: Vector3 | null = null;
-			let angle =0 ;
+			let minIntersection: Intersection | undefined;
 
 			for (let q = x - voxelSizes.x / 2; q <= x + voxelSizes.x / 2; q += voxelSizes.x / preset.Rays)
 			{
@@ -67,40 +71,47 @@ export const VoxelizationFreeSpace = (mesh: Mesh, printer: Printer) => {
 				{
 					raycaster.ray.origin.set(q, y - voxelSizes.y / 2, w);
 
-					const intersection: THREE.Intersection<THREE.Object3D<THREE.Event>>[] = [];
+					const intersection: Intersection[] = [];
 
 					mesh.raycast(raycaster, intersection);
 
-					intersection.every(x => {
-						if (!point || x.distance < distance)
+					if (intersection.length)
+					{
+						//)
+						const min = _.minBy(intersection
+							.filter(s => !!s.face && !result.PositionsProbe.some(y => y.Touchpoint && y.Touchpoint.distanceTo(s.point) < body * 4)), r => r.distance);
+						if (min)
 						{
-							if (x.face && !result.PositionsProbe.some(y => y.Touchpoint && y.Touchpoint.distanceTo(x.point) < body * 4))
+							if (!minIntersection || minIntersection?.distance > min.distance)
 							{
-								distance = x.distance;
-								point = x.point;
-								normal = x.face.normal.applyQuaternion(mesh.quaternion);
-								//ThreeHelper.DrawDirLine(x.point, normal);
-								//console.log(normal );
+								minIntersection= min;
 							}
 						}
-					});
+					}
 				}
 			}
 
 			AppStore.sceneStore.scene.add(probeMeshBox.clone());
 			AppStore.sceneStore.animate();
 
-			angle = normal!.angleTo(new Vector3(0, -1, 0)) * (180 / Math.PI);
+			//angle = normal!.angleTo(new Vector3(0, -1, 0)) * (180 / Math.PI);
 
-			if (point && angle < 90)
+			if (minIntersection && minIntersection.face)
 			{
-				ThreeHelper.DrawPoint(point);
-				result.PositionsProbe.push({
-					Touchpoint: point,
-					Position: new Vector3(x, y, z),
-					IsIntersecting: probe,
-					TouchpointNormal: normal!
-				});
+				ThreeHelper.DrawPoint(minIntersection.point);
+
+				const normalMatrix = new THREE.Matrix3().getNormalMatrix( mesh.matrixWorld );
+				const normalAngle = minIntersection.face.normal.clone().applyMatrix3( normalMatrix ).normalize().angleTo(new Vector3(0, -1, 0)) * (180 / Math.PI);
+
+				if (normalAngle <= 90) {
+					result.PositionsProbe.push({
+						Touchpoint: minIntersection.point,
+						Position: new Vector3(x, y, z),
+						IsIntersecting: probe,
+						TouchpointNormal: minIntersection.face!.normal.applyQuaternion(mesh.quaternion)!
+					});
+				}
+
 				return;
 			}
 		}

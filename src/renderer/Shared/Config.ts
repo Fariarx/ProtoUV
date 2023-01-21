@@ -14,7 +14,7 @@ export const _default = {
 		scene:{
 			transformAlignToPlane: true,
 			setStartupPerspectiveCamera: false,
-			isFixedCenter: true,
+			isFixedCenter: false,
 			sharpness:.0001
 		},
 		colors: {

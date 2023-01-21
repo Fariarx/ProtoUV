@@ -94,61 +94,67 @@ const objectDelete = (message: AppEvent) => {
 };
 
 const objectTransform = (message: AppEvent) => {
-	const moveObject = message.args as AppEventMoveObject;
-	const mesh: Mesh = moveObject.sceneObject.mesh;
+	const event = message.args as AppEventMoveObject;
+	const mesh: Mesh = event.sceneObject.mesh;
 
-	if (!moveObject.actionBreak) {
-		if (!moveObject.instrument) {
-			moveObject.instrument = AppStore.transform.state;
+	if (!event.actionBreak) {
+		if (!event.instrument) {
+			event.instrument = AppStore.transform.state;
+		}
+
+		if (event.sceneObject.supports?.length && !event.deletedSupportsDisabled)
+		{
+			event.deletedSupports = event.sceneObject.supports;
+			AppStore.sceneStore.removeSupports(event.sceneObject);
 		}
 
 		const minScale = config.scene.sharpness;
 
-		switch (moveObject.instrument) {
+		switch (event.instrument) {
 			case TransformEnum.Move:
-				if (moveObject.to.isDifferent)
+				if (event.to.isDifferent)
 				{
-					mesh.position.add(moveObject.to as Vector3);
+					mesh.position.add(event.to as Vector3);
 				}
 				else {
-					mesh.position.set(moveObject.to.x, moveObject.to.y, moveObject.to.z);
+					mesh.position.set(event.to.x, event.to.y, event.to.z);
 				}
 				break;
 			case TransformEnum.Rotate:
-				if (moveObject.to.isDifferent)
+				if (event.to.isDifferent)
 				{
-					mesh.rotation.setFromVector3(moveObject.to as Vector3);
+					mesh.rotation.setFromVector3(event.to as Vector3);
 				}
 				else {
-					mesh.rotation.set(moveObject.to.x, moveObject.to.y, moveObject.to.z);
+					mesh.rotation.set(event.to.x, event.to.y, event.to.z);
 				}
 				break;
 			case TransformEnum.Scale:
-				if(moveObject.to.x < minScale)
+				if(event.to.x < minScale)
 				{
-					moveObject.to.x = minScale;
+					event.to.x = minScale;
 				}
-				if(moveObject.to.y < minScale)
+				if(event.to.y < minScale)
 				{
-					moveObject.to.y = minScale;
+					event.to.y = minScale;
 				}
-				if(moveObject.to.z < minScale)
+				if(event.to.z < minScale)
 				{
-					moveObject.to.z = minScale;
+					event.to.z = minScale;
 				}
 
-				if (moveObject.to.isDifferent)
+				if (event.to.isDifferent)
 				{
-					mesh.scale.add(moveObject.to as Vector3);
+					mesh.scale.add(event.to as Vector3);
 				}
 				else {
-					mesh.scale.set(moveObject.to.x, moveObject.to.y, moveObject.to.z);
+					mesh.scale.set(event.to.x, event.to.y, event.to.z);
 				}
 				break;
 		}
 	}
 
-	if(!moveObject.renderBreak)
+	if(!event.renderBreak)
 	{
 		AppStore.sceneStore.animate();
 	}
@@ -157,7 +163,6 @@ const objectTransform = (message: AppEvent) => {
 const editSupports = (message: AppEvent) => {
 	const event = message.args as AppEventEditSupports;
 
-	console.log(event.object.supports);
 	if (event.object.supports?.length)
 	{
 		AppStore.sceneStore.removeSupports(event.object);
@@ -168,7 +173,8 @@ const editSupports = (message: AppEvent) => {
 		AppStore.sceneStore.scene.add(...event.supports);
 	}
 
+	event.oldSupports = event.object.supports;
 	event.object.supports = event.supports;
-	event.object.AlignToPlaneY();
+	event.object.AlignToPlaneY(true);
 	AppStore.sceneStore.animate();
 };

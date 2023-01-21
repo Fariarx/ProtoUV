@@ -159,7 +159,7 @@ export class SceneObject {
 		this.sceneStore.scene.add(this.mesh);
 	};
 
-	AlignToPlaneY = () => {
+	AlignToPlaneY = (deletedSupportsDisabled?: boolean) => {
 		this.mesh.position.setY(0);
 		this.UpdateSize();
 
@@ -169,7 +169,8 @@ export class SceneObject {
 				? -this.minY.y + toUnits(this.sceneStore.printer.SupportPreset.Lifting)
 				: -this.minY.y),
 			sceneObject: this as SceneObject,
-			instrument: TransformEnum.Move
+			instrument: TransformEnum.Move,
+			deletedSupportsDisabled: deletedSupportsDisabled
 		} as AppEventMoveObject);
 
 		this.UpdateSize();

@@ -49,7 +49,7 @@ export const PerformSupportsApp = observer(() => {
 					if (!AppStore.sceneStore.groupSelectedLast.supports?.length)
 					{
 						AppStore.sceneStore.groupSelectedLast.supports = [];
-						AppStore.sceneStore.groupSelectedLast.AlignToPlaneY();
+						AppStore.sceneStore.groupSelectedLast.AlignToPlaneY(true);
 					}
 
 					const supports = SupportsGenerator(

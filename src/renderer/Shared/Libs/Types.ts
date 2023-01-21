@@ -40,6 +40,8 @@ export type AppEventMoveObject = {
   sceneObject: SceneObject;
   actionBreak: true | undefined;
   renderBreak: true | undefined;
+  deletedSupports: Mesh[] | undefined;
+  deletedSupportsDisabled: true | undefined;
   id: number | undefined;
 };
 
@@ -68,4 +70,5 @@ export enum SupportsEnum {
 export type AppEventEditSupports = {
   object: SceneObject;
   supports: Mesh[] | undefined;
+  oldSupports: Mesh[] | undefined;
 };

@@ -11,7 +11,7 @@ import { LockLookAtCenterApp } from './LockLookAtCenterApp';
 export const ViewChangeApp = observer(() => {
 	return <Box sx={{
 		right: (container.resolve(ToolsRightStore).width + 22) + 'px',
-		top: Sizes.sum(APP_HEADER_HEIGHT_PX, Sizes.eight),
+		top: Sizes.sum(APP_HEADER_HEIGHT_PX, '10px'),
 		position: 'absolute',
 		//border: '1px solid ' + colors.background.darkest,
 		//borderRadius: Sizes.twentyFour,

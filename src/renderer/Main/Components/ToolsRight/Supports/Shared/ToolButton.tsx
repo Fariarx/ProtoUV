@@ -7,9 +7,10 @@ export const ToolButton = (props: {
   isActive: boolean;
   onClick: () => void;
   text: string;
+  placement?: string | any;
 }) => {
 
-	return <Tooltip title={props.text} arrow placement="bottom">
+	return <Tooltip title={props.text} arrow placement={props.placement ?? 'bottom'}>
 		<Box
 			onClick={props.onClick}
 			sx={{

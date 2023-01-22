@@ -34,7 +34,7 @@ export class AppStore {
 		return AppStore.instance.state;
 	}
 
-	public static setState(state: Pages) {
+	public static changeState(state: Pages) {
 		AppStore.sceneStore.updatePrinter();
 		AppStore.instance.state = state;
 	}

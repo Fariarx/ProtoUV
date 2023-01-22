@@ -24,7 +24,7 @@ export const ConfiguratorAutoApp = observer(() => {
 		else {
 			AppStore.sceneStore.printer = printer;
 			AppStore.sceneStore.printerName = config.printerName = printer.name;
-			AppStore.setState(Pages.Main);
+			AppStore.changeState(Pages.Main);
 			saveConfig();
 		}
 	};
@@ -63,7 +63,7 @@ export const ConfiguratorAutoApp = observer(() => {
 								helperText={<>
                   Please select your printer or{' '}
 									<Link sx={{ cursor: 'pointer' }} onClick={() =>
-										AppStore.setState(Pages.ConfiguratorManually)
+										AppStore.changeState(Pages.ConfiguratorManually)
 									}>
                     create a new configuration
 									</Link>

@@ -21,54 +21,57 @@ export const PerformSupportsApp = observer(() => {
 		borderRight: 'unset',
 		backgroundColor: colors.background.common,
 		borderRadius: Sizes.four + ' 0' + ' 0 ' + Sizes.four,
-		display: 'flex',
-		gap: 0.5,
 		mt: 1,
 	}}>
-		<ToolButton
-			text='add support tool. to randomize select press R.'
-			isActive={AppStore.performSupports.state === SupportsEnum.Add}
-			onClick={() => AppStore.performSupports.changeState(  SupportsEnum.Add)}>
-			<MdAddCircleOutline transform='scale(1.1)' color={colors.background.light}/>
-		</ToolButton>
-		<ToolButton
-			text='remove support tool'
-			isActive={AppStore.performSupports.state === SupportsEnum.Remove}
-			onClick={() => AppStore.performSupports.changeState( SupportsEnum.Remove)}>
-			<MdRemoveCircleOutline transform='scale(1.1)' color={colors.background.light}/>
-		</ToolButton>
-		<ToolButton
-			text='auto generate supports'
-			isActive={false}
-			onClick={() => {
-				if (!AppStore.sceneStore.groupSelectedLast)
-				{
-					Log('select object not found');
-				}
-				else {
-					if (!AppStore.sceneStore.groupSelectedLast.supports?.length)
+		<Box sx={{
+			display: 'flex',
+			gap: 0.5,
+		}}>
+			<ToolButton
+				text='add support tool. press R to randomize'
+				isActive={AppStore.performSupports.state === SupportsEnum.Add}
+				onClick={() => AppStore.performSupports.changeState(  SupportsEnum.Add)}>
+				<MdAddCircleOutline transform='scale(1.1)' color={colors.background.light}/>
+			</ToolButton>
+			<ToolButton
+				text='remove support tool'
+				isActive={AppStore.performSupports.state === SupportsEnum.Remove}
+				onClick={() => AppStore.performSupports.changeState( SupportsEnum.Remove)}>
+				<MdRemoveCircleOutline transform='scale(1.1)' color={colors.background.light}/>
+			</ToolButton>
+			<ToolButton
+				text='auto generate supports'
+				isActive={false}
+				onClick={() => {
+					if (!AppStore.sceneStore.groupSelectedLast)
 					{
-						AppStore.sceneStore.groupSelectedLast.supports = [];
-						AppStore.sceneStore.groupSelectedLast.AlignToPlaneY(true);
+						Log('select object not found');
 					}
+					else {
+						if (!AppStore.sceneStore.groupSelectedLast.supports?.length)
+						{
+							AppStore.sceneStore.groupSelectedLast.supports = [];
+							AppStore.sceneStore.groupSelectedLast.AlignToPlaneY(true);
+						}
 
-					const supports = SupportsGenerator(
+						const supports = SupportsGenerator(
             AppStore.sceneStore.printer!,
             AppStore.sceneStore.groupSelectedLast.mesh,
             AppStore.sceneStore.objects.map(obj => obj.mesh));
 
-					if (!supports.length) {
-						Log('generation result is empty');
+						if (!supports.length) {
+							Log('generation result is empty');
+						}
+						else {
+							Dispatch(AppEventEnum.EDIT_SUPPORTS, {
+								object: AppStore.sceneStore.groupSelectedLast,
+								supports: supports
+							} as AppEventEditSupports);
+						}
 					}
-					else {
-						Dispatch(AppEventEnum.EDIT_SUPPORTS, {
-							object: AppStore.sceneStore.groupSelectedLast,
-							supports: supports
-						} as AppEventEditSupports);
-					}
-				}
-			}}>
-			<MdWbAuto transform='scale(1.1)' color={colors.background.light}/>
-		</ToolButton>
+				}}>
+				<MdWbAuto transform='scale(1.1)' color={colors.background.light}/>
+			</ToolButton>
+		</Box>
 	</Box>;
 });

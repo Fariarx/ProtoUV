@@ -13,7 +13,7 @@ export let tempPrinter: Printer | undefined;
 export const ConfiguratorManuallyApp = observer(() => {
 	const printer = tempPrinter ? tempPrinter : Printer.LoadDefaultConfigFromFile();
 	if (!printer) {
-		AppStore.setState(Pages.Configurator);
+		AppStore.changeState(Pages.Configurator);
 		return <Box/>;
 	}
 
@@ -21,7 +21,7 @@ export const ConfiguratorManuallyApp = observer(() => {
 		AppStore.sceneStore.printerName = config.printerName = printer.name;
 		Printer.SaveToFile(printer);
 		AppStore.sceneStore.printer = printer;
-		AppStore.setState(Pages.Main);
+		AppStore.changeState(Pages.Main);
 		saveConfig();
 	};
 
@@ -52,7 +52,7 @@ export const ConfiguratorManuallyApp = observer(() => {
 				}}>
 					<Button onClick={() => {
 						tempPrinter = printer;
-						AppStore.setState(Pages.Configurator);
+						AppStore.changeState(Pages.Configurator);
 					}} sx={{
 						width: '100%',
 						borderRadius: Sizes.twentyFour

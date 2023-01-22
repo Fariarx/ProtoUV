@@ -69,12 +69,17 @@ export class PerformSupportsStore {
 	private addCursor = new Mesh();
 	private target?: SceneObject;
 	private preview?: Mesh;
+	private isInited = false;
 
 	public addCursorToScene = () => {
-		this.addCursor.geometry = new SphereGeometry(toUnits(AppStore.sceneStore.printer!.SupportPreset.Body));
-		this.addCursor.material = AppStore.sceneStore.materialForSupports.preview;
-		this.addCursor.visible = false;
-		AppStore.sceneStore.scene.add(this.addCursor);
+		if (!this.isInited)
+		{
+			this.addCursor.geometry = new SphereGeometry(toUnits(AppStore.sceneStore.printer!.SupportPreset.Body));
+			this.addCursor.material = AppStore.sceneStore.materialForSupports.preview;
+			this.addCursor.visible = false;
+			AppStore.sceneStore.scene.add(this.addCursor);
+			this.isInited = true;
+		}
 	};
 
 	public MouseMoveToRemove = (event: MouseEvent, isPressed: boolean) => {

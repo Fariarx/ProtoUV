@@ -44,7 +44,7 @@ export class SceneStore extends SceneInitializer {
 		}
 		else
 		{
-			setTimeout(() => AppStore.setState(Pages.Configurator));
+			setTimeout(() => AppStore.changeState(Pages.Configurator));
 			Log('Printer configuration is empty!');
 		}
 	}

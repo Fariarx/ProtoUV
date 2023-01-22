@@ -17,6 +17,7 @@ import { SubscribersMouseMove, SubscribersMouseUp } from '../../../Shared/Libs/L
 import { FlexBox, FlexBoxColumn, FlexBoxRow, RisizibleFlexBox, flexChildrenCenter, flexSelfCenter } from '../../../Shared/Styled/FlexBox';
 import { Sizes } from '../../../Shared/Styled/Sizes';
 import { ListObjects } from './ListObjectsApp';
+import { PrinterApp } from './PrinterApp';
 import { PerformSupportsApp } from './Supports/PerformSupportsApp';
 import { ToolsRightStore } from './ToolsRightStore';
 
@@ -69,6 +70,7 @@ export const ToolsRightApp = observer(() => {
 		<FlexBoxColumn sx={{
 			pointerEvents: 'auto',
 		}}>
+			<PrinterApp/>
 			<ListObjects/>
 			<PerformSupportsApp/>
 		</FlexBoxColumn>

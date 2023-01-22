@@ -23,7 +23,7 @@
       "ConnectionSphere": 0.5,
       "Head": 0.4,
       "Body": 0.5,
-      "Indent": 0.8,
+      "Indent": 0.6,
       "RetreatFromTheWalls": 3,
       "Angle": 56,
       "PlatformWidth": 3,

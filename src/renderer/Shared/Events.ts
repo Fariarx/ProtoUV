@@ -1,4 +1,5 @@
 import { runInAction } from 'mobx';
+import { clearSupportCreateBuffer } from 'renderer/Main/Components/ToolsRight/Supports/Shared/SupportsGen';
 import { Mesh, Vector3 } from 'three';
 import { AppStore } from '../AppStore';
 import { SceneObject } from './../Main/Scene/Entities/SceneObject';
@@ -35,6 +36,11 @@ const Handler = (message: any) => {
 		case AppEventEnum.EDIT_SUPPORTS:
 			editSupports(message);
 			break;
+	}
+
+	if (message.name !== AppEventEnum.EDIT_SUPPORTS)
+	{
+		clearSupportCreateBuffer();
 	}
 
 	return true;

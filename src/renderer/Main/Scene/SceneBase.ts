@@ -30,7 +30,7 @@ export abstract class SceneBase {
 	});
 	public materialForSupports = {
 		normal: new MeshLambertMaterial({ transparent: true, opacity: 0.6, color: '#5bc3fc' }),
-		preview: new MeshLambertMaterial({ transparent: true, opacity: 0.2, color: '#80caff' })
+		preview: new MeshLambertMaterial({ transparent: true, opacity: 0.3, color: '#80ffaa' })
 	};
 
 	public materialLine = new LineMaterial({

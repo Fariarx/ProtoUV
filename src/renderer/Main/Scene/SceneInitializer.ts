@@ -19,6 +19,7 @@ import * as OrientationHelper from '../../Shared/Helpers/OrientationHelper';
 import { SubscribersKeyPressed, isKeyPressed } from '../../Shared/Libs/Keys';
 import { SubscribersDoubleMouseClick, SubscribersMouseDown, SubscribersMouseMove, SubscribersMouseUp, SubscribersWindowResize } from '../../Shared/Libs/Listerners';
 import { AppEventEnum, AppEventMoveObject, AppEventSelectionChanged, SupportsEnum, TransformEnum } from '../../Shared/Libs/Types';
+import { clearSupportCreateBuffer } from '../Components/ToolsRight/Supports/Shared/SupportsGen';
 import { ToolsRightStore } from '../Components/ToolsRight/ToolsRightStore';
 import { SceneObject } from './Entities/SceneObject';
 import { SceneBase } from './SceneBase';
@@ -41,8 +42,6 @@ export class SceneInitializer extends SceneBase {
 		this.setupDropFile();
 		this.setupMouse();
 		this.setupKeyboard();
-
-		setTimeout(() => AppStore.sceneStore.handleLoadFile('C:\\Users\\admin\\Downloads\\Old\\V7_Infinity_Cube_Hinge.stl'), 100);
 
 		Log('SceneComponents loaded!');
 	}
@@ -357,6 +356,11 @@ export class SceneInitializer extends SceneBase {
 	};
 	public setupKeyboard = () => {
 		SubscribersKeyPressed.push(k => {
+			if (k === Key.R && AppStore.performSupports.state === SupportsEnum.Add)
+			{
+				AppStore.performSupports.MouseMoveToAdd(undefined, true);
+				return;
+			}
 			if (k === Key.Delete)
 			{
 				SceneObject.SelectObjsDelete();
@@ -376,7 +380,12 @@ export class SceneInitializer extends SceneBase {
 
 			if (AppStore.performSupports.state === SupportsEnum.Remove)
 			{
-				AppStore.performSupports.MouseMove(e, isMouseDown);
+				AppStore.performSupports.MouseMoveToRemove(e, isMouseDown);
+				return;
+			}
+			if (AppStore.performSupports.state === SupportsEnum.Add)
+			{
+				AppStore.performSupports.MouseClickToAdd();
 				return;
 			}
 
@@ -391,7 +400,12 @@ export class SceneInitializer extends SceneBase {
 
 			if (AppStore.performSupports.state === SupportsEnum.Remove)
 			{
-				AppStore.performSupports.MouseMove(e, isMouseDown);
+				AppStore.performSupports.MouseMoveToRemove(e, isMouseDown);
+				return;
+			}
+			if (AppStore.performSupports.state === SupportsEnum.Add)
+			{
+				AppStore.performSupports.MouseMoveToAdd(e);
 				return;
 			}
 
@@ -465,7 +479,12 @@ export class SceneInitializer extends SceneBase {
 		SubscribersMouseMove.push(e => {
 			if (AppStore.performSupports.state === SupportsEnum.Remove)
 			{
-				AppStore.performSupports.MouseMove(e, isMouseDown);
+				AppStore.performSupports.MouseMoveToRemove(e, isMouseDown);
+				return;
+			}
+			if (AppStore.performSupports.state === SupportsEnum.Add)
+			{
+				AppStore.performSupports.MouseMoveToAdd(e);
 				return;
 			}
 		});
@@ -476,6 +495,8 @@ export class SceneInitializer extends SceneBase {
 		});
 	};
 	public updateSelectionChanged = () => {
+		clearSupportCreateBuffer();
+
 		AppStore.sceneStore.transformControls.detach();
 		AppStore.sceneStore.groupSelected = [];
 

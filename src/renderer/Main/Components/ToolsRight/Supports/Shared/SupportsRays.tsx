@@ -1,6 +1,6 @@
-import _ from 'lodash';
+import _, { shuffle } from 'lodash';
 import { Printer } from 'renderer/Main/Printer/Configs/Printer';
-import { toUnits } from 'renderer/Shared/Globals';
+import { toMM, toUnits } from 'renderer/Shared/Globals';
 import { ThreeHelper } from 'renderer/Shared/Helpers/Three';
 import { CircleGeometry, Float32BufferAttribute, Group, Intersection, Mesh, Object3D, Raycaster, Vector3 } from 'three';
 import { PositionProbe } from './SupportsVoxelization';
@@ -13,16 +13,39 @@ const getRayDirection = (ray: Object3D) => {
 	return dir;
 };
 
-export const SupportsRays = (meshes: Mesh[], printer: Printer, probe: PositionProbe) => {
+export const SupportsRays = (
+	meshes: Mesh[],
+	printer: Printer,
+	probe: PositionProbe,
+	randomize: boolean
+) => {
 	const body = toUnits(printer.SupportPreset.Body);
-	const indent = toUnits(printer.SupportPreset.Indent);
-	const retreatFromTheWalls = toUnits(printer.SupportPreset.RetreatFromTheWalls);
+	const indent = toUnits(printer.SupportPreset.Indent) + body;
 
-	rays = !rays || printer.SupportPreset.Body !== rays.size_mm + retreatFromTheWalls
-		? defineRaysObj(printer.SupportPreset.Body + retreatFromTheWalls)
+	rays = !rays || (indent)  !== toUnits(rays.size_mm)
+		? defineRaysObj(toMM(indent))
 		: rays;
 
-	const endpointPointIndent = probe.Touchpoint!.clone().add(probe.TouchpointNormal!.multiplyScalar(body + indent));
+	const forward = probe.Touchpoint!.clone();//.add(probe.TouchpointNormal!.multiplyScalar(indent + body));
+	const endpointsPointIndent: Vector3[] = [
+		forward.clone().add(new Vector3(0, -indent, 0)),
+
+		forward.clone().add(new Vector3(0, -indent, -indent)),
+		forward.clone().add(new Vector3(indent, -indent, 0)),
+		forward.clone().add(new Vector3(0, -indent, indent)),
+		forward.clone().add(new Vector3(-indent, -indent, 0)),
+	];
+	// console.log(probe.TouchpointAngle! ,  printer.SupportPreset.Angle);
+	// if (printer.SupportPreset.Angle && probe.TouchpointAngle! > printer.SupportPreset.Angle)
+	// {
+	// 	while (endpointPointIndent.angleTo(probe.Touchpoint!) * (180 / Math.PI) < probe.TouchpointAngle! - printer.SupportPreset.Angle)
+	// 	{
+	// 		endpointPointIndent.setY(endpointPointIndent.y - body);
+	// 	}
+
+	// 	console.log(endpointPointIndent.angleTo(probe.Touchpoint!) * (180 / Math.PI));
+	// 	//console.log(true);
+	// }
 
 	const findPathToPlane = (from: Vector3, path: Vector3[]) => {
 		path.push(from);
@@ -40,7 +63,7 @@ export const SupportsRays = (meshes: Mesh[], printer: Printer, probe: PositionPr
 
 			rays?.groupFocused.lookAt(nextPoint);
 
-			if (calculateIntersects(meshes).some(x => x.distance <= body + retreatFromTheWalls))
+			if (calculateIntersects(meshes).some(x => x.distance <= body + indent))
 			{
 				return false;
 			}
@@ -60,14 +83,23 @@ export const SupportsRays = (meshes: Mesh[], printer: Printer, probe: PositionPr
 				path.push(nextPoint);
 			}
 		}
+		else {
+			//path.forEach(x => ThreeHelper.DrawPoint(x, undefined, undefined, 2500));
+		}
 	};
 
-	const path: Vector3[] = [];
+	for (const x of (randomize ? shuffle(endpointsPointIndent.map(x => x.clone())) : endpointsPointIndent))
+	{
+		const path: Vector3[] = [];
 
-	findPathToPlane(endpointPointIndent, path);
+		findPathToPlane(x, path);
 
-	if (path.length !== 0 && path[path.length - 1].y <= 0) {
-		return path;
+		//const angle = Math.asin(Math.abs(probe.Position.y - x.y) / probe.Position.distanceTo(x)) * 180 / Math.PI;
+		//console.log(angle);
+
+		if (path.length !== 0 && path[path.length - 1].y <= 0) {
+			return path;
+		}
 	}
 
 	return undefined;
@@ -90,7 +122,7 @@ const calculateIntersects = (
 		raycaster.ray.origin = pos;
 
 		//for debug
-		//ThreeHelper.DrawDirLine(pos, dir);
+		//ThreeHelper.DrawDirLine(pos, dir, undefined, 2500);
 
 		const arr = raycaster.intersectObjects(meshes);
 		if(arr.length) {

@@ -126,6 +126,15 @@ export class SceneStore extends SceneInitializer {
 		this.grid.obj.position.set(0, 0.02, 0);
 
 		this.updateCameraLookPosition();
+
+		if (this.printer)
+		{
+			setTimeout(() => {
+				AppStore.sceneStore.handleLoadFile('C:\\Users\\admin\\Downloads\\Old\\V7_Infinity_Cube_Hinge.stl');
+				AppStore.performSupports.addCursorToScene();
+			}, 100);
+		}
+
 		this.animate();
 	}
 }

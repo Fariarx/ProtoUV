@@ -1,9 +1,10 @@
+import _ from 'lodash';
 import { AppStore } from 'renderer/AppStore';
 import { Printer } from 'renderer/Main/Printer/Configs/Printer';
 import { toUnits } from 'renderer/Shared/Globals';
 import { CatmullRomCurve3, CylinderGeometry, ExtrudeGeometry, Material, Mesh, MeshLambertMaterial, Shape, SphereGeometry, Vector2, Vector3 } from 'three';
 import { SupportsRays } from './SupportsRays';
-import { VoxelizationFreeSpace } from './SupportsVoxelization';
+import { PositionProbe, VoxelizationFreeSpace } from './SupportsVoxelization';
 
 export const SupportsGenerator = (printer: Printer, mesh: Mesh, meshes: Mesh[]) => {
 	const voxelization = VoxelizationFreeSpace(
@@ -16,7 +17,7 @@ export const SupportsGenerator = (printer: Printer, mesh: Mesh, meshes: Mesh[]) 
 	voxelization.PositionsProbe.forEach(x => {
 		if (x.Touchpoint)
 		{
-			x.Path = SupportsRays(meshes, printer, x);
+			x.Path = SupportsRays(meshes, printer, x, false);
 
 			if (x.Path)
 			{
@@ -29,10 +30,52 @@ export const SupportsGenerator = (printer: Printer, mesh: Mesh, meshes: Mesh[]) 
 	return _supports;
 };
 
+let _voxelizationBuffer: undefined | {
+	PositionsProbe: PositionProbe[];
+};
+
+export const SupportSingleGenerator = (
+	printer: Printer,
+	mesh: Mesh,
+	meshes: Mesh[],
+	normal: Vector3,
+	touchpoint: Vector3,
+	randomize?: boolean
+) => {
+	const voxelization = _voxelizationBuffer
+		? _voxelizationBuffer
+		: VoxelizationFreeSpace(
+			mesh,
+			printer
+		);
+
+	_voxelizationBuffer = voxelization;
+
+	const _supports = [] as Mesh[];
+	const _voxel = _.minBy(voxelization.PositionsProbe, x => x.Position.distanceTo(touchpoint));
+
+	if (_voxel)
+	{
+		_voxel.Touchpoint = touchpoint;
+		_voxel.TouchpointNormal = normal;
+		_voxel.IsIntersecting = true;
+
+		const path = SupportsRays(meshes, printer, _voxel, randomize ?? false);
+
+		if (path)
+		{
+			_supports.push(
+				_supportCreator(path, touchpoint, printer));
+		}
+	}
+
+	return _supports;
+};
+
 const _supportCreator = (
 	path: Vector3[],
 	to: Vector3,
-	printer: Printer
+	printer: Printer,
 ) => {
 	const head = toUnits(printer.SupportPreset.Head);
 	const connectionSphere = toUnits(printer.SupportPreset.ConnectionSphere);
@@ -104,4 +147,8 @@ const createContactSphere = (
 	return {
 		mesh: mesh
 	};
+};
+
+export const clearSupportCreateBuffer = () => {
+	_voxelizationBuffer = undefined;
 };

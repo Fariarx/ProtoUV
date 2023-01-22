@@ -1,8 +1,6 @@
 import _ from 'lodash';
-import { AppStore } from 'renderer/AppStore';
 import { Printer } from 'renderer/Main/Printer/Configs/Printer';
 import { toUnits } from 'renderer/Shared/Globals';
-import { ThreeHelper } from 'renderer/Shared/Helpers/Three';
 import { BoxGeometry, Intersection, Matrix4, Mesh, MeshStandardMaterial, Raycaster, Vector3 } from 'three';
 import * as THREE from 'three';
 import {  acceleratedRaycast, computeBoundsTree, disposeBoundsTree } from 'three-mesh-bvh';
@@ -102,12 +100,13 @@ export const VoxelizationFreeSpace = (mesh: Mesh, printer: Printer) => {
 				const normalMatrix = new THREE.Matrix3().getNormalMatrix( mesh.matrixWorld );
 				const normalAngle = minIntersection.face.normal.clone().applyMatrix3( normalMatrix ).normalize().angleTo(new Vector3(0, -1, 0)) * (180 / Math.PI);
 
-				if (normalAngle <= 90) {
+				if (normalAngle <= preset.Angle) {
 					result.PositionsProbe.push({
+						TouchpointAngle: normalAngle,
 						Touchpoint: minIntersection.point,
 						Position: new Vector3(x, y, z),
 						IsIntersecting: probe,
-						TouchpointNormal: minIntersection.face!.normal.applyQuaternion(mesh.quaternion)!
+						TouchpointNormal: minIntersection.face!.normal
 					});
 				}
 
@@ -135,11 +134,12 @@ export const VoxelizationFreeSpace = (mesh: Mesh, printer: Printer) => {
 	return result;
 };
 
-type VoxelizationResult = {
+export type VoxelizationResult = {
 	PositionsProbe: PositionProbe[];
 };
 
 export type PositionProbe = {
+  TouchpointAngle?: number;
   TouchpointNormal?: Vector3;
   Touchpoint?: Vector3;
   Position: Vector3;

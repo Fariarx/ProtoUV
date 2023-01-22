@@ -2,7 +2,7 @@ import { ArrowHelper, Mesh, MeshBasicMaterial, Scene, SphereGeometry, Vector3 } 
 import { AppStore } from '../../AppStore';
 
 export class ThreeHelper {
-	static DrawDirLine(origin: Vector3, dir: Vector3, length  = 100, scene: Scene = AppStore.sceneStore.scene)
+	static DrawDirLine(origin: Vector3, dir: Vector3, length  = 100, deleteAfterMs = 60000, scene: Scene = AppStore.sceneStore.scene)
 	{
 		const _dir = dir.clone().normalize();
 		const _origin = origin.clone();
@@ -12,6 +12,11 @@ export class ThreeHelper {
 		const arrowHelper = new ArrowHelper( _dir, _origin, length, hex );
 
 		scene.add( arrowHelper );
+
+		if (deleteAfterMs)
+		{
+			setTimeout(() => scene.remove(arrowHelper), deleteAfterMs);
+		}
 	}
 
 	static DrawPoint(origin: Vector3, color = 0xf27f00, size  = 0.05, deleteAfterMs = 60000, scene: Scene = AppStore.sceneStore.scene)

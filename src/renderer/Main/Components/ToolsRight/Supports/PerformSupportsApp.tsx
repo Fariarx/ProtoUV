@@ -1,9 +1,10 @@
 import { Box } from '@mui/material';
+import { BiEditAlt } from '@react-icons/all-files/bi/BiEditAlt';
 import { MdAddCircleOutline } from '@react-icons/all-files/Md/MdAddCircleOutline';
 import { MdRemoveCircleOutline } from '@react-icons/all-files/Md/MdRemoveCircleOutline';
 import { MdWbAuto } from '@react-icons/all-files/md/MdWbAuto';
 import { observer } from 'mobx-react-lite';
-import { AppStore, Log } from 'renderer/AppStore';
+import { AppStore, Log, Pages } from 'renderer/AppStore';
 import { colors } from 'renderer/Shared/Config';
 import { Dispatch } from 'renderer/Shared/Events';
 import { AppEventEditSupports, AppEventEnum, SupportsEnum } from 'renderer/Shared/Libs/Types';
@@ -15,7 +16,7 @@ export const PerformSupportsApp = observer(() => {
 
 	return <Box sx={{
 		width: '100%',
-		height: '100px',
+		height: 'fit-content',
 		padding: '8px',
 		border: '1px solid ' + colors.background.darkest,
 		borderRight: 'unset',
@@ -71,6 +72,12 @@ export const PerformSupportsApp = observer(() => {
 					}
 				}}>
 				<MdWbAuto transform='scale(1.1)' color={colors.background.light}/>
+			</ToolButton>
+			<ToolButton
+				text='edit supports preset'
+				isActive={false}
+				onClick={() => AppStore.changeState( Pages.ConfiguratorSupports)}>
+				<BiEditAlt transform='scale(1.1)' color={colors.background.light}/>
 			</ToolButton>
 		</Box>
 	</Box>;

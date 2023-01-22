@@ -47,6 +47,10 @@ if (process.env.NODE_ENV === 'production') {
 const isDebug =
   process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
 
+ipcMain.on('electron.isDebug', (event: any) => {
+	event.returnValue = isDebug;
+});
+
 if (isDebug) {
 	// eslint-disable-next-line @typescript-eslint/no-var-requires
 	require('electron-debug')();
@@ -90,6 +94,7 @@ const createWindow = async () => {
 				: path.join(__dirname, '../../.erb/dll/preload.js'),
 			webSecurity: false,
 			sandbox: false,
+			devTools: isDebug
 		},
 		titleBarStyle: 'hidden',
 	});

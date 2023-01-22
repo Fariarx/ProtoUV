@@ -1,4 +1,5 @@
 import { makeObservable } from 'mobx';
+import { bridge } from 'renderer/Shared/Globals';
 import { Mesh, PCFSoftShadowMap, PlaneGeometry, Scene, Vector2, Vector3 } from 'three';
 import { Line2 } from 'three/examples/jsm/lines/Line2';
 import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry';
@@ -130,7 +131,10 @@ export class SceneStore extends SceneInitializer {
 		if (this.printer)
 		{
 			setTimeout(() => {
-				AppStore.sceneStore.handleLoadFile('C:\\Users\\admin\\Downloads\\Old\\V7_Infinity_Cube_Hinge.stl');
+				if (bridge.isDebug())
+				{
+					AppStore.sceneStore.handleLoadFile('C:\\Users\\admin\\Downloads\\Old\\V7_Infinity_Cube_Hinge.stl');
+				}
 				AppStore.performSupports.addCursorToScene();
 			}, 100);
 		}

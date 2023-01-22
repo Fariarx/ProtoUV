@@ -12,6 +12,7 @@ const body = {
 		minimize: () => ipcRenderer.send('electron.minimize'),
 		close: () => ipcRenderer.send('electron.closeWindow'),
 		userData: () => ipcRenderer.sendSync('electron.userData'),
+		isDebug: () => ipcRenderer.sendSync('electron.isDebug'),
 		fs: fs,
 		path: path,
 		url: url,

@@ -51,5 +51,6 @@ export enum Pages {
 	None,
 	Main,
 	Configurator,
-	ConfiguratorManually
+	ConfiguratorManually,
+  ConfiguratorSupports
 }

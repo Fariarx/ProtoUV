@@ -5,6 +5,7 @@ import '../renderer/Shared/Config';
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);
+document.body.style.overflow = 'hidden';
 root.render(<App />);
 
 declare global {

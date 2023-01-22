@@ -7,11 +7,13 @@ import { config, saveConfig } from '../Shared/Config';
 import { colors } from '../Shared/Config';
 import { FlexBoxColumn, FlexBoxColumnFit, flexChildrenCenter } from '../Shared/Styled/FlexBox';
 import { Sizes } from '../Shared/Styled/Sizes';
+import { GridFields, NameField } from './Shared/Edit';
 
 export let tempPrinter: Printer | undefined;
 
 export const ConfiguratorManuallyApp = observer(() => {
 	const printer = tempPrinter ? tempPrinter : Printer.LoadDefaultConfigFromFile();
+
 	if (!printer) {
 		AppStore.changeState(Pages.Configurator);
 		return <Box/>;
@@ -40,7 +42,7 @@ export const ConfiguratorManuallyApp = observer(() => {
 				height: 'fit-content',
 				overflow: 'auto'
 			}}>
-				<NameField printer={printer}/>
+				<NameField text={printer.name} setText={x => printer.name = x}/>
 				<GridFields obj={printer.Resolution} name={'Resolution'}/>
 				<Divider sx={{ mt: Sizes.twelve, mb: Sizes.twelve, transform: 'translateY(12px)', borderColor: colors.background.heavy }}/>
 				<GridFields obj={printer.Workspace} name={'Workspace'}/>
@@ -66,79 +68,3 @@ export const ConfiguratorManuallyApp = observer(() => {
 		</FlexBoxColumn>
 	</FlexBoxColumn>;
 });
-
-const GridFields = (props: {obj: any, name: string}) => <FlexBoxColumnFit sx={{
-	width: '100%',
-	maxWidth: '1000px',
-	height: 'unset'
-}}>
-	<Typography variant={'h6'} sx={{
-		color: colors.background.white,
-		margin: Sizes.eight,
-		marginTop: Sizes.twelve
-	}}>
-		{props.name}
-	</Typography>
-	<Grid container spacing={2} sx={{ width: '100%', height: 'unset' }} >
-		{Object.entries(props.obj)
-			.map((x: [string, unknown]) => <Grid key={x[0]} item xs={3}>
-				<NumberField {...props} pair={x}/>
-			</Grid>)}
-	</Grid>
-</FlexBoxColumnFit>;
-
-const NameField = (props: {printer: Printer}) => {
-	const [error, setterError] = useState(false);
-
-	return <FlexBoxColumnFit sx={{
-		width: '100%',
-		maxWidth: '1000px',
-		height: 'unset'
-	}}>
-		<TextField autoFocus
-			variant="filled"
-			error={error}
-			defaultValue={props.printer.name}
-			label={'Printer configuration name'}
-			sx={{ width: '70%' }}
-			onChange={(y) => {
-				if (y.currentTarget.value && y.currentTarget.value.length > 3 && y.currentTarget.value.length < 128)
-				{
-					props.printer.name = y.currentTarget.value;
-					setterError(false);
-				}
-				else {
-					setterError(true);
-				}
-			}}
-			InputLabelProps={{
-				shrink: true,
-			}}
-		/>
-	</FlexBoxColumnFit>;
-};
-
-const NumberField = (props: {obj: any, name: string, pair: [string, unknown]}) => {
-	const [error, setterError] = useState(false);
-
-	return <TextField variant="filled"
-		label={props.pair[0]}
-		sx={{ width: '100%' }}
-		type="number"
-		error={error}
-		defaultValue={props.pair[1]}
-		onChange={(y) => {
-			if (y.currentTarget.value && y.currentTarget.value !== '0')
-			{
-				props.obj[props.pair[0] as string] = y.currentTarget.value;
-				setterError(false);
-			}
-			else {
-				setterError(true);
-			}
-		}}
-		InputLabelProps={{
-			shrink: true,
-		}}
-	/>;
-};

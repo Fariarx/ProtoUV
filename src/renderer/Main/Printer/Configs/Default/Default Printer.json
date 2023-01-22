@@ -24,13 +24,11 @@
       "Head": 0.4,
       "Body": 0.5,
       "Indent": 0.6,
-      "RetreatFromTheWalls": 3,
       "Angle": 56,
       "PlatformWidth": 3,
       "PlatformHeight": 0.8,
       "Density": 10,
       "Rays": 3,
-      "Sticking": 1,
       "Lifting": 5
     }
   ]

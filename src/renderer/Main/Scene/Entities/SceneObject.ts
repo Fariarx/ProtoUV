@@ -275,6 +275,10 @@ export class SceneObject {
 		});
 	}
 
+	static UpdateSupports(objs: SceneObject[], isVisible: boolean) {
+		objs.forEach(obj => obj.supports?.forEach(support => support.children[0].visible = isVisible));
+	}
+
 	static SearchIndexByMesh(objs: SceneObject[], _mesh: THREE.Mesh) {
 		let _index = -1;
 

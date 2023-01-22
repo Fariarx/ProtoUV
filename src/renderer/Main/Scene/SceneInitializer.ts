@@ -728,14 +728,13 @@ export class SceneInitializer extends SceneBase {
 
 			this.lightFromCamera.position.set(this.activeCamera.position.x, this.activeCamera.position.y, this.activeCamera.position.z);
 
-			/*if (this.activeCamera.position.y >= 0)
-      {
-        SceneObject.UpdateSupportRender(this.groupSelected, true);
-        SceneObject.UpdateSupportRender(SceneObject.GetUniqueInA(this.objects,this.groupSelected), false);
-      }
-      else {
-        SceneObject.UpdateSupportRender(this.objects, false);
-      }*/
+			if (this.activeCamera.position.y >= 0)
+			{
+				SceneObject.UpdateSupports(this.objects, true);
+			}
+			else {
+				SceneObject.UpdateSupports(this.objects, false);
+			}
 
 			this.renderer.render(this.scene, this.activeCamera);
 

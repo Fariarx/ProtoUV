@@ -28,6 +28,7 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { SupportsRemoveCircleApp } from './Main/Components/ToolsRight/Supports/Shared/SupportsRemoveCircleApp';
 import { ConfiguratorSupport } from './ConfiguratorSupport/ConfiguratorSupportApp';
+import { SliceButtonApp } from './Main/Components/Slice/SliceButtonApp';
 
 UpdateScheme();
 
@@ -46,6 +47,7 @@ const Main = observer(() => {
 						<FlexBoxRow>
 							<SceneApp/>
 							<ToolsRightApp/>
+							<SliceButtonApp/>
 						</FlexBoxRow>
 						<ToolsLeftApp/>
 						<ViewChangeApp/>

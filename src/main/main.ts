@@ -5,6 +5,7 @@ import path from 'path';
 import { resolveHtmlPath } from './util';
 
 let mainWindow: BrowserWindow | null = null;
+let workerWindow: BrowserWindow | null = null;
 let mainWindowIsFocused: boolean | undefined;
 
 ipcMain.on('electron.userData', (event: any) => {
@@ -94,14 +95,33 @@ const createWindow = async () => {
 				: path.join(__dirname, '../../.erb/dll/preload.js'),
 			webSecurity: false,
 			sandbox: false,
-			devTools: isDebug
+			nodeIntegration: true,
+			devTools: isDebug,
+			nodeIntegrationInWorker: true,
+			nodeIntegrationInSubFrames: true
 		},
 		titleBarStyle: 'hidden',
+	});
+
+	workerWindow = new BrowserWindow({
+		//show: false,
+		webPreferences: {
+			preload: app.isPackaged
+				? path.join(__dirname, 'preload.js')
+				: path.join(__dirname, '../../.erb/dll/preload.js'),
+			webSecurity: false,
+			sandbox: false,
+			nodeIntegration: true,
+			devTools: isDebug,
+			nodeIntegrationInWorker: true,
+			nodeIntegrationInSubFrames: true
+		}
 	});
 
 	mainWindow.setMenu(null);
 
 	mainWindow.loadURL(resolveHtmlPath('index.html'));
+	workerWindow.loadURL(resolveHtmlPath('index.html'));
 
 	mainWindow.on('ready-to-show', () => {
 		if (!mainWindow) {
@@ -122,6 +142,22 @@ const createWindow = async () => {
 	mainWindow.webContents.setWindowOpenHandler((data: any) => {
 		shell.openExternal(data.url);
 		return { action: 'deny' };
+	});
+
+	ipcMain.on('worker-slice', (event, ...args) => {
+		if(typeof workerWindow === 'undefined') {
+			console.log('WorkerWindow window does not exist');
+			return;
+		}
+    workerWindow!.webContents.send('worker-slice', ...args);
+	});
+
+	ipcMain.on('worker-slice-message', (event, payload) => {
+    mainWindow!.webContents.send('worker-slice-message', payload);
+	});
+
+	ipcMain.on('worker-slice-message-progress', (event, payload) => {
+    mainWindow!.webContents.send('worker-slice-message-progress', payload);
 	});
 };
 

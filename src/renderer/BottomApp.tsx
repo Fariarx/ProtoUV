@@ -7,6 +7,7 @@ import { bridge } from './Shared/Globals';
 import { FlexBoxColumn, FlexBoxRow } from './Shared/Styled/FlexBox';
 import { Sizes } from './Shared/Styled/Sizes';
 
+export const APP_BOTTOM_HEIGHT = 24;
 export const APP_BOTTOM_HEIGHT_PX =  Sizes.twentyFour;
 
 export const LineBottomApp = observer(() => {

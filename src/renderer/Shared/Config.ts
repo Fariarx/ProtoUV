@@ -1,13 +1,13 @@
 import { Restore } from './Libs/Restore';
 
 export const _default = {
-	version: 24,
-	versionPrinterConfigs: 24,
+	version: 25,
+	versionPrinterConfigs: 25,
 	settings: {
 		ui: {
 			opacity: 0.8,
 			sizes: {
-				toolsTab: 170,
+				toolsTab: 200,
 				sceneItemList: 200
 			}
 		},

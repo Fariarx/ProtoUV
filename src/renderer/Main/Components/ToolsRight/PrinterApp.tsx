@@ -26,7 +26,8 @@ export const PrinterApp = observer(() => {
 		}}>
 			<Typography sx={{
 				width: '100%',
-				fontSize: '16px'
+				fontSize: '14px',
+				mt: '1px', ml: '2px'
 			}}>
 				{AppStore.sceneStore.printerName}
 			</Typography>

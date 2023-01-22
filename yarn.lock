@@ -1845,6 +1845,22 @@
     "@typescript-eslint/types" "5.41.0"
     eslint-visitor-keys "^3.3.0"
 
+"@uttori/data-tools@^2.3.0":
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/@uttori/data-tools/-/data-tools-2.4.0.tgz#fc59062a29790a01c2a60597bc7ef8504f9c4495"
+  integrity sha512-9M+SEbmYWmAl2gOmEkpojetJ5kzJpvBAqUSTQz103jJQ43QAX0wtnUuM5CMkmNAmia7GJosBbRPpdKZS4FSCsQ==
+  optionalDependencies:
+    debug "^4.3.4"
+
+"@uttori/image-png@^1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@uttori/image-png/-/image-png-1.3.0.tgz#21fbbc3dbdd52deac06b3918a8952ebcc0746003"
+  integrity sha512-WjIM/QGHB3duzH9jKmT2iWHnikOahhuYlT2U/Yfvt69KQ9iMJcwdJqYPzMMjFlsX+kH7rTiLLqg5U45Nz4WRvA==
+  dependencies:
+    "@uttori/data-tools" "^2.3.0"
+  optionalDependencies:
+    debug "^4.3.3"
+
 "@webassemblyjs/ast@1.11.1":
   version "1.11.1"
   resolved "https://registry.yarnpkg.com/@webassemblyjs/ast/-/ast-1.11.1.tgz#2bfd767eae1a6996f432ff7e8d7fc75679c0b6a7"

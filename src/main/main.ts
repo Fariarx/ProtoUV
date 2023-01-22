@@ -104,7 +104,7 @@ const createWindow = async () => {
 	});
 
 	workerWindow = new BrowserWindow({
-		//show: false,
+		show: false,
 		webPreferences: {
 			preload: app.isPackaged
 				? path.join(__dirname, 'preload.js')

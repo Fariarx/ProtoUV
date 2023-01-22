@@ -45,6 +45,7 @@ export class AppStore {
 	public dropFile = false;
 	public fileCount = 0;
 	public projectFolder?: string;
+	public linearProgress?: number;
 }
 
 export enum Pages {

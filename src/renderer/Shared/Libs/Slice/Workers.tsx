@@ -54,71 +54,31 @@ const _sliceFullScene = (job: Job, finish: () => void) => {
 	printer.workerData.raycast = acceleratedRaycast;
 	printer.workerData.geometry.computeBoundsTree();
 	printer.workerData.geometrySize = new Vector3();
-	console.log(12345);
 
 	new THREE.Box3().setFromObject(new THREE.Mesh(printer.workerData.geometry)).getSize(printer.workerData.geometrySize);
 
 	printer.workerData.voxelSize = calculateVoxelSizes(scene.printer as Printer);
 
 	const maxLayers = Math.ceil((printer.workerData.geometrySize.y / printer.workerData.voxelSize.voxelSizeY));
-
-	const workerCountMax = config.workerCount;
-	const workerCountNow = 0;
-
-	const layerIteratorFromThread = 0;
-	const layerIterator = 0;
-	const layersInterval = 100;
-
-	const result: SliceResult[] = [];
-
 	const printerJson = JSON.stringify(scene.printer);
 
-	//let date = Date.now();
-
-	console.log(1234);
 	const runWorker = (startLayerNum: number, stopLayerNum: number) => {
 		new Promise((resolve, reject) => {
 			bridge.ipcRenderer.send('worker-slice',
 				printerJson, startLayerNum,  stopLayerNum
 			);
 			bridge.ipcRenderer.receive('worker-slice-message', (x: string) => {
-				console.log(x);
-				resolve('done');
+				resolve(x);
 			});
 			bridge.ipcRenderer.receive('worker-slice-message-progress', (progress: number) => {
-				console.log(progress);
+				job.onState(progress);
 			});
-		}).then(x => console.log(x));
-
+		}).then(x => {
+			const result = x as SliceResult[];
+			job.onResult(result);
+			finishJob();
+		});
 	};
 
 	runWorker(0, maxLayers);
-	// const updateWorkers = () => {
-	// 	while (workerCountNow < workerCountMax)
-	// 	{
-	// 		if(layerIterator === maxLayers)
-	// 		{
-	// 			break;
-	// 		}
-
-	// 		const startNum = layerIterator;
-
-	// 		layerIterator += layersInterval;
-
-	// 		if(layerIterator >= maxLayers)
-	// 		{
-	// 			layerIterator = maxLayers;
-	// 			runWorker(startNum, maxLayers);
-	// 			workerCountNow++;
-	// 			break;
-	// 		}
-	// 		else {
-	// 			runWorker(startNum, layerIterator - 1);
-	// 		}
-
-	// 		workerCountNow++;
-	// 	}
-	// };
-
-	// updateWorkers();
 };

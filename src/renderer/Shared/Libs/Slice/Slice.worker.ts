@@ -6,8 +6,7 @@ import { MeshBVH } from 'three-mesh-bvh';
 import { SliceResult, slice } from './Slice';
 
 export const sliceLayers = async (printerJson: string, numLayerFrom: number, numLayerTo: number) => {
-	console.log(125);
-	const arr: SliceResult[] = [];
+	const array: SliceResult[] = [];
 	const start = numLayerFrom;
 
 	const printer = JSON.parse(printerJson) as Printer;
@@ -18,10 +17,10 @@ export const sliceLayers = async (printerJson: string, numLayerFrom: number, num
 	});
 
 	while (numLayerFrom <= numLayerTo) {
-		arr.push(slice(printer, numLayerFrom, geometry, mesh, raycaster));
+		array.push(slice(printer, numLayerFrom, geometry, mesh, raycaster));
 		bridge.ipcRenderer.send('worker-slice-message-progress', (numLayerFrom - start)/(numLayerTo - start));
 		numLayerFrom++;
 	}
 
-	return arr;
+	return array;
 };

@@ -9,12 +9,13 @@
     "lint": "cross-env NODE_ENV=development eslint . --ext .js,.jsx,.ts,.tsx",
     "package": "ts-node ./.erb/scripts/clean.js dist && yarn run build && electron-builder build --publish never",
     "postinstall": "ts-node .erb/scripts/check-native-dep.js && electron-builder install-app-deps && cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.dev.dll.ts && opencollective-postinstall",
-    "start": "ts-node ./.erb/scripts/check-port-in-use.js && yarn run start:renderer",
+    "start": "ts-node ./.erb/scripts/check-port-in-use.js && yarn run build:worker && yarn run start:renderer",
     "start:main": "cross-env NODE_ENV=development electronmon -r ts-node/register/transpile-only ./src/main/main.ts",
     "start:preload": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.preload.dev.ts",
     "start:renderer": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack serve --config ./.erb/configs/webpack.config.renderer.dev.ts",
     "test": "jest",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "build:worker": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.workers.js"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -184,11 +185,11 @@
     "css-loader": "^6.7.1",
     "css-minimizer-webpack-plugin": "^3.4.1",
     "detect-port": "^1.3.0",
-    "electron": "21.2.0",
+    "electron": "22.0.3",
     "electron-builder": "^23.0.3",
     "electron-devtools-installer": "^3.2.0",
     "electron-notarize": "^1.2.1",
-    "electron-rebuild": "^3.2.7",
+    "electron-rebuild": "^3.2.9",
     "electronmon": "^2.0.2",
     "eslint": "^8.12.0",
     "eslint-config-airbnb-base": "^15.0.0",
@@ -209,6 +210,7 @@
     "jest": "^27.5.1",
     "lint-staged": "^12.3.7",
     "mini-css-extract-plugin": "^2.6.0",
+    "node-loader": "^2.0.0",
     "opencollective-postinstall": "^2.0.3",
     "prettier": "^2.6.2",
     "react-refresh": "^0.12.0",
@@ -217,6 +219,7 @@
     "rimraf": "^3.0.2",
     "sass": "^1.49.11",
     "sass-loader": "^12.6.0",
+    "sharp": "^0.31.3",
     "style-loader": "^3.3.1",
     "terser-webpack-plugin": "^5.3.1",
     "ts-jest": "^27.1.4",
@@ -239,10 +242,12 @@
     "@mui/styled-engine-sc": "^5.6.1",
     "@react-icons/all-files": "^4.1.0",
     "@types/lodash": "^4.14.191",
+    "@types/sharp": "^0.31.1",
     "@types/worker-plugin": "^5.0.1",
-    "@uttori/image-png": "^1.3.0",
     "comlink": "^4.3.1",
+    "canvas": "^2.11.0",
     "easy-web-worker": "^1.0.6",
+    "electron-canvas-to-buffer": "^2.0.0",
     "electron-debug": "^3.2.0",
     "electron-log": "^4.4.6",
     "electron-updater": "^4.6.5",
@@ -260,7 +265,7 @@
     "three-mesh-bvh": "^0.5.17",
     "ts-keycode-enum": "^1.0.6",
     "tsyringe": "^4.7.0",
-    "worker-plugin": "^5.0.1"
+    "webpack-node-externals": "^3.0.0"
   },
   "devEngines": {
     "node": ">=14.x"

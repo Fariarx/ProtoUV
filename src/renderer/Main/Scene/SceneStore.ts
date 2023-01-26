@@ -4,10 +4,10 @@ import { Mesh, PCFSoftShadowMap, PlaneGeometry, Scene, Vector2, Vector3 } from '
 import { Line2 } from 'three/examples/jsm/lines/Line2';
 import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry';
 import { singleton } from 'tsyringe';
+import { SceneInitializer } from './SceneInitializer';
 import { AppStore, Log, Pages } from '../../AppStore';
 import { Grid } from '../../Shared/Libs/Tools';
 import { Printer } from '../Printer/Configs/Printer';
-import { SceneInitializer } from './SceneInitializer';
 
 @singleton()
 export class SceneStore extends SceneInitializer {
@@ -21,12 +21,6 @@ export class SceneStore extends SceneInitializer {
 	}
 
 	public setup() {
-		this.renderer.shadowMap.enabled = true;
-		this.renderer.shadowMap.type = PCFSoftShadowMap;
-		this.renderer.setPixelRatio( window.devicePixelRatio);
-		this.renderer.setClearColor(0x000000, 0);
-		this.renderer.sortObjects = true;
-
 		this.scene.add(this.decorations);
 	}
 

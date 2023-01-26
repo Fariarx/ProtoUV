@@ -1,13 +1,11 @@
-import { AppStore } from 'renderer/AppStore';
-import { Printer } from 'renderer/Main/Printer/Configs/Printer';
-import { SceneObject } from 'renderer/Main/Scene/Entities/SceneObject';
-import { config } from 'renderer/Shared/Config';
-import { bridge } from 'renderer/Shared/Globals';
 import * as THREE from 'three';
 import { Vector3 } from 'three';
 import { acceleratedRaycast, computeBoundsTree, disposeBoundsTree } from 'three-mesh-bvh';
 import { Job, WorkerType } from './Job';
-import { SliceResult, calculateVoxelSizes } from './Slice';
+import { AppStore } from '../../../AppStore';
+import { Printer } from '../../../Main/Printer/Configs/Printer';
+import { SceneObject } from '../../../Main/Scene/Entities/SceneObject';
+import { bridge } from '../../Globals';
 
 export let isWorking = false;
 
@@ -63,22 +61,22 @@ const _sliceFullScene = (job: Job, finish: () => void) => {
 	const printerJson = JSON.stringify(scene.printer);
 
 	const runWorker = (startLayerNum: number, stopLayerNum: number) => {
-		new Promise((resolve, reject) => {
-			bridge.ipcRenderer.send('worker-slice',
-				printerJson, startLayerNum,  stopLayerNum
+		new Promise(resolve => {
+			bridge.ipcRenderer.send('capture-page'
 			);
-			bridge.ipcRenderer.receive('worker-slice-message', (x: string) => {
-				resolve(x);
-			});
-			bridge.ipcRenderer.receive('worker-slice-message-progress', (progress: number) => {
-				job.onState(progress);
-			});
 		}).then(x => {
-			const result = x as SliceResult[];
-			job.onResult(result);
+			job.onResult(x);
 			finishJob();
 		});
 	};
 
 	runWorker(0, maxLayers);
+};
+
+export const calculateVoxelSizes = (printer: Printer) => {
+	return {
+		voxelSizeX: .1 * printer.Workspace.SizeX / printer.Resolution.X,
+		voxelSizeY: .1 * printer.PrintSettings.LayerHeight,
+		voxelSizeZ: .1 * printer.Workspace.SizeY / printer.Resolution.Y,
+	};
 };

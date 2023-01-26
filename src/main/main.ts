@@ -1,15 +1,19 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unreachable code error
+
 import electron, { BrowserWindow, app, dialog, ipcMain, shell } from 'electron';
+import fs from 'fs';
 import path from 'path';
+import { Worker } from 'worker_threads';
 import { resolveHtmlPath } from './util';
 
+const userData = electron.app.getPath('userData');
+
 let mainWindow: BrowserWindow | null = null;
-let workerWindow: BrowserWindow | null = null;
 let mainWindowIsFocused: boolean | undefined;
 
 ipcMain.on('electron.userData', (event: any) => {
-	event.returnValue = electron.app.getPath('userData');
+	event.returnValue = userData;
 });
 ipcMain.on('electron.checkFocus', (event: any) => {
 	event.returnValue = mainWindowIsFocused;
@@ -103,25 +107,8 @@ const createWindow = async () => {
 		titleBarStyle: 'hidden',
 	});
 
-	workerWindow = new BrowserWindow({
-		show: false,
-		webPreferences: {
-			preload: app.isPackaged
-				? path.join(__dirname, 'preload.js')
-				: path.join(__dirname, '../../.erb/dll/preload.js'),
-			webSecurity: false,
-			sandbox: false,
-			nodeIntegration: true,
-			devTools: isDebug,
-			nodeIntegrationInWorker: true,
-			nodeIntegrationInSubFrames: true
-		}
-	});
-
 	mainWindow.setMenu(null);
-
 	mainWindow.loadURL(resolveHtmlPath('index.html'));
-	workerWindow.loadURL(resolveHtmlPath('index.html'));
 
 	mainWindow.on('ready-to-show', () => {
 		if (!mainWindow) {
@@ -144,20 +131,21 @@ const createWindow = async () => {
 		return { action: 'deny' };
 	});
 
-	ipcMain.on('worker-slice', (event, ...args) => {
-		if(typeof workerWindow === 'undefined') {
-			console.log('WorkerWindow window does not exist');
-			return;
-		}
-    workerWindow!.webContents.send('worker-slice', ...args);
+	ipcMain.on('worker-slice', (event, f, a, b) => {
+		const worker = new Worker('./src/workers/slice.worker.bundle.js', { workerData: [f, a, b, userData] });
+		worker.on('message', msg => mainWindow!.webContents.send('worker-slice', msg));
+		worker.on('error', error => mainWindow!.webContents.send('worker-slice', 'error in slice worker and ' + error));
+		worker.on('exit', code => mainWindow!.webContents.send('worker-slice', `worker exited with code ${code}`));
 	});
-
-	ipcMain.on('worker-slice-message', (event, payload) => {
-    mainWindow!.webContents.send('worker-slice-message', payload);
-	});
-
-	ipcMain.on('worker-slice-message-progress', (event, payload) => {
-    mainWindow!.webContents.send('worker-slice-message-progress', payload);
+	ipcMain.on('capture-page', (e, screenshot: string) => {
+		const b = atob(screenshot);
+		fs.writeFileSync(userData + '/slice/' + 'b.png',b , 'binary' );
+		const fere = Date.now();
+    mainWindow!.webContents.capturePage().then(image =>
+    {
+    	fs.writeFileSync(userData + '/slice/' + 'screen', image.toPNG() );
+    	console.log(Date.now() - fere);
+    });
 	});
 };
 

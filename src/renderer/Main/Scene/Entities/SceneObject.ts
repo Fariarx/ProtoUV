@@ -2,10 +2,23 @@ import { action, makeObservable, observable, runInAction } from 'mobx';
 import { toUnits } from 'renderer/Shared/Globals';
 import { AppEventDeleteObject, AppEventEnum, AppEventMoveObject, TransformEnum } from 'renderer/Shared/Libs/Types';
 import {
+	BackSide,
+	BufferAttribute,
 	BufferGeometry,
+	DecrementWrapStencilOp,
+	DynamicDrawUsage,
+	EqualDepth,
+	FrontSide,
+	Group,
+	IncrementWrapStencilOp,
+	LineBasicMaterial,
+	LineSegments,
 	Mesh,
+	MeshBasicMaterial,
+	MeshStandardMaterial,
 	Vector3,
 } from 'three';
+import { MeshBVH, MeshBVHVisualizer } from 'three-mesh-bvh';
 import { AppStore } from '../../../AppStore';
 import { Dispatch } from '../../../Shared/Events';
 import { SceneStore } from '../SceneStore';
@@ -37,6 +50,8 @@ export class SceneObject {
 
 	private wasSelected: boolean;
 
+	public temp: any = {};
+
 	constructor(geometry: BufferGeometry,
 		filePath: string,
 		selected = false,
@@ -50,6 +65,131 @@ export class SceneObject {
 		this.mesh.castShadow = true;
 		this.mesh.receiveShadow = false;
 		this.mesh.geometry.center();
+
+		const surfaceModel = this.mesh.clone();
+		surfaceModel.material = new MeshStandardMaterial( {
+			depthFunc: EqualDepth,
+		} );
+		surfaceModel.renderOrder = 1;
+
+		const lineGeometry = new BufferGeometry();
+		const linePosAttr = new BufferAttribute( new Float32Array( 300000 ), 3, false );
+		linePosAttr.setUsage( DynamicDrawUsage );
+		lineGeometry.setAttribute( 'position', linePosAttr );
+		const clippingLineMin = new  LineSegments( lineGeometry, new LineBasicMaterial() );
+	 clippingLineMin.material.color.set( 0x00acc1 ).convertSRGBToLinear();
+		 clippingLineMin.frustumCulled = false;
+	 clippingLineMin.renderOrder = 3;
+
+	 clippingLineMin.scale.copy( this.mesh.scale );
+		clippingLineMin.position.set( 0, 0, 0 );
+		clippingLineMin.quaternion.identity();
+
+		this.mesh.updateMatrixWorld( true );
+
+		// Adjust all the materials to draw front and back side with stencil for clip cap
+		const matSet = new Set();
+		const materialMap = new Map();
+		this.mesh.updateMatrixWorld( true );
+		this.mesh.traverse( c => {
+
+			if ( materialMap.has( c.material ) ) {
+
+				c.material = materialMap.get( c.material );
+				return;
+
+			}
+
+			matSet.add( c.material );
+
+			const material = c.material.clone();
+			material.color.set( 0xffffff );
+			material.roughness = 1.0;
+			material.metalness = 0.0;
+			material.side = FrontSide;
+			material.stencilWrite = true;
+			material.stencilFail = IncrementWrapStencilOp;
+			material.stencilZFail = IncrementWrapStencilOp;
+			material.stencilZPass = IncrementWrapStencilOp;
+			material.clippingPlanes = [this.sceneStore.clippingPlaneMin];
+
+			materialMap.set( c.material, material );
+			c.material = material;
+
+		} );
+
+		materialMap.clear();
+
+		const backSideModel = this.mesh.clone();
+		backSideModel.traverse( c => {
+
+			if ( c.isMesh ) {
+
+				if ( materialMap.has( c.material ) ) {
+
+					c.material = materialMap.get( c.material );
+					return;
+
+				}
+
+				const material = c.material.clone();
+				material.color.set( 0xffffff );
+				material.roughness = 1.0;
+				material.metalness = 0.0;
+				material.colorWrite = false;
+				material.depthWrite = false;
+				material.side =  BackSide;
+				material.stencilWrite = true;
+				material.stencilFail =  DecrementWrapStencilOp;
+				material.stencilZFail = DecrementWrapStencilOp;
+				material.stencilZPass =  DecrementWrapStencilOp;
+				material.clippingPlanes = [this.sceneStore.clippingPlaneMin];
+
+				materialMap.set( c.material, material );
+				c.material = material;
+
+			}
+
+		} );
+
+		const colliderBvh = new MeshBVH( this.mesh.geometry, { maxLeafTris: 3 } );
+		this.mesh.geometry.boundsTree = colliderBvh;
+
+		const colliderMesh = new Mesh( this.mesh.geometry,  new MeshBasicMaterial( {
+			wireframe: true,
+			transparent: true,
+			opacity: 0.01,
+			depthWrite: false,
+		} ) );
+		colliderMesh.renderOrder = 2;
+		colliderMesh.position.copy( this.mesh.position );
+		colliderMesh.rotation.copy( this.mesh.rotation );
+		colliderMesh.scale.copy( this.mesh.scale );
+
+		const bvhHelper = new MeshBVHVisualizer( colliderMesh, parseInt( 1 ) );
+		bvhHelper.depth = parseInt( 1 );
+		bvhHelper.update();
+
+		const group = new Group();
+		group.add( this.mesh, backSideModel, surfaceModel, colliderMesh, bvhHelper,clippingLineMin );
+
+		bvhHelper.visible = true;
+		colliderMesh.visible = true;
+
+		this.mesh.visible = true;
+		backSideModel.visible = true;
+
+		const clippingPlane = this.sceneStore.clippingPlaneMin;
+		clippingPlane.normal.set( 0, 0,   - 1 );
+		clippingPlane.constant = 0;
+		clippingPlane.applyMatrix4( this.sceneStore.clippingPlaneMeshMin.matrixWorld );
+
+		this.temp.colliderMesh = colliderMesh;
+		this.temp.outlineLines = clippingLineMin;
+		this.temp.colliderBvh = colliderBvh;
+
+		this.mesh= new Mesh(geometry, sceneStore.materialForObjects.normal);
+		this.mesh.add( group);
 
 		this.minY = new Vector3();
 		this.maxY = new Vector3();
@@ -160,20 +300,6 @@ export class SceneObject {
 	};
 
 	AlignToPlaneY = (deletedSupportsDisabled?: boolean) => {
-		this.mesh.position.setY(0);
-		this.UpdateSize();
-
-		Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
-			from: this.mesh.position.clone(),
-			to: this.mesh.position.clone().setY(this.supports !== undefined && this.sceneStore.printer
-				? -this.minY.y + toUnits(this.sceneStore.printer.SupportPreset.Lifting)
-				: -this.minY.y),
-			sceneObject: this as SceneObject,
-			instrument: TransformEnum.Move,
-			deletedSupportsDisabled: deletedSupportsDisabled
-		} as AppEventMoveObject);
-
-		this.UpdateSize();
 	};
 
 	AlignToPlaneXZ = (gridVec: Vector3) => {

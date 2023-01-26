@@ -2,23 +2,25 @@ import { computed, observable } from 'mobx';
 import {
 	DirectionalLight, DoubleSide,
 	FrontSide, Group,
+	LineSegments,
 	Material, MeshLambertMaterial, MeshPhongMaterial,
 	Object3D,
 	OrthographicCamera,
-	PerspectiveCamera, Scene, ShaderMaterial,
+	PerspectiveCamera, Plane, Scene, ShaderMaterial,
 	ShadowMaterial, Vector3,
 	WebGLRenderer
 } from 'three';
+import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import { OutlineEffect } from 'three/examples/jsm/effects/OutlineEffect';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial';
+import { SceneObject } from './Entities/SceneObject';
 import { config } from '../../Shared/Config';
 import { colors } from '../../Shared/Config';
 import { toNormalizedRGBArray } from '../../Shared/Libs/Tools';
 import { Printer } from '../Printer/Configs/Printer';
-import { SceneObject } from './Entities/SceneObject';
 
 export abstract class SceneBase {
 	public renderer: WebGLRenderer = new WebGLRenderer({
@@ -26,7 +28,7 @@ export abstract class SceneBase {
 		alpha:true,
 	});
 	public outlineEffectRenderer: OutlineEffect = new OutlineEffect( this.renderer, {
-		defaultThickness:0.0005
+		defaultThickness:0.0015
 	});
 	public materialForSupports = {
 		normal: new MeshLambertMaterial({ transparent: true, opacity: 0.6, color: '#5bc3fc' }),
@@ -38,12 +40,29 @@ export abstract class SceneBase {
 		linewidth: 1.5
 	});
 
+	public clippingLineMin!: LineSegments;
+	public clippingPlaneMin = new Plane(new Vector3(0, 1, 0), 0.5);
+	//public clippingPlaneMax = new Plane(new Vector3(0, -1, 0), 1);
+
+	public clippingPlaneMeshMin= new THREE.Mesh( new THREE.PlaneBufferGeometry(), new THREE.MeshBasicMaterial( {
+		side: THREE.DoubleSide,
+		stencilWrite: true,
+		stencilFunc: THREE.NotEqualStencilFunc,
+		stencilFail: THREE.ZeroStencilOp,
+		stencilZFail: THREE.ZeroStencilOp,
+		stencilZPass: THREE.ZeroStencilOp,
+	} ) );
+
 	public materialsForScene = {
 		default: {
 			normal: new MeshPhongMaterial( { color: '#f8a745', emissive:'#ffd4d4',
-				emissiveIntensity: 0.15, flatShading: true, side: DoubleSide, shininess: 20, opacity: 0.7, transparent: true } ),
+				emissiveIntensity: 0.15, flatShading: true, side: DoubleSide,
+				shininess: 20, opacity: 0.7, transparent: true,
+				clippingPlanes: [this.clippingPlaneMin]
+			} ),
 			select: new MeshPhongMaterial( { color: '#858dff', emissive:'#ffffff',
-				emissiveIntensity: 0.15, side: DoubleSide } ),
+				emissiveIntensity: 0.15, side: DoubleSide, shininess: 90, stencilWrite: true,
+				clippingPlanes: [this.clippingPlaneMin] } ),
 		} as MaterialForScene,
 	};
 

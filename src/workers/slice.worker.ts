@@ -1,25 +1,12 @@
-
+import fs from 'fs';
 import { Printer } from 'renderer/Main/Printer/Configs/Printer';
-import { BufferGeometry, Raycaster } from 'three';
+import { BufferGeometryLoader, Raycaster } from 'three';
 import * as THREE from 'three';
 import { MeshBVH } from 'three-mesh-bvh';
+import { parentPort, workerData } from 'worker_threads';
+import * as zlib from 'zlib';
 
-const material = new THREE.MeshPhongMaterial( { color: '#f8a745', emissive:'#ffd4d4', emissiveIntensity:0.3 , flatShading: true, side: THREE.DoubleSide, shininess: 60 } );
-
-export const calculateVoxelSizes = (printer: Printer) => {
-	return {
-		voxelSizeX: .1 * printer.Workspace.SizeX / printer.Resolution.X,
-		voxelSizeY: .1 * printer.PrintSettings.LayerHeight,
-		voxelSizeZ: .1 * printer.Workspace.SizeY / printer.Resolution.Y,
-	};
-};
-
-export type SliceResult = {
-        image: Uint8Array;
-        voxelCount: number;
-};
-
-export const slice = (printer: Printer, layer: number, geometry: BufferGeometry, mesh: MeshBVH, raycaster: Raycaster) => {
+const slice = async (printer: Printer, layer: number, mesh: MeshBVH, raycaster: Raycaster) => {
 	const voxelSizes = printer.workerData.voxelSize;
 
 	const startPixelPositionX = printer.workerData.gridSize.x / 2 - voxelSizes.voxelSizeX * printer.Resolution.X / 2;
@@ -95,8 +82,46 @@ export const slice = (printer: Printer, layer: number, geometry: BufferGeometry,
 		indexPixelX += 1;
 	}
 
-	return {
-		image:imageBuffer,
-		voxelCount: voxelDrawCount
-	} as SliceResult;
+	fs.writeFileSync(userData +'/slice/' + layer +'.layer',  zlib.gzipSync(imageBuffer), 'binary');
 };
+
+export const sliceLayers = async (printerJson: string, numLayerFrom: number, numLayerTo: number) => {
+	const start = numLayerFrom;
+
+	const printer = JSON.parse(printerJson) as Printer;
+	const raycaster = new Raycaster();
+	const geometry = new BufferGeometryLoader().parse(printer.workerData.geometry);
+	const mesh = new MeshBVH(geometry, {
+		maxLeafTris: 20
+	});
+
+	const _w = printer.Resolution.X;
+	const _h = printer.Resolution.Y;
+
+	const _slice = (layer: number) => {
+		slice(printer, layer, mesh, raycaster);
+	};
+
+	while (numLayerFrom <= numLayerTo) {
+		_slice(numLayerFrom);
+
+		parentPort?.postMessage((numLayerFrom - start)/(numLayerTo - start));
+
+		numLayerFrom++;
+	}
+};
+
+const userData = workerData[3];
+
+if (fs.existsSync(userData +'/slice'))
+{
+	fs.rmSync(userData +'/slice', { recursive: true, force: true });
+}
+fs.mkdirSync(userData +'/slice');
+
+parentPort?.postMessage(userData);
+sliceLayers(workerData[0], workerData[1], workerData[2]).then(x => {
+	parentPort?.postMessage('slice finished from worker');
+});
+
+parentPort?.postMessage('slice started from worker');

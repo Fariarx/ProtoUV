@@ -1,15 +1,19 @@
 import { runInAction } from 'mobx';
 import { WheelEvent } from 'React';
+import { bridge } from 'renderer/Shared/Globals';
 import {
-	AmbientLight, ArrowHelper, BufferGeometry,
-	DirectionalLight,
-	Group, MathUtils, Mesh, Object3D, OrthographicCamera, PerspectiveCamera, Raycaster, Vector3
+	AmbientLight, ArrowHelper, BufferAttribute,
+	BufferGeometry,
+	DirectionalLight, DynamicDrawUsage, Group, Line3, LineBasicMaterial, LineSegments, MathUtils, Matrix4, Mesh, Object3D, OrthographicCamera, PCFSoftShadowMap, PerspectiveCamera, Plane, Raycaster, Vector3, sRGBEncoding
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader';
+import { CONTAINED } from 'three-mesh-bvh';
 import { Key } from 'ts-keycode-enum';
 import { container } from 'tsyringe';
+import { SceneObject } from './Entities/SceneObject';
+import { SceneBase } from './SceneBase';
 import { AppStore, Log } from '../../AppStore';
 import { APP_HEADER_HEIGHT } from '../../HeaderApp';
 import { config, saveConfig } from '../../Shared/Config';
@@ -21,8 +25,6 @@ import { SubscribersDoubleMouseClick, SubscribersMouseDown, SubscribersMouseMove
 import { AppEventEnum, AppEventMoveObject, AppEventSelectionChanged, SupportsEnum, TransformEnum } from '../../Shared/Libs/Types';
 import { clearSupportCreateBuffer } from '../Components/ToolsRight/Supports/Shared/SupportsGen';
 import { ToolsRightStore } from '../Components/ToolsRight/ToolsRightStore';
-import { SceneObject } from './Entities/SceneObject';
-import { SceneBase } from './SceneBase';
 
 export class SceneInitializer extends SceneBase {
 	private temp: any = {};
@@ -30,7 +32,19 @@ export class SceneInitializer extends SceneBase {
 	public constructor() {
 		super();
 
-		this.renderer.localClippingEnabled = false;
+		this.renderer.setPixelRatio( window.devicePixelRatio);
+		this.renderer.setClearColor(0x000000, 0);
+		this.renderer.sortObjects = true;
+
+		this.renderer.localClippingEnabled = true;
+		this.renderer.shadowMap.enabled = true;
+		this.renderer.shadowMap.type = PCFSoftShadowMap;
+		this.renderer.outputEncoding = sRGBEncoding;
+
+		this.clippingPlaneMeshMin.scale.setScalar( 1 );
+		this.clippingPlaneMeshMin.material.color.set( 0x80deea ).convertLinearToSRGB();
+		this.clippingPlaneMeshMin.renderOrder = 2;
+		this.scene.add(this.clippingPlaneMeshMin);
 
 		this.setupWindowResize();
 		this.setupLight();
@@ -704,6 +718,112 @@ export class SceneInitializer extends SceneBase {
 		const _animate = () => {
 			this.renderer.clearDepth(); // important!
 
+			if (!this.groupSelectedLast) {return;}
+			const inverseMatrix = new Matrix4();
+			const localPlane = new Plane();
+			const tempLine = new  Line3();
+			const tempVector = new  Vector3();
+			const tempVector1 = new  Vector3();
+			const tempVector2 = new Vector3();
+			const tempVector3 = new Vector3();
+
+			this.clippingPlaneMin.constant = 0;
+
+			this.clippingPlaneMeshMin.updateMatrixWorld();
+			this.clippingPlaneMin.applyMatrix4( this.clippingPlaneMeshMin.matrixWorld );
+
+			// get the clipping plane in the local space of the BVH
+		 inverseMatrix.copy( this.groupSelectedLast .temp. colliderMesh.matrixWorld ).invert();
+			localPlane.copy( this.clippingPlaneMin ).applyMatrix4( inverseMatrix );
+
+			this.clippingPlaneMin.normal.set( 0, 0, 1);
+
+			let index = 0;
+			const posAttr =  this.groupSelectedLast .temp.outlineLines.geometry.attributes.position;
+			const startTime = window.performance.now();
+			this.groupSelectedLast .temp.colliderBvh.shapecast( {
+
+				intersectsBounds: box => {return CONTAINED;
+
+				},
+
+				intersectsTriangle: tri => {
+
+					// check each triangle edge to see if it intersects with the plane. If so then
+					// add it to the list of segments.
+					let count = 0;
+
+					tempLine.start.copy( tri.a );
+					tempLine.end.copy( tri.b );
+					if ( localPlane.intersectLine( tempLine, tempVector ) ) {
+
+						posAttr.setXYZ( index, tempVector.x, tempVector.y, tempVector.z );
+						index ++;
+						count ++;
+
+					}
+
+					tempLine.start.copy( tri.b );
+					tempLine.end.copy( tri.c );
+					if ( localPlane.intersectLine( tempLine, tempVector ) ) {
+
+						posAttr.setXYZ( index, tempVector.x, tempVector.y, tempVector.z );
+						count ++;
+						index ++;
+
+					}
+
+					tempLine.start.copy( tri.c );
+					tempLine.end.copy( tri.a );
+					if ( localPlane.intersectLine( tempLine, tempVector ) ) {
+
+						posAttr.setXYZ( index, tempVector.x, tempVector.y, tempVector.z );
+						count ++;
+						index ++;
+
+					}
+
+					// When the plane passes through a vertex and one of the edges of the triangle, there will be three intersections, two of which must be repeated
+					if ( count === 3 ) {
+
+						tempVector1.fromBufferAttribute( posAttr, index - 3 );
+						tempVector2.fromBufferAttribute( posAttr, index - 2 );
+						tempVector3.fromBufferAttribute( posAttr, index - 1 );
+						// If the last point is a duplicate intersection
+						if ( tempVector3.equals( tempVector1 ) || tempVector3.equals( tempVector2 ) ) {
+
+							count --;
+							index --;
+
+						} else if ( tempVector1.equals( tempVector2 ) ) {
+
+							// If the last point is not a duplicate intersection
+							// Set the penultimate point as a distinct point and delete the last point
+							posAttr.setXYZ( index - 2, tempVector3 );
+							count --;
+							index --;
+
+						}
+
+					}
+
+					// If we only intersected with one or three sides then just remove it. This could be handled
+					// more gracefully.
+					if ( count !== 2 ) {
+
+						index -= count;
+
+					}
+
+				},
+
+			} );
+
+			// set the draw range to only the new segments and offset the lines so they don't intersect with the geometry
+			this.groupSelectedLast .temp.outlineLines.geometry.setDrawRange( 0, index );
+			this.groupSelectedLast .temp.outlineLines.position.copy( this.clippingPlaneMin.normal ).multiplyScalar( - 0.00001 );
+			posAttr.needsUpdate = true;
+
 			// if dumping enabled
 			this.orbitControls.update();
 
@@ -754,6 +874,12 @@ export class SceneInitializer extends SceneBase {
 
 				if (this.activeCamera.position.y >= 0)
 				{
+					// this.renderer.setSize( 333, 333 );
+					// this.renderer.render( this.scene, this.activeCamera );
+					// const screenshot = this.renderer.domElement.toDataURL('image/png');
+					// console.log(screenshot);
+					// bridge.ipcRenderer.send('capture-page', screenshot.replace('data:image/png;base64,','')
+					// );
 					this.outlineEffectRenderer.renderOutline(this.scene, this.activeCamera);
 				}
 			}, 500);

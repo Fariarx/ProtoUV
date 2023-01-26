@@ -1,0 +1,15 @@
+C:\Users\admin\Github\ProtoUV\background\core\bin\Debug\net6.0\core.exe
+C:\Users\admin\Github\ProtoUV\background\core\bin\Debug\net6.0\core.deps.json
+C:\Users\admin\Github\ProtoUV\background\core\bin\Debug\net6.0\core.runtimeconfig.json
+C:\Users\admin\Github\ProtoUV\background\core\bin\Debug\net6.0\core.dll
+C:\Users\admin\Github\ProtoUV\background\core\bin\Debug\net6.0\core.pdb
+C:\Users\admin\Github\ProtoUV\background\core\obj\Debug\net6.0\core.csproj.AssemblyReference.cache
+C:\Users\admin\Github\ProtoUV\background\core\obj\Debug\net6.0\core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\admin\Github\ProtoUV\background\core\obj\Debug\net6.0\core.AssemblyInfoInputs.cache
+C:\Users\admin\Github\ProtoUV\background\core\obj\Debug\net6.0\core.AssemblyInfo.cs
+C:\Users\admin\Github\ProtoUV\background\core\obj\Debug\net6.0\core.csproj.CoreCompileInputs.cache
+C:\Users\admin\Github\ProtoUV\background\core\obj\Debug\net6.0\core.dll
+C:\Users\admin\Github\ProtoUV\background\core\obj\Debug\net6.0\refint\core.dll
+C:\Users\admin\Github\ProtoUV\background\core\obj\Debug\net6.0\core.pdb
+C:\Users\admin\Github\ProtoUV\background\core\obj\Debug\net6.0\core.genruntimeconfig.cache
+C:\Users\admin\Github\ProtoUV\background\core\obj\Debug\net6.0\ref\core.dll

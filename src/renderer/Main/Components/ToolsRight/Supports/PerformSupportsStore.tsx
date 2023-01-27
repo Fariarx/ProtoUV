@@ -33,20 +33,23 @@ export class PerformSupportsStore {
 			? SupportsEnum.None
 			: state;
 
-		if (state === SupportsEnum.Add)
+		if (AppStore.sceneStore.groupSelectedLast)
 		{
-			if (! AppStore.sceneStore.groupSelectedLast.supports)
+			if (state === SupportsEnum.Add)
 			{
-				AppStore.sceneStore.groupSelectedLast.supports = [];
-				AppStore.sceneStore.groupSelectedLast.AlignToPlaneY();
+				if (! AppStore.sceneStore.groupSelectedLast.supports)
+				{
+					AppStore.sceneStore.groupSelectedLast.supports = [];
+					AppStore.sceneStore.groupSelectedLast.AlignToPlaneY();
+				}
 			}
-		}
-		else {
-			if (AppStore.sceneStore.groupSelectedLast.supports
+			else {
+				if (AppStore.sceneStore.groupSelectedLast.supports
           && AppStore.sceneStore.groupSelectedLast.supports.length === 0)
-			{
-				AppStore.sceneStore.groupSelectedLast.supports = undefined;
-				AppStore.sceneStore.groupSelectedLast.AlignToPlaneY();
+				{
+					AppStore.sceneStore.groupSelectedLast.supports = undefined;
+					AppStore.sceneStore.groupSelectedLast.AlignToPlaneY();
+				}
 			}
 		}
 

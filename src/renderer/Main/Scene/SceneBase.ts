@@ -74,16 +74,13 @@ export abstract class SceneBase {
 
 	public materialsForScene = {
 		default: {
-			normal: new MeshStandardMaterial( { color: '#f8a745', emissive:'#ffd4d4',
-				emissiveIntensity: 0.15, flatShading: true, side: DoubleSide,
-				opacity: 0.7, transparent: true,
-				clippingPlanes: [this.clippingPlaneMin],
-				depthFunc: EqualDepth,
+			normal: new MeshStandardMaterial( {  color: '#ffa600', side: DoubleSide,
+				stencilWrite: true, metalness: 0.1,
+				clippingPlanes: [this.clippingPlaneMin]
 			} ),
 			select: new MeshStandardMaterial( { color: '#ffffff', side: DoubleSide,
 				stencilWrite: true, metalness: 0.1,
 				clippingPlanes: [this.clippingPlaneMin] } ),
-			depthFunc: EqualDepth,
 		} as MaterialForScene,
 	};
 

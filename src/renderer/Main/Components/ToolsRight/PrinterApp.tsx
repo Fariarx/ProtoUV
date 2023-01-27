@@ -18,6 +18,7 @@ export const PrinterApp = observer(() => {
 		borderRight: 'unset',
 		backgroundColor: colors.background.dark,
 		borderRadius: Sizes.four + ' 0' + ' 0 ' + Sizes.four,
+		userSelect: 'none',
 		mt: 1,
 	}}>
 		<Box sx={{

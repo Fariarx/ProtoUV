@@ -544,8 +544,9 @@ export class SceneInitializer extends SceneBase {
 		});
 
 		SubscribersDoubleMouseClick.push(() => {
-
-			AppStore.transform.changeState(TransformEnum.None);
+			AppStore.transform.changeState(TransformEnum.None === AppStore.transform.state
+				? TransformEnum.Move
+				: TransformEnum.None);
 		});
 	};
 	public updateSelectionChanged = () => {
@@ -828,7 +829,7 @@ export class SceneInitializer extends SceneBase {
 		}
 	};
 
-	public animate = () => {
+	public animate = (force?: boolean) => {
 		const frameLag = () => {
 			if (this.temp.needAnimateTimer)
 			{
@@ -856,8 +857,6 @@ export class SceneInitializer extends SceneBase {
 
 		const _animate = () => {
 			this.renderer.clearDepth(); // important!
-
-			this.someClippingShit();
 
 			// if dumping enabled
 			this.orbitControls.update();
@@ -922,12 +921,13 @@ export class SceneInitializer extends SceneBase {
 
 			this.stats.update();
 
+			this.someClippingShit();
 			/*if (this.isTransformWorking) {
         requestAnimationFrame(_animate);
       }*/
 		};
 
-		if (frameLag())
+		if (frameLag() && force !== true)
 		{
 			return;
 		}

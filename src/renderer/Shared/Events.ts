@@ -1,10 +1,10 @@
 import { runInAction } from 'mobx';
 import { clearSupportCreateBuffer } from 'renderer/Main/Components/ToolsRight/Supports/Shared/SupportsGen';
 import { Mesh, Vector3 } from 'three';
-import { AppStore } from '../AppStore';
 import { SceneObject } from './../Main/Scene/Entities/SceneObject';
 import { config } from './Config';
 import { AppEvent, AppEventAddObject, AppEventArguments, AppEventDeleteObject, AppEventEditSupports, AppEventEnum, AppEventMoveObject, TransformEnum } from './Libs/Types';
+import { AppStore } from '../AppStore';
 
 export const Dispatch = (name: AppEventEnum, args: typeof AppEventArguments) => {
 	const message = {
@@ -163,6 +163,8 @@ const objectTransform = (message: AppEvent) => {
 	if(!event.renderBreak)
 	{
 		AppStore.sceneStore.animate();
+		setTimeout(() =>
+			AppStore.sceneStore.animate(true));
 	}
 };
 

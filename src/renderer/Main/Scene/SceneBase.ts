@@ -1,24 +1,42 @@
-import { computed, observable } from 'mobx';
 import {
-	DirectionalLight, DoubleSide,
-	FrontSide, Group,
+	computed,
+	observable,
+} from 'mobx';
+import * as THREE from 'three';
+import {
+	DirectionalLight,
+	DoubleSide,
+	EqualDepth,
+	FrontSide,
+	Group,
 	LineSegments,
-	Material, MeshLambertMaterial, MeshPhongMaterial,
+	Material,
+	MeshLambertMaterial,
+	MeshPhongMaterial,
+	MeshStandardMaterial,
 	Object3D,
 	OrthographicCamera,
-	PerspectiveCamera, Plane, Scene, ShaderMaterial,
-	ShadowMaterial, Vector3,
-	WebGLRenderer
+	PerspectiveCamera,
+	Plane,
+	Scene,
+	ShaderMaterial,
+	ShadowMaterial,
+	Vector3,
+	WebGLRenderer,
 } from 'three';
-import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
+import {
+	TransformControls,
+} from 'three/examples/jsm/controls/TransformControls';
 import { OutlineEffect } from 'three/examples/jsm/effects/OutlineEffect';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial';
+
 import { SceneObject } from './Entities/SceneObject';
-import { config } from '../../Shared/Config';
-import { colors } from '../../Shared/Config';
+import {
+	colors,
+	config,
+} from '../../Shared/Config';
 import { toNormalizedRGBArray } from '../../Shared/Libs/Tools';
 import { Printer } from '../Printer/Configs/Printer';
 
@@ -41,28 +59,42 @@ export abstract class SceneBase {
 	});
 
 	public clippingLineMin!: LineSegments;
-	public clippingPlaneMin = new Plane(new Vector3(0, 1, 0), 0.5);
-	//public clippingPlaneMax = new Plane(new Vector3(0, -1, 0), 1);
+	public clippingPlaneMin = new Plane();
+	public clippingPlaneMax = new Plane();
 
-	public clippingPlaneMeshMin= new THREE.Mesh( new THREE.PlaneBufferGeometry(), new THREE.MeshBasicMaterial( {
-		side: THREE.DoubleSide,
+	public clippingPlaneMeshMin = new THREE.Mesh( new THREE.PlaneBufferGeometry(), new THREE.MeshStandardMaterial({
+		color: '#56fd5f',  side: DoubleSide,
+		transparent: true,
 		stencilWrite: true,
+		stencilRef: 0,
 		stencilFunc: THREE.NotEqualStencilFunc,
-		stencilFail: THREE.ZeroStencilOp,
-		stencilZFail: THREE.ZeroStencilOp,
-		stencilZPass: THREE.ZeroStencilOp,
-	} ) );
+		stencilFail: THREE.ReplaceStencilOp,
+		stencilZFail: THREE.ReplaceStencilOp,
+		stencilZPass: THREE.ReplaceStencilOp,
+	}));
+	public clippingPlaneMeshMax = new THREE.Mesh( new THREE.PlaneBufferGeometry(), new THREE.MeshStandardMaterial({
+		color: '#56fd5f',  side: DoubleSide,
+		transparent: true,
+		stencilWrite: true,
+		stencilRef: 0,
+		stencilFunc: THREE.NotEqualStencilFunc,
+		stencilFail: THREE.ReplaceStencilOp,
+		stencilZFail: THREE.ReplaceStencilOp,
+		stencilZPass: THREE.ReplaceStencilOp,
+	}));
 
 	public materialsForScene = {
 		default: {
-			normal: new MeshPhongMaterial( { color: '#f8a745', emissive:'#ffd4d4',
+			normal: new MeshStandardMaterial( { color: '#f8a745', emissive:'#ffd4d4',
 				emissiveIntensity: 0.15, flatShading: true, side: DoubleSide,
-				shininess: 20, opacity: 0.7, transparent: true,
-				clippingPlanes: [this.clippingPlaneMin]
+				opacity: 0.7, transparent: true,
+				clippingPlanes: [this.clippingPlaneMin],
+				depthFunc: EqualDepth,
 			} ),
-			select: new MeshPhongMaterial( { color: '#858dff', emissive:'#ffffff',
-				emissiveIntensity: 0.15, side: DoubleSide, shininess: 90, stencilWrite: true,
+			select: new MeshStandardMaterial( { color: '#ffffff', side: DoubleSide,
+				stencilWrite: true, metalness: 0.1,
 				clippingPlanes: [this.clippingPlaneMin] } ),
+			depthFunc: EqualDepth,
 		} as MaterialForScene,
 	};
 

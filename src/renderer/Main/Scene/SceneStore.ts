@@ -1,11 +1,22 @@
 import { makeObservable } from 'mobx';
 import { bridge } from 'renderer/Shared/Globals';
-import { Mesh, PCFSoftShadowMap, PlaneGeometry, Scene, Vector2, Vector3 } from 'three';
+import {
+	Mesh,
+	PlaneGeometry,
+	Scene,
+	Vector2,
+	Vector3,
+} from 'three';
 import { Line2 } from 'three/examples/jsm/lines/Line2';
 import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry';
 import { singleton } from 'tsyringe';
+
 import { SceneInitializer } from './SceneInitializer';
-import { AppStore, Log, Pages } from '../../AppStore';
+import {
+	AppStore,
+	Log,
+	Pages,
+} from '../../AppStore';
 import { Grid } from '../../Shared/Libs/Tools';
 import { Printer } from '../Printer/Configs/Printer';
 
@@ -75,7 +86,7 @@ export class SceneStore extends SceneInitializer {
 			const plane2 = new Mesh(geometry, this.materialForPlaneShadow);
 			plane2.rotateX(-Math.PI / 2);
 			plane2.receiveShadow = true;
-			plane2.position.set(this.gridSize.x / 2, 0.02, this.gridSize.z / 2);
+			plane2.position.set(this.gridSize.x / 2, 0, this.gridSize.z / 2);
 
 			this.decorations.add(plane2);
 		}
@@ -105,6 +116,8 @@ export class SceneStore extends SceneInitializer {
 
 			const line = new Line2(geometry, this.materialLine);
 
+			line.renderOrder = 0.5;
+
 			scene.add(line);
 
 			return {
@@ -118,7 +131,7 @@ export class SceneStore extends SceneInitializer {
 		};
 
 		this.grid = createPrinterGrid(this.gridSize, this.scene);
-		this.grid.obj.position.set(0, 0.02, 0);
+		this.grid.obj.position.set(0, 0.00001, 0);
 
 		this.updateCameraLookPosition();
 
@@ -132,6 +145,8 @@ export class SceneStore extends SceneInitializer {
 				AppStore.performSupports.addCursorToScene();
 			}, 100);
 		}
+
+		this.clippingPlaneMeshMin.scale.setScalar(Math.max(this.gridSize.x, this.gridSize.z) * 3);
 
 		this.animate();
 	}

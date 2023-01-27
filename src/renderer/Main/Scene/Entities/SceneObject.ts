@@ -17,13 +17,17 @@ import {
 	FrontSide,
 	Group,
 	IncrementWrapStencilOp,
+	Line3,
 	LineBasicMaterial,
 	LineSegments,
+	Matrix4,
 	Mesh,
 	MeshBasicMaterial,
 	MeshStandardMaterial,
+	Plane,
 	Vector3,
 } from 'three';
+import { mergeBufferGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils';
 import { MeshBVH } from 'three-mesh-bvh';
 
 import { AppStore } from '../../../AppStore';
@@ -56,20 +60,20 @@ export class SceneObject {
 	};
 
 	private wasSelected: boolean;
-
-	public temp: any = {};
+	public clippingSnapshot?: Matrix4;
 
 	constructor(geometry: BufferGeometry,
 		filePath: string,
 		selected = false,
 		sceneStore: SceneStore = AppStore.sceneStore)
 	{
+		geometry = geometry.deleteAttribute('color');
+
 		this.name = (filePath.split('\\').pop()?.split('.').shift() ?? 'undefined');
 		this.sceneStore = sceneStore;
 		this.geometry = geometry;
+		this.mesh = new Mesh(geometry, sceneStore.materialForObjects.select);
 		this.geometry.scale(0.1, 0.1, 0.1);
-
-		this.CreateMesh(geometry);
 
 		this.minY = new Vector3();
 		this.maxY = new Vector3();
@@ -85,108 +89,147 @@ export class SceneObject {
 		makeObservable(this);
 	}
 
-	CreateMesh = (geometry: BufferGeometry) => {
-		const mesh = new Mesh(geometry);
-		mesh.updateMatrixWorld( true );
-		const surfaceModel = mesh.clone();
-		surfaceModel.material = this.sceneStore.materialForObjects.select;
-		surfaceModel.renderOrder = 1;
+	static CreateClippingGroup = () => {
+		const store = AppStore.sceneStore;
 
-		const lineGeometry = new BufferGeometry();
-		const linePosAttr = new BufferAttribute( new Float32Array( 300000 ), 3, false );
-		linePosAttr.setUsage( DynamicDrawUsage );
-		lineGeometry.setAttribute( 'position', linePosAttr );
-		const clippingLineMin = new  LineSegments( lineGeometry, new LineBasicMaterial() );
-		clippingLineMin.material.color.set( 0x00acc1 ).convertSRGBToLinear();
-		clippingLineMin.frustumCulled = false;
-		clippingLineMin.renderOrder = 3;
+		const _create = (geometry: BufferGeometry) => {
+			const mesh = new Mesh(geometry);
+			mesh.updateMatrixWorld( true );
+			const surfaceModel = mesh.clone();
+			surfaceModel.material = AppStore.sceneStore.materialForObjects.select.clone();
+			surfaceModel.material .transparent = true;
+			surfaceModel.material .opacity = 0;
+			surfaceModel.renderOrder = 1;
 
-		clippingLineMin.scale.copy( mesh.scale );
-		clippingLineMin.position.set( 0, 0, 0 );
-		clippingLineMin.quaternion.identity();
+			const lineGeometry = new BufferGeometry();
+			const linePosAttr = new BufferAttribute( new Float32Array( 300000 ), 3, false );
+			linePosAttr.setUsage( DynamicDrawUsage );
+			lineGeometry.setAttribute( 'position', linePosAttr );
+			const clippingLineMin = new  LineSegments( lineGeometry, new LineBasicMaterial() );
+			clippingLineMin.material.color.set( 0x00acc1 ).convertSRGBToLinear();
+			clippingLineMin.frustumCulled = false;
+			clippingLineMin.renderOrder = 3;
 
-		const matSet = new Set();
-		const materialMap = new Map();
-		mesh.traverse((c: Mesh | any) => {
-			if ( materialMap.has( c.material ) ) {
-				c.material = materialMap.get( c.material );
-				return;
-			}
+			clippingLineMin.scale.copy( mesh.scale );
+			clippingLineMin.position.set( 0, 0, 0 );
+			clippingLineMin.quaternion.identity();
 
-			matSet.add( c.material );
-
-			const material = c.material.clone();
-			material.roughness = 1.0;
-			material.side = FrontSide;
-			material.stencilWrite = true;
-			material.stencilFail = IncrementWrapStencilOp;
-			material.stencilZFail = IncrementWrapStencilOp;
-			material.stencilZPass = IncrementWrapStencilOp;
-			material.clippingPlanes = [this.sceneStore.clippingPlaneMin];
-
-			materialMap.set( c.material, material );
-			c.material = material;
-		});
-
-		materialMap.clear();
-
-		const backSideModel = mesh.clone();
-		backSideModel.traverse((c: Mesh | any) => {
-			if (c.isMesh) {
+			const matSet = new Set();
+			const materialMap = new Map();
+			mesh.traverse((c: Mesh | any) => {
 				if ( materialMap.has( c.material ) ) {
 					c.material = materialMap.get( c.material );
 					return;
 				}
 
+				matSet.add( c.material );
+
 				const material = c.material.clone();
-				material.color.set( 0xffffff );
 				material.roughness = 1.0;
-				material.colorWrite = false;
-				material.depthWrite = false;
-				material.side =  BackSide;
+				material .transparent = true;
+				material .opacity = 0;
+				material.side = FrontSide;
 				material.stencilWrite = true;
-				material.stencilFail =  DecrementWrapStencilOp;
-				material.stencilZFail = DecrementWrapStencilOp;
-				material.stencilZPass =  DecrementWrapStencilOp;
-				material.clippingPlanes = [this.sceneStore.clippingPlaneMin];
+				material.stencilFail = IncrementWrapStencilOp;
+				material.stencilZFail = IncrementWrapStencilOp;
+				material.stencilZPass = IncrementWrapStencilOp;
+				material.clippingPlanes = [AppStore.sceneStore.clippingPlaneMin];
 
 				materialMap.set( c.material, material );
 				c.material = material;
+			});
+
+			materialMap.clear();
+
+			const backSideModel = mesh.clone();
+			backSideModel.traverse((c: Mesh | any) => {
+				if (c.isMesh) {
+					if ( materialMap.has( c.material ) ) {
+						c.material = materialMap.get( c.material );
+						return;
+					}
+
+					const material = c.material.clone();
+					material.color.set( 0xffffff );
+					material.roughness = 1.0;
+					material.colorWrite = false;
+					material.depthWrite = false;
+					material.transparent = true;
+					material.opacity = 0;
+					material.side =  BackSide;
+					material.stencilWrite = true;
+					material.stencilFail =  DecrementWrapStencilOp;
+					material.stencilZFail = DecrementWrapStencilOp;
+					material.stencilZPass =  DecrementWrapStencilOp;
+					material.clippingPlanes = [AppStore.sceneStore.clippingPlaneMin];
+
+					materialMap.set( c.material, material );
+					c.material = material;
+				}
+			});
+
+			const colliderBvh = new MeshBVH( mesh.geometry, { maxLeafTris: 3 } );
+			mesh.geometry.boundsTree = colliderBvh;
+
+			const colliderMesh = new Mesh( mesh.geometry,  new MeshBasicMaterial( {
+				depthWrite: false,
+			}));
+			colliderMesh.renderOrder = 2;
+			colliderMesh.position.copy( mesh.position );
+			colliderMesh.rotation.copy( mesh.rotation );
+			colliderMesh.scale.copy( mesh.scale );
+
+			const group = new Group();
+
+			group.add(mesh,
+				backSideModel,
+				surfaceModel,
+				colliderMesh,
+				clippingLineMin);
+
+			mesh.visible = true;
+			colliderMesh.visible = false;
+			backSideModel.visible = true;
+
+			return {
+				group: group,
+				colliderMesh : colliderMesh,
+				outlineLines:clippingLineMin,
+				colliderBvh :colliderBvh
+			};
+		};
+
+		if (store.objects.some(x => !x.clippingSnapshot || !x.clippingSnapshot.equals(x.mesh.matrixWorld)))
+		{
+			store.objects.forEach(x => {
+				x.clippingSnapshot = x.mesh.matrixWorld.clone();
+			});
+
+			const created = _create(mergeBufferGeometries(store.objects
+				.map(o => o.mesh.geometry.clone().applyMatrix4(o.mesh.matrixWorld))));
+
+			if(store.clippingBuffer?.sceneGeometryGrouped)
+			{
+				store.scene.remove(store.clippingBuffer.sceneGeometryGrouped);
 			}
-		});
 
-		const colliderBvh = new MeshBVH( mesh.geometry, { maxLeafTris: 3 } );
-		mesh.geometry.boundsTree = colliderBvh;
+			AppStore.sceneStore.scene.add(created.group);
 
-		const colliderMesh = new Mesh( mesh.geometry,  new MeshBasicMaterial( {
-			depthWrite: false,
-		}));
-		colliderMesh.renderOrder = 2;
-		colliderMesh.position.copy( mesh.position );
-		colliderMesh.rotation.copy( mesh.rotation );
-		colliderMesh.scale.copy( mesh.scale );
+			const result = {
+				sceneGeometryGrouped: created.group,
 
-		const group = new Group();
+				intersectionMesh: {
+					colliderMesh : created.colliderMesh,
+					outlineLines: created.outlineLines,
+					colliderBvh : created.colliderBvh
+				},
+			};
 
-		group.add(mesh,
-			backSideModel,
-			surfaceModel,
-			colliderMesh,
-			clippingLineMin);
-
-		mesh.visible = true;
-		colliderMesh.visible = false;
-		backSideModel.visible = true;
-
-		this.temp.colliderMesh = colliderMesh;
-		this.temp.outlineLines = clippingLineMin;
-		this.temp.colliderBvh = colliderBvh;
-
-		this.mesh = new Mesh(mesh.geometry, this.sceneStore.materialForObjects.normal);
-		this.mesh.add(group);
-		this.mesh.castShadow = true;
-		this.mesh.receiveShadow = false;
-		this.mesh.geometry.center();
+			AppStore.sceneStore.clippingBuffer = {
+				...AppStore.sceneStore.clippingBuffer,
+				...result
+			};
+		}
 	};
 
 	UpdateSelection = () => {

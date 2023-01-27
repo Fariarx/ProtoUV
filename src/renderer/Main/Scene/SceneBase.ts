@@ -60,19 +60,8 @@ export abstract class SceneBase {
 
 	public clippingLineMin!: LineSegments;
 	public clippingPlaneMin = new Plane();
-	public clippingPlaneMax = new Plane();
 
 	public clippingPlaneMeshMin = new THREE.Mesh( new THREE.PlaneBufferGeometry(), new THREE.MeshStandardMaterial({
-		color: '#56fd5f',  side: DoubleSide,
-		transparent: true,
-		stencilWrite: true,
-		stencilRef: 0,
-		stencilFunc: THREE.NotEqualStencilFunc,
-		stencilFail: THREE.ReplaceStencilOp,
-		stencilZFail: THREE.ReplaceStencilOp,
-		stencilZPass: THREE.ReplaceStencilOp,
-	}));
-	public clippingPlaneMeshMax = new THREE.Mesh( new THREE.PlaneBufferGeometry(), new THREE.MeshStandardMaterial({
 		color: '#56fd5f',  side: DoubleSide,
 		transparent: true,
 		stencilWrite: true,

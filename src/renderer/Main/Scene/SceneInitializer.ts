@@ -7,6 +7,7 @@ import {
 	DirectionalLight,
 	Group,
 	Line3,
+	LineSegments,
 	MathUtils,
 	Matrix4,
 	Mesh,
@@ -24,7 +25,8 @@ import {
 	TransformControls,
 } from 'three/examples/jsm/controls/TransformControls';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader';
-import { CONTAINED } from 'three-mesh-bvh';
+import { mergeBufferGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils';
+import { CONTAINED, MeshBVH } from 'three-mesh-bvh';
 import { Key } from 'ts-keycode-enum';
 import { container } from 'tsyringe';
 
@@ -727,59 +729,36 @@ export class SceneInitializer extends SceneBase {
 		AppStore.performSupports.changeState(SupportsEnum.None, true);
 	};
 
-	public animate = () => {
-		const frameLag = () => {
-			if (this.temp.needAnimateTimer)
-			{
-				clearTimeout(this.temp.needAnimateTimer);
-				this.temp.needAnimateTimer = null;
-			}
+	public someClippingShit = () => {
+		if (this.objects.length > 0)
+		{
+			SceneObject.CreateClippingGroup();
 
-			if (Date.now() - this.temp.windowResizeAt < 50)
-			{
-				return;
-			}
+			if (this.clippingBuffer.sceneGeometryGrouped) {
+				const intersect = this.clippingBuffer.intersectionMesh;
+				const  inverseMatrix = this.clippingBuffer.inverseMatrix;
+				const  localPlane = this.clippingBuffer.localPlane;
+				const  tempLine = this.clippingBuffer.tempLine;
+				const  tempVector = this.clippingBuffer.tempVector1;
+				const  tempVector1 = this.clippingBuffer.tempVector1;
+				const  tempVector2 = this.clippingBuffer.tempVector2;
+				const  tempVector3 = this.clippingBuffer.tempVector3;
 
-			if (this.temp.lastFrameTime && Date.now() - this.temp.lastFrameTime < 5)
-			{
-				this.temp.needAnimateTimer = setTimeout(() => {
-					this.animate();
-				});
-				return true;
-			}
-			else {
-				this.temp.lastFrameTime = Date.now();
-				return false;
-			}
-		};
+				this.clippingPlaneMeshMin.updateMatrixWorld();
+				this.clippingPlaneMeshMin.position.setY(0.5);
+				this.clippingPlaneMin.applyMatrix4( this.clippingPlaneMeshMin.matrixWorld );
 
-		const _animate = () => {
-			this.renderer.clearDepth(); // important!
+				this.clippingPlaneMin.constant = 0.5;
+				this.clippingPlaneMin.normal.set( 0, -1, 0);
 
-			if (!this.groupSelectedLast) {return;}
-			const inverseMatrix = new Matrix4();
-			const localPlane = new Plane();
-			const tempLine = new  Line3();
-			const tempVector = new  Vector3();
-			const tempVector1 = new  Vector3();
-			const tempVector2 = new Vector3();
-			const tempVector3 = new Vector3();
+				this.clippingBuffer.inverseMatrix.copy( intersect.colliderMesh!.matrixWorld ).invert();
+				this.clippingBuffer.localPlane.copy(this.clippingPlaneMin).applyMatrix4(inverseMatrix);
 
-			this.clippingPlaneMeshMin.updateMatrixWorld();
-			this.clippingPlaneMeshMin.position.setY(0.5);
-			this.clippingPlaneMin.applyMatrix4( this.clippingPlaneMeshMin.matrixWorld );
-			this.clippingPlaneMin.constant = -0.5;
-			this.clippingPlaneMin.normal.set( 0, 1, 0);
+				let index = 0;
 
-			inverseMatrix.copy( this.groupSelectedLast .temp. colliderMesh.matrixWorld ).invert();
-			localPlane.copy( this.clippingPlaneMin ).applyMatrix4( inverseMatrix );
+				const posAttr =  intersect.outlineLines!.geometry.attributes.position;
 
-			let index = 0;
-
-			const posAttr =  this.groupSelectedLast .temp.outlineLines.geometry.attributes.position;
-			const startTime = window.performance.now();
-
-			this.groupSelectedLast .temp.colliderBvh.shapecast( {
+			intersect.colliderBvh!.shapecast( {
 				intersectsBounds: () =>  CONTAINED,
 				intersectsTriangle: (tri: any) => {
 
@@ -823,7 +802,7 @@ export class SceneInitializer extends SceneBase {
 						} else if ( tempVector1.equals( tempVector2 ) ) {
 							// If the last point is not a duplicate intersection
 							// Set the penultimate point as a distinct point and delete the last point
-							posAttr.setXYZ( index - 2, tempVector3 );
+							posAttr.setXYZ( index - 2, tempVector3.x, tempVector3.y, tempVector3.z );
 							count --;
 							index --;
 						}
@@ -838,13 +817,47 @@ export class SceneInitializer extends SceneBase {
 			});
 
 			// set the draw range to only the new segments and offset the lines so they don't intersect with the geometry
-			this.groupSelectedLast .temp.outlineLines.geometry.setDrawRange( 0, index );
-			this.groupSelectedLast .temp.outlineLines.position.copy( this.clippingPlaneMin.normal ).multiplyScalar( - 0.00001 );
+			intersect.outlineLines!.geometry.setDrawRange( 0, index );
+			intersect.outlineLines!.position.copy( this.clippingPlaneMin.normal ).multiplyScalar( - 0.00001 );
 
 			//const mesh = new Mesh( this.groupSelectedLast .temp.outlineLines.geometry, new MeshPhongMaterial( { color: 'red', side: DoubleSide } ) );
 			//	this.scene.add( mesh );
 
 			posAttr.needsUpdate = true;
+			}
+		}
+	};
+
+	public animate = () => {
+		const frameLag = () => {
+			if (this.temp.needAnimateTimer)
+			{
+				clearTimeout(this.temp.needAnimateTimer);
+				this.temp.needAnimateTimer = null;
+			}
+
+			if (Date.now() - this.temp.windowResizeAt < 50)
+			{
+				return;
+			}
+
+			if (this.temp.lastFrameTime && Date.now() - this.temp.lastFrameTime < 5)
+			{
+				this.temp.needAnimateTimer = setTimeout(() => {
+					this.animate();
+				});
+				return true;
+			}
+			else {
+				this.temp.lastFrameTime = Date.now();
+				return false;
+			}
+		};
+
+		const _animate = () => {
+			this.renderer.clearDepth(); // important!
+
+			this.someClippingShit();
 
 			// if dumping enabled
 			this.orbitControls.update();
@@ -902,7 +915,8 @@ export class SceneInitializer extends SceneBase {
 					// console.log(screenshot);
 					// bridge.ipcRenderer.send('capture-page', screenshot.replace('data:image/png;base64,','')
 					// );
-					this.outlineEffectRenderer.renderOutline(this.scene, this.activeCamera);
+
+					//this.outlineEffectRenderer.renderOutline(this.scene, this.activeCamera);
 				}
 			}, 500);
 
@@ -919,5 +933,23 @@ export class SceneInitializer extends SceneBase {
 		}
 
 		requestAnimationFrame(_animate);
+	};
+
+	public clippingBuffer = {
+		sceneGeometryGrouped: null as null | Group,
+
+		intersectionMesh: {
+			colliderMesh : null as null | Mesh,
+			outlineLines: null as null | LineSegments,
+			colliderBvh : null as null | MeshBVH,
+		},
+
+		inverseMatrix: new Matrix4(),
+		localPlane: new Plane(),
+		tempLine: new  Line3(),
+		tempVector: new  Vector3(),
+		tempVector1: new  Vector3(),
+		tempVector2: new Vector3(),
+		tempVector3: new Vector3()
 	};
 }

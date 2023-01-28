@@ -167,7 +167,6 @@ const objectTransform = (message: AppEvent) => {
 	if(!event.renderBreak)
 	{
 		AppStore.sceneStore.animate();
-
 		setTimeout(() => {
 			AppStore.sceneStore.clippingReset();
 			AppStore.sceneStore.animate();

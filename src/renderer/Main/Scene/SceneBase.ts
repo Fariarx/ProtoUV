@@ -58,9 +58,12 @@ export abstract class SceneBase {
 		linewidth: 1.5
 	});
 
+	// [0, 1] or -1 to off
+	public clippingScenePercent = 0.01;
+	public clippingSceneDirectionDown = true;
+
 	public clippingLineMin!: LineSegments;
 	public clippingPlaneMin = new Plane();
-
 	public clippingPlaneMeshMin = new THREE.Mesh( new THREE.PlaneBufferGeometry(), new THREE.MeshStandardMaterial({
 		color: '#56fd5f',  side: DoubleSide,
 		transparent: true,

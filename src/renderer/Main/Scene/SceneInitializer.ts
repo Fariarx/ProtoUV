@@ -25,7 +25,6 @@ import {
 	TransformControls,
 } from 'three/examples/jsm/controls/TransformControls';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader';
-import { mergeBufferGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils';
 import { CONTAINED, MeshBVH } from 'three-mesh-bvh';
 import { Key } from 'ts-keycode-enum';
 import { container } from 'tsyringe';
@@ -737,9 +736,16 @@ export class SceneInitializer extends SceneBase {
 		}
 	};
 	public clippingSomeShit = () => {
+		if (this.clippingScenePercent === -1)
+		{
+			this.clippingReset();
+			return;
+		}
+
 		if (this.objects.length > 0)
 		{
 			SceneObject.CreateClippingGroup();
+
 			if (this.clippingBuffer.sceneGeometryGrouped) {
 				const intersect = this.clippingBuffer.intersectionMesh;
 				const  inverseMatrix = this.clippingBuffer.inverseMatrix;
@@ -751,11 +757,11 @@ export class SceneInitializer extends SceneBase {
 				const  tempVector3 = this.clippingBuffer.tempVector3;
 
 				this.clippingPlaneMeshMin.updateMatrixWorld();
-				this.clippingPlaneMeshMin.position.setY(0.5);
+				this.clippingPlaneMeshMin.position.setY(this.clippingScenePercent * this.gridSize.y);
 				this.clippingPlaneMin.applyMatrix4( this.clippingPlaneMeshMin.matrixWorld );
 
-				this.clippingPlaneMin.constant = 0.5;
-				this.clippingPlaneMin.normal.set( 0, -1, 0);
+				this.clippingPlaneMin.constant = (this.clippingSceneDirectionDown ? 1 : -1) * this.clippingScenePercent * this.gridSize.y;
+				this.clippingPlaneMin.normal.set( 0, (this.clippingSceneDirectionDown ? -1 : 1), 0);
 
 				this.clippingBuffer.inverseMatrix.copy( intersect.colliderMesh!.matrixWorld ).invert();
 				this.clippingBuffer.localPlane.copy(this.clippingPlaneMin).applyMatrix4(inverseMatrix);
@@ -866,6 +872,8 @@ export class SceneInitializer extends SceneBase {
 		const _animate = () => {
 			this.renderer.clearDepth(); // important!
 
+			this.clippingSomeShit();
+
 			// if dumping enabled
 			this.orbitControls.update();
 
@@ -923,13 +931,14 @@ export class SceneInitializer extends SceneBase {
 					// bridge.ipcRenderer.send('capture-page', screenshot.replace('data:image/png;base64,','')
 					// );
 
-					this.outlineEffectRenderer.renderOutline(this.scene, this.activeCamera);
+					if (this.clippingScenePercent === -1) {
+						this.outlineEffectRenderer.renderOutline(this.scene, this.activeCamera);
+					}
 				}
 			}, 500);
 
 			this.stats.update();
 
-			this.clippingSomeShit();
 			/*if (this.isTransformWorking) {
         requestAnimationFrame(_animate);
       }*/

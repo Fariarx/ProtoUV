@@ -1,12 +1,13 @@
+import { TransformApp } from './Transform/TransformApp';
 import { APP_HEADER_HEIGHT_PX } from '../../../HeaderApp';
 import { FlexBoxRow } from '../../../Shared/Styled/FlexBox';
 import { Sizes } from '../../../Shared/Styled/Sizes';
-import { TransformApp } from './Transform/TransformApp';
+import { SliceSliderApp } from '../ViewChange/SliceSliderApp';
 
 export const ToolsLeftApp = () => {
 	return <FlexBoxRow
 		sx={{
-			height: 'fit-content',
+			height: 'calc(100% - 15% - 90px)',
 			width: 'fit-content',
 			flexDirection: 'column',
 			position: 'absolute',
@@ -14,5 +15,6 @@ export const ToolsLeftApp = () => {
 			left: 0,
 		}}>
 		<TransformApp/>
+		<SliceSliderApp/>
 	</FlexBoxRow>;
 };

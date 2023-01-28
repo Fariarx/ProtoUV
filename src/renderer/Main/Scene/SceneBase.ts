@@ -59,64 +59,65 @@ export abstract class SceneBase {
 	});
 
 	// [0, 1] or -1 to off
+  @observable
 	public clippingScenePercent = 0.01;
-	public clippingSceneDirectionDown = true;
+  public clippingSceneDirectionDown = true;
 
-	public clippingLineMin!: LineSegments;
-	public clippingPlaneMin = new Plane();
-	public clippingPlaneMeshMin = new THREE.Mesh( new THREE.PlaneBufferGeometry(), new THREE.MeshStandardMaterial({
-		color: '#56fd5f',  side: DoubleSide,
-		transparent: true,
-		stencilWrite: true,
-		stencilRef: 0,
-		stencilFunc: THREE.NotEqualStencilFunc,
-		stencilFail: THREE.ReplaceStencilOp,
-		stencilZFail: THREE.ReplaceStencilOp,
-		stencilZPass: THREE.ReplaceStencilOp,
-	}));
+  public clippingLineMin!: LineSegments;
+  public clippingPlaneMin = new Plane();
+  public clippingPlaneMeshMin = new THREE.Mesh( new THREE.PlaneBufferGeometry(), new THREE.MeshStandardMaterial({
+  	color: '#56fd5f',  side: DoubleSide,
+  	transparent: true,
+  	stencilWrite: true,
+  	stencilRef: 0,
+  	stencilFunc: THREE.NotEqualStencilFunc,
+  	stencilFail: THREE.ReplaceStencilOp,
+  	stencilZFail: THREE.ReplaceStencilOp,
+  	stencilZPass: THREE.ReplaceStencilOp,
+  }));
 
-	public materialsForScene = {
-		default: {
-			normal: new MeshStandardMaterial( {  color: '#ffa600', side: DoubleSide,
-				stencilWrite: true, metalness: 0.1,
-				clippingPlanes: [this.clippingPlaneMin]
-			} ),
-			select: new MeshStandardMaterial( { color: '#ffffff', side: DoubleSide,
-				stencilWrite: true, metalness: 0.1,
-				clippingPlanes: [this.clippingPlaneMin] } ),
-		} as MaterialForScene,
-	};
+  public materialsForScene = {
+  	default: {
+  		normal: new MeshStandardMaterial( {  color: '#ffa600', side: DoubleSide,
+  			stencilWrite: true, metalness: 0.1,
+  			clippingPlanes: [this.clippingPlaneMin]
+  		} ),
+  		select: new MeshStandardMaterial( { color: '#ffffff', side: DoubleSide,
+  			stencilWrite: true, metalness: 0.1,
+  			clippingPlanes: [this.clippingPlaneMin] } ),
+  	} as MaterialForScene,
+  };
 
-	public materialForPlaneShadow: Material = new ShadowMaterial({
-		color: '#444444',
-		side: FrontSide,
-	});
-	public materialForPlane?: Material;
-	public materialForObjects: MaterialForScene = this.materialsForScene.default;
-	public perspectiveCamera = new PerspectiveCamera(
-		60,
-		window.innerWidth / window.innerHeight,
-		0.01,
-		1000
-	);
-	public orthographicCamera = new OrthographicCamera(
-		window.innerWidth / - 2,
-		window.innerWidth / 2,
-		window.innerHeight / 2,
-		window.innerHeight / - 2,
-		0.0001,
-	);
-	public activeCamera: OrthographicCamera | PerspectiveCamera = this.perspectiveCamera;
+  public materialForPlaneShadow: Material = new ShadowMaterial({
+  	color: '#444444',
+  	side: FrontSide,
+  });
+  public materialForPlane?: Material;
+  public materialForObjects: MaterialForScene = this.materialsForScene.default;
+  public perspectiveCamera = new PerspectiveCamera(
+  	60,
+  	window.innerWidth / window.innerHeight,
+  	0.01,
+  	1000
+  );
+  public orthographicCamera = new OrthographicCamera(
+  	window.innerWidth / - 2,
+  	window.innerWidth / 2,
+  	window.innerHeight / 2,
+  	window.innerHeight / - 2,
+  	0.0001,
+  );
+  public activeCamera: OrthographicCamera | PerspectiveCamera = this.perspectiveCamera;
 
-	public stats = Stats();
+  public stats = Stats();
 
-	public printerName: string = config.printerName;
-	public printer?: Printer;
+  public printerName: string = config.printerName;
+  public printer?: Printer;
 
-	public scene: Scene = new Scene();
+  public scene: Scene = new Scene();
 
 	@observable
-	public groupSelected: SceneObject[] = [];
+  public groupSelected: SceneObject[] = [];
 
   @computed
 	public get groupSelectedLast () {

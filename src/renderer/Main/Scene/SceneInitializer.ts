@@ -41,6 +41,7 @@ import {
 	saveConfig,
 } from '../../Shared/Config';
 import { Dispatch } from '../../Shared/Events';
+import { MaxNumber } from '../../Shared/Globals';
 import { EnumHelpers } from '../../Shared/Helpers/Enum';
 import * as OrientationHelper from '../../Shared/Helpers/OrientationHelper';
 import {
@@ -72,6 +73,7 @@ export class SceneInitializer extends SceneBase {
 	public constructor() {
 		super();
 
+		Log('Scene loading...');
 		this.renderer.setPixelRatio( window.devicePixelRatio);
 		this.renderer.setClearColor(0x000000, 0);
 		this.renderer.sortObjects = true;
@@ -96,7 +98,7 @@ export class SceneInitializer extends SceneBase {
 		this.setupMouse();
 		this.setupKeyboard();
 
-		Log('SceneComponents loaded!');
+		Log('Scene loaded!');
 	}
 
 	private file3dLoad = (file: File | string, handler: Function): boolean => {
@@ -239,7 +241,7 @@ export class SceneInitializer extends SceneBase {
 		this.transformControls = new TransformControls(this.activeCamera, this.renderer.domElement);
 		this.transformControls.setSize(0.8);
 		this.transformControls.setSpace('world');
-		this.transformControls.setTranslationSnap( 0.5 );
+		this.transformControls.setTranslationSnap( 0.25 );
 		this.transformControls.setRotationSnap(MathUtils.degToRad( 5 ) );
 		this.transformControls.setScaleSnap( 0.002 );
 		this.scene.add(this.transformControls);
@@ -739,7 +741,12 @@ export class SceneInitializer extends SceneBase {
 		if (this.clippingScenePercent === -1)
 		{
 			this.clippingReset();
+			this.clippingPlaneMeshMin.visible = false;
+			this.clippingPlaneMin.constant = MaxNumber;
 			return;
+		}
+		else {
+			this.clippingPlaneMeshMin.visible = true;
 		}
 
 		if (this.objects.length > 0)

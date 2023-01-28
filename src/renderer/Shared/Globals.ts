@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { acceleratedRaycast, computeBoundsTree, disposeBoundsTree } from 'three-mesh-bvh';
 
+//eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 export const bridge = window.electron.ipcRenderer.window;
 
 export const AppName = 'protouv';

@@ -79,7 +79,11 @@ const objectAdd = (message: AppEvent) => {
   args!.object.AlignByOtherSceneItems();
   scene.updateSelectionChanged();
   scene.updateTransformControls();
-  scene.animate();
+
+  setTimeout(() => {
+  	scene.clippingReset();
+  	scene.animate();
+  });
 
   runInAction(() => {
   	if (args?.source && !app.projectFolder)
@@ -163,8 +167,11 @@ const objectTransform = (message: AppEvent) => {
 	if(!event.renderBreak)
 	{
 		AppStore.sceneStore.animate();
-		setTimeout(() =>
-			AppStore.sceneStore.animate(true));
+
+		setTimeout(() => {
+			AppStore.sceneStore.clippingReset();
+			AppStore.sceneStore.animate();
+		});
 	}
 };
 

@@ -3,9 +3,12 @@ import {
 	observable,
 	runInAction,
 } from 'mobx';
+import { toUnits } from 'renderer/Shared/Globals';
 import {
 	AppEventDeleteObject,
 	AppEventEnum,
+	AppEventMoveObject,
+	TransformEnum,
 } from 'renderer/Shared/Libs/Types';
 import {
 	BackSide,
@@ -13,18 +16,14 @@ import {
 	BufferGeometry,
 	DecrementWrapStencilOp,
 	DynamicDrawUsage,
-	EqualDepth,
 	FrontSide,
 	Group,
 	IncrementWrapStencilOp,
-	Line3,
 	LineBasicMaterial,
 	LineSegments,
 	Matrix4,
 	Mesh,
 	MeshBasicMaterial,
-	MeshStandardMaterial,
-	Plane,
 	Vector3,
 } from 'three';
 import { mergeBufferGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils';
@@ -72,8 +71,8 @@ export class SceneObject {
 		this.name = (filePath.split('\\').pop()?.split('.').shift() ?? 'undefined');
 		this.sceneStore = sceneStore;
 		this.geometry = geometry;
-		this.mesh = new Mesh(geometry, sceneStore.materialForObjects.select);
 		this.geometry.scale(0.1, 0.1, 0.1);
+		this.mesh = new Mesh(geometry, sceneStore.materialForObjects.select);
 
 		this.minY = new Vector3();
 		this.maxY = new Vector3();
@@ -93,6 +92,8 @@ export class SceneObject {
 		const store = AppStore.sceneStore;
 
 		const _create = (geometry: BufferGeometry) => {
+			console.log(1);
+
 			const mesh = new Mesh(geometry);
 			mesh.updateMatrixWorld( true );
 			const surfaceModel = mesh.clone();
@@ -199,8 +200,12 @@ export class SceneObject {
 			};
 		};
 
-		if (store.objects.some(x => !x.clippingSnapshot || !x.clippingSnapshot.equals(x.mesh.matrixWorld)))
+		if (store.clippingBuffer.sceneGeometryCount !== store.objects.length
+      || store.objects.some(x => !x.clippingSnapshot || !x.clippingSnapshot.equals(x.mesh.matrixWorld))
+      || store.objects.length !== 0 && store.clippingBuffer.sceneGeometryGrouped === null)
 		{
+			store.clippingBuffer.sceneGeometryCount = store.objects.length;
+
 			store.objects.forEach(x => {
 				x.clippingSnapshot = x.mesh.matrixWorld.clone();
 			});
@@ -255,7 +260,7 @@ export class SceneObject {
 	};
 
 	UpdateSize = () => {
-		this.mesh.updateMatrixWorld();
+		this.mesh.updateMatrixWorld(true);
 
 		const geometry = this.mesh.geometry;
 		const vertices = geometry.attributes.position.array;
@@ -327,9 +332,31 @@ export class SceneObject {
 	};
 
 	AlignToPlaneY = (deletedSupportsDisabled?: boolean) => {
+		this.mesh.position.setY(0);
+		this.UpdateSize();
+
+		Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
+			from: this.mesh.position.clone(),
+			to: this.mesh.position.clone().setY(this.supports !== undefined && this.sceneStore.printer
+				? -this.minY.y + toUnits(this.sceneStore.printer.SupportPreset.Lifting)
+				: -this.minY.y),
+			sceneObject: this as SceneObject,
+			instrument: TransformEnum.Move,
+			deletedSupportsDisabled: deletedSupportsDisabled
+		} as AppEventMoveObject);
+
+		this.UpdateSize();
 	};
 
 	AlignToPlaneXZ = (gridVec: Vector3) => {
+		Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
+			from: this.mesh.position.clone(),
+			to: this.mesh.position.clone().setX(gridVec.x / 2).setZ(gridVec.z / 2),
+			sceneObject: this as SceneObject,
+			instrument: TransformEnum.Move
+		} as AppEventMoveObject);
+
+		this.UpdateSize();
 	};
 
 	AlignToPlanePreparedToPrint = () => {
@@ -349,6 +376,7 @@ export class SceneObject {
 		}
 
 		this.mesh.rotation.set(-rotation.x, -rotation.y, -rotation.z);
+		this.UpdateSize();
 	};
 
 	AlignByOtherSceneItems = () => {

@@ -215,7 +215,7 @@ export class SceneInitializer extends SceneBase {
 			if (e.dataTransfer)
 			{
 				Log('Drop ' + e.dataTransfer.files.length + ' file(s) event');
-				Array.from(e.dataTransfer.files).forEach(file =>
+				Array.from(e.dataTransfer.files).forEach((file: File & {path: string} & any) =>
 					AppStore.sceneStore.handleLoadFile(file.path));
 			}
 			else {
@@ -730,11 +730,16 @@ export class SceneInitializer extends SceneBase {
 		AppStore.performSupports.changeState(SupportsEnum.None, true);
 	};
 
-	public someClippingShit = () => {
+	public clippingReset = () => {
+		if (this.clippingBuffer.sceneGeometryGrouped) {
+			AppStore.sceneStore.scene.remove(AppStore.sceneStore.clippingBuffer.sceneGeometryGrouped!);
+			AppStore.sceneStore.clippingBuffer.sceneGeometryGrouped = null;
+		}
+	};
+	public clippingSomeShit = () => {
 		if (this.objects.length > 0)
 		{
 			SceneObject.CreateClippingGroup();
-
 			if (this.clippingBuffer.sceneGeometryGrouped) {
 				const intersect = this.clippingBuffer.intersectionMesh;
 				const  inverseMatrix = this.clippingBuffer.inverseMatrix;
@@ -827,6 +832,9 @@ export class SceneInitializer extends SceneBase {
 			posAttr.needsUpdate = true;
 			}
 		}
+		else {
+			this.clippingReset();
+		}
 	};
 
 	public animate = (force?: boolean) => {
@@ -915,13 +923,13 @@ export class SceneInitializer extends SceneBase {
 					// bridge.ipcRenderer.send('capture-page', screenshot.replace('data:image/png;base64,','')
 					// );
 
-					//this.outlineEffectRenderer.renderOutline(this.scene, this.activeCamera);
+					this.outlineEffectRenderer.renderOutline(this.scene, this.activeCamera);
 				}
 			}, 500);
 
 			this.stats.update();
 
-			this.someClippingShit();
+			this.clippingSomeShit();
 			/*if (this.isTransformWorking) {
         requestAnimationFrame(_animate);
       }*/
@@ -936,6 +944,7 @@ export class SceneInitializer extends SceneBase {
 	};
 
 	public clippingBuffer = {
+		sceneGeometryCount: 0 as number,
 		sceneGeometryGrouped: null as null | Group,
 
 		intersectionMesh: {

@@ -78,6 +78,8 @@ export class SceneInitializer extends SceneBase {
 		this.renderer.setClearColor(0x000000, 0);
 		this.renderer.sortObjects = true;
 
+		this.sliceRenderer.setClearColor(0x000000);
+
 		this.renderer.localClippingEnabled = true;
 		this.renderer.shadowMap.enabled = true;
 		this.renderer.shadowMap.type = PCFSoftShadowMap;
@@ -940,8 +942,8 @@ export class SceneInitializer extends SceneBase {
 					// console.log(screenshot);
 					// bridge.ipcRenderer.send('capture-page', screenshot.replace('data:image/png;base64,','')
 					// );
-					this.outlineEffectRenderer.renderOutline(this.scene, this.activeCamera);
 					if (this.clippingScenePercent === -1) {
+						this.outlineEffectRenderer.renderOutline(this.scene, this.activeCamera);
 					}
 				}
 			}, 500);

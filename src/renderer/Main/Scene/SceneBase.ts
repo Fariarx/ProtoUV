@@ -45,6 +45,17 @@ export abstract class SceneBase {
 		antialias: true,
 		alpha:true,
 	});
+	public sliceRenderer: WebGLRenderer = new WebGLRenderer({
+		antialias: true,
+		alpha:false,
+	});
+	public sliceOrthographicCamera = new OrthographicCamera(
+		window.innerWidth / - 2,
+		window.innerWidth / 2,
+		window.innerHeight / 2,
+		window.innerHeight / - 2,
+		0.000001,
+	);
 	public outlineEffectRenderer: OutlineEffect = new OutlineEffect( this.renderer, {
 		defaultThickness:0.0015
 	});

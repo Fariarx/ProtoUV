@@ -1,11 +1,11 @@
 import { makeObservable } from 'mobx';
 import { bridge } from 'renderer/Shared/Globals';
 import {
-	Mesh,
+	Mesh, OrthographicCamera,
 	PlaneGeometry,
 	Scene,
 	Vector2,
-	Vector3,
+	Vector3
 } from 'three';
 import { Line2 } from 'three/examples/jsm/lines/Line2';
 import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry';
@@ -86,7 +86,7 @@ export class SceneStore extends SceneInitializer {
 			const plane2 = new Mesh(geometry, this.materialForPlaneShadow);
 			plane2.rotateX(-Math.PI / 2);
 			plane2.receiveShadow = true;
-			plane2.position.set(this.gridSize.x / 2, 0, this.gridSize.z / 2);
+			plane2.position.set(this.gridSize.x / 2, 0.1, this.gridSize.z / 2);
 
 			this.decorations.add(plane2);
 		}
@@ -131,7 +131,7 @@ export class SceneStore extends SceneInitializer {
 		};
 
 		this.grid = createPrinterGrid(this.gridSize, this.scene);
-		this.grid.obj.position.set(0, 0.00001, 0);
+		this.grid.obj.position.set(0, 0.00002, 0);
 
 		this.updateCameraLookPosition();
 
@@ -144,9 +144,17 @@ export class SceneStore extends SceneInitializer {
 				}
 				AppStore.performSupports.addCursorToScene();
 			}, 100);
-		}
 
-		this.clippingPlaneMeshMin.scale.setScalar(Math.max(this.gridSize.x, this.gridSize.z) * 3);
+			this.clippingPlaneMeshMin.scale.setScalar(Math.max(this.gridSize.x, this.gridSize.z) * 3);
+			this.sliceRenderer.setSize(this.printer.Resolution.X, this.printer.Resolution.Y);
+			this.sliceOrthographicCamera = new OrthographicCamera(
+				this.printer.Resolution.X,
+				this.printer.Resolution.X,
+				this.printer.Resolution.Y,
+				this.printer.Resolution.Y,
+				0.00001,
+			);
+		}
 
 		this.animate();
 	}

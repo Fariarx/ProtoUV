@@ -742,11 +742,14 @@ export class SceneInitializer extends SceneBase {
 		{
 			this.clippingReset();
 			this.clippingPlaneMeshMin.visible = false;
-			this.clippingPlaneMin.constant = MaxNumber;
+			this.materialsForScene.default.select.clippingPlanes = [];
+			this.materialsForScene.default.normal.clippingPlanes = [];
 			return;
 		}
 		else {
 			this.clippingPlaneMeshMin.visible = true;
+			this.materialsForScene.default.select.clippingPlanes = [this.clippingPlaneMin];
+			this.materialsForScene.default.normal.clippingPlanes = [this.clippingPlaneMin];
 		}
 
 		if (this.objects.length > 0)
@@ -937,9 +940,8 @@ export class SceneInitializer extends SceneBase {
 					// console.log(screenshot);
 					// bridge.ipcRenderer.send('capture-page', screenshot.replace('data:image/png;base64,','')
 					// );
-
+					this.outlineEffectRenderer.renderOutline(this.scene, this.activeCamera);
 					if (this.clippingScenePercent === -1) {
-						this.outlineEffectRenderer.renderOutline(this.scene, this.activeCamera);
 					}
 				}
 			}, 500);

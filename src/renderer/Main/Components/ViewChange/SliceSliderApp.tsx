@@ -8,7 +8,7 @@ export const SliceSliderApp = observer(() => {
 		setTimeout(() => {
 			AppStore.sceneStore.clippingReset();
 			AppStore.sceneStore.animate();
-		});
+		},100);
 	};
 
 	return <Box sx={{
@@ -32,6 +32,10 @@ export const SliceSliderApp = observer(() => {
 			onChange={(_,n: number & any) => {
 				AppStore.sceneStore.clippingScenePercent = n < 0 ? -1 : n / 100000;
 				AppStore.sceneStore.animate();
+				if (AppStore.sceneStore.clippingScenePercent < 0 && n >= 0)
+				{
+					refresh();
+				}
 			}}
 			/*onDoubleClick={() => {
 				AppStore.sceneStore.clippingSceneDirectionDown =

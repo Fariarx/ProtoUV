@@ -1,10 +1,20 @@
 import { Box, Slider } from '@mui/material';
+import _ from 'lodash';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { AppStore } from '../../../AppStore';
 import { config } from '../../../Shared/Config';
+import { SceneObject } from '../../Scene/Entities/SceneObject';
 
 export const SliceSliderApp = observer(() => {
+	if (AppStore.sceneStore.objects.length === 0)
+	{
+		return;
+	}
+
+	const maxObjectsPoint =  _.maxBy(AppStore.sceneStore.objects, (x: SceneObject) => x.maxY.y);
+	const sliceTo = Math.min(AppStore.sceneStore.gridSize.y, maxObjectsPoint!.maxY.y);
+
 	return <Box sx={{
 		flexGrow: 1,
 		ml: 1, mt: 4
@@ -12,9 +22,12 @@ export const SliceSliderApp = observer(() => {
 		<Slider
 			sx={{
 				height:'100%',
-				opacity: 0.3,
+				opacity: 0.4,
 				transition: '1s all',
 				':active': {
+					opacity: config.ui.opacity
+				},
+				':hover': {
 					opacity: config.ui.opacity
 				}
 			}}
@@ -22,16 +35,17 @@ export const SliceSliderApp = observer(() => {
 			valueLabelDisplay="off"
 			min={-1}
 			max={100001}
-			value={AppStore.sceneStore.clippingScenePercent * 100000}
-			onChange={(_,n: number & any) => {
+			value={100000 * ((AppStore.sceneStore.clippingScenePercent * AppStore.sceneStore.gridSize.y) / sliceTo)}
+			onChange={(_e,n: number & any) => {
 				runInAction(() => {
 					if (n < 0 || n > 100000)
 					{
 						AppStore.sceneStore.clippingSceneWorking = false;
 					}
 					else  {
+						const percent = n / 100000;
 						AppStore.sceneStore.clippingSceneWorking = true;
-						AppStore.sceneStore.clippingScenePercent = n / 100000;
+						AppStore.sceneStore.clippingScenePercent = (sliceTo * percent) / AppStore.sceneStore.gridSize.y;
 					}
 					AppStore.sceneStore.animate();
 				});

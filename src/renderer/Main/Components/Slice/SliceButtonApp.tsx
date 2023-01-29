@@ -7,7 +7,10 @@ import { colors } from 'renderer/Shared/Config';
 
 export const SliceButtonApp = observer(() => {
 	return <BigButton sx={{
-		opacity: AppStore.sceneStore.objects.length > 0 ? 1 : 0
+		display: AppStore.sceneStore.objects.length > 0 ? 'flex' : 'none',
+		position: 'fixed',
+		bottom: 10 + APP_BOTTOM_HEIGHT - 4 + 'px',
+		right: '4px',
 	}}  onClick={() => {
 		Log('run slicing');
 		AppStore.changeState(Pages.Slice);
@@ -19,9 +22,6 @@ export const SliceButtonApp = observer(() => {
 });
 
 export const BigButton = styled(Box)(() => ({
-	position: 'fixed',
-	bottom: 10 + APP_BOTTOM_HEIGHT - 4 + 'px',
-	right: '4px',
 	backgroundColor: colors.background.dark,
 	borderRadius: '4px',
 	width: '150px',
@@ -29,8 +29,9 @@ export const BigButton = styled(Box)(() => ({
 	display: 'flex',
 	justifyContent: 'center',
 	alignItems: 'center',
-	transition: 'all 0.4',
+	transition: 'all 0.4s',
 	userSelect: 'none',
+	paddingLeft: '12px', paddingRight: '12px',
 	':hover': {
 		backgroundColor: colors.background.darkest
 	},

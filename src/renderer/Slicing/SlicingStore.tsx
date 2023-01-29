@@ -17,6 +17,9 @@ export class SlicingStore {
 	public sliceTo = 0;
 	public image = '';
 
+	public imageLargest = '';
+	public imageLargestSize = 0;
+
 	public run = () => {
 		this.isWorking = true;
 		bridge.ipcRenderer.send('prepare-to-slicing');
@@ -33,15 +36,14 @@ export class SlicingStore {
 	};
 
 	public reset = () => {
-		if (this.isWorking)
-		{
-			AppStore.instance.progressPercent = 0;
-		}
+		AppStore.instance.progressPercent = 0;
 		this.isWorking = false;
 		this.sliceCount = 0;
 		this.sliceCountMax = 0;
 		this.sliceTo = 0;
 		this.image = '';
+		this.imageLargest = '';
+		this.imageLargestSize = 0;
 	};
 
 	private animate = () => {
@@ -57,7 +59,18 @@ export class SlicingStore {
 			(this.sliceCount/this.sliceCountMax) * this.sliceTo / AppStore.sceneStore.gridSize.y,
 			this.sliceCount);
 
+		if (this.image.length > this.imageLargestSize)
+		{
+			this.imageLargest = this.image;
+			this.imageLargestSize = this.image.length;
+		}
+
 		this.sliceCount += 1;
+
+		if (!this.isWorking)
+		{
+			return;
+		}
 
 		if (this.sliceCount <= this.sliceCountMax) {
 			requestAnimationFrame(this.animate);

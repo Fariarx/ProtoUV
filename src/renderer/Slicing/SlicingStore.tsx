@@ -35,6 +35,8 @@ export class SlicingStore {
 			return;
 		}
 
+		AppStore.instance.progressPercent = (this.sliceCount/this.sliceCountMax);
+
 		AppStore.sceneStore.sliceLayer(
 			(this.sliceCount/this.sliceCountMax) * this.sliceTo / AppStore.sceneStore.gridSize.y,
 			this.sliceCount);

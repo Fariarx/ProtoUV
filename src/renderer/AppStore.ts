@@ -53,7 +53,7 @@ export class AppStore {
 	public dropFile = false;
 	public fileCount = 0;
 	public projectFolder?: string;
-	public linearProgress?: number;
+	public progressPercent = 0;
 }
 
 export enum Pages {

@@ -1,7 +1,7 @@
 import { Restore } from './Libs/Restore';
 
 export const _default = {
-	version: 25,
+	version: 26,
 	versionPrinterConfigs: 25,
 	settings: {
 		ui: {
@@ -40,6 +40,7 @@ export const _default = {
 				neutral2:'#5241c0',
 				warning:'#ffbd39',
 				danger:'#fb594f',
+				success:'#a2fb4f',
 			},
 			scene:{
 				colorBackgroundScene:'#4b4b4b',

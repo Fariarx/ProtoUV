@@ -19,6 +19,29 @@ export const LineBottomApp = observer(() => {
 		bottom: 0,
 		userSelect: 'none'
 	}}>
+		{app.progressPercent > 0 && <Box sx={{
+			position: 'absolute',
+			bottom: 0, left: 0,
+			height: '100%',
+			width: app.progressPercent * 100 + '%',
+			opacity: 0.5,
+			borderRight: '1px solid '+ colors.background.darkest,
+			backgroundColor: app.progressPercent >= 1
+				? colors.interact.success : colors.interact.neutral2,
+			transition: '1s background'
+		}}/>}
+		{app.progressPercent > 0 && <Box sx={{
+			position: 'absolute',
+			bottom: 0, left: 0,
+			height: '100%',
+			opacity: 0.8,
+			display: 'flex',
+			alignItems: 'center',
+			justifyContent: 'start',
+			pl: 1,fontSize: '12px',
+		}}>
+			{Math.round(app.progressPercent * 100)}%
+		</Box>}
 		<FlexBoxRow sx={{
 			background: colors.background.dark,
 			justifyContent: 'flex-end',

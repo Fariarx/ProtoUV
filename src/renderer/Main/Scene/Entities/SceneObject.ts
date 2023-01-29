@@ -74,7 +74,7 @@ export class SceneObject {
 		this.sceneStore = sceneStore;
 		this.geometry = geometry;
 		this.geometry.scale(0.1, 0.1, 0.1);
-		this.mesh = new Mesh(geometry, sceneStore.materialForObjects.select);
+		this.mesh = new Mesh(geometry.clone(), sceneStore.materialForObjects.select);
 		this.mesh.renderOrder = 3;
 
 		this.minY = new Vector3();
@@ -260,6 +260,10 @@ export class SceneObject {
 
 	Update = () => {
 		this.UpdateSelection();
+
+		this.UpdateSize();
+		this.mesh.geometry.center();
+		this.mesh.position.copy(this.center);
 		this.UpdateSize();
 	};
 

@@ -101,7 +101,7 @@ export abstract class SceneBase {
   			 metalness: 0.1,
   			clippingPlanes: [this.clippingPlaneMin]
   		} ),
-  		select: new MeshLambertMaterial( { color: '#ffffff', side: DoubleSide,
+  		select: new MeshLambertMaterial( { color: '#98de9c', side: DoubleSide,
   			 metalness: 0.1,
   			clippingPlanes: [this.clippingPlaneMin]
   		} ),

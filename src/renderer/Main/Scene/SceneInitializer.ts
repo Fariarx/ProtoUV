@@ -775,6 +775,7 @@ export class SceneInitializer extends SceneBase {
 
 				this.clippingPlaneMeshMin.updateMatrixWorld(true);
 				this.clippingPlaneMeshMin.position.setY(this.clippingScenePercent * this.gridSize.y);
+				this.clippingPlaneMeshMin.updateMatrixWorld(true);
 				this.clippingPlaneMin.applyMatrix4( this.clippingPlaneMeshMin.matrixWorld );
 				this.clippingPlaneMeshMin.updateMatrixWorld(true);
 
@@ -939,7 +940,6 @@ export class SceneInitializer extends SceneBase {
 
 				this.renderer.render(this.scene, this.activeCamera);
 
-				this.outlineEffectRenderer.renderOutline(this.scene, this.activeCamera);
 				if (this.activeCamera.position.y >= 0)
 				{
 					// this.renderer.setSize( 333, 333 );
@@ -949,18 +949,32 @@ export class SceneInitializer extends SceneBase {
 					// bridge.ipcRenderer.send('capture-page', screenshot.replace('data:image/png;base64,','')
 					// );
 					if (!this.clippingSceneWorking) {
+						this.outlineEffectRenderer.renderOutline(this.scene, this.activeCamera);
 					}
 				}
 			}, 500);
 
 			this.stats.update();
 
-			//this.stencilRenderer.clearDepth();
-			this.sliceOrthographicCamera.position.set(this.gridSize.x/2, 40, this.gridSize.z/2);
+			const _hide = (isShow: boolean) => {
+				this.lightGroup.visible = isShow;
+				this.lightFromCamera.visible = isShow;
+				this.decorations.visible = isShow;
+				this.objects.forEach(x => {
+					x.mesh.visible = isShow;
+					x.supports?.forEach(y =>
+						y.visible = isShow);
+				});
+			};
+
+			_hide(false);
+			this.stencilRenderer.clearDepth();
+			this.sliceOrthographicCamera.position.set(this.gridSize.x/2, this.gridSize.y + 1, this.gridSize.z/2);
 			this.sliceOrthographicCamera.lookAt(this.gridSize.x/2, 0, this.gridSize.z/2);
 			this.stencilRenderer.render(this.scene, this.sliceOrthographicCamera);
-			const v = new Vector3();
-			ThreeHelper.DrawPoint(this.sliceOrthographicCamera.getWorldPosition(v));
+			_hide(true);
+			//const v = new Vector3();
+			//ThreeHelper.DrawPoint(this.sliceOrthographicCamera.getWorldPosition(v));
 			//ThreeHelper.DrawDirLine(this.sliceOrthographicCamera.position,this.sliceOrthographicCamera.getWorldDirection(v) );
 
 			const screenshot = this.stencilRenderer.domElement.toDataURL('image/png');

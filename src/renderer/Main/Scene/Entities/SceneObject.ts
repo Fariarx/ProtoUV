@@ -11,6 +11,7 @@ import {
 	TransformEnum,
 } from 'renderer/Shared/Libs/Types';
 import {
+	AlwaysStencilFunc,
 	BackSide,
 	BufferAttribute,
 	BufferGeometry,
@@ -24,7 +25,7 @@ import {
 	Matrix4,
 	Mesh,
 	MeshBasicMaterial,
-	Vector3,
+	Vector3
 } from 'three';
 import { mergeBufferGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils';
 import { MeshBVH } from 'three-mesh-bvh';
@@ -93,9 +94,9 @@ export class SceneObject {
 		const store = AppStore.sceneStore;
 
 		const _create = (geometry: BufferGeometry) => {
-			const mesh = new Mesh(geometry);
-			mesh.updateMatrixWorld( true );
-			const surfaceModel = mesh.clone();
+			const frontSideModel = new Mesh(geometry);
+			frontSideModel.updateMatrixWorld( true );
+			const surfaceModel = frontSideModel.clone();
 			surfaceModel.material = AppStore.sceneStore.materialForObjects.select.clone();
 			surfaceModel.material .transparent = true;
 			surfaceModel.material .opacity = 0;
@@ -110,13 +111,13 @@ export class SceneObject {
 			clippingLineMin.frustumCulled = false;
 			clippingLineMin.renderOrder = 3;
 
-			clippingLineMin.scale.copy( mesh.scale );
+			clippingLineMin.scale.copy( frontSideModel.scale );
 			clippingLineMin.position.set( 0, 0, 0 );
 			clippingLineMin.quaternion.identity();
 
 			const matSet = new Set();
 			const materialMap = new Map();
-			mesh.traverse((c: Mesh | any) => {
+			frontSideModel.traverse((c: Mesh | any) => {
 				if ( materialMap.has( c.material ) ) {
 					c.material = materialMap.get( c.material );
 					return;
@@ -126,13 +127,17 @@ export class SceneObject {
 
 				const material = c.material.clone();
 				material.roughness = 1.0;
-				material .transparent = true;
-				material .opacity = 0;
+				material.metalness = 0.1;
 				material.side = FrontSide;
 				material.stencilWrite = true;
-				material.stencilFail = IncrementWrapStencilOp;
-				material.stencilZFail = IncrementWrapStencilOp;
-				material.stencilZPass = IncrementWrapStencilOp;
+				material.stencilFail =  DecrementWrapStencilOp;
+				material.stencilZFail = DecrementWrapStencilOp;
+				material.stencilZPass =  DecrementWrapStencilOp;
+				material.depthWrite = false;
+				material.depthTest = false;
+				material.colorWrite = false;
+				material.stencilWrite = true;
+				material.stencilFunc = AlwaysStencilFunc;
 				material.clippingPlanes = [AppStore.sceneStore.clippingPlaneMin];
 
 				materialMap.set( c.material, material );
@@ -141,7 +146,7 @@ export class SceneObject {
 
 			materialMap.clear();
 
-			const backSideModel = mesh.clone();
+			const backSideModel = frontSideModel.clone();
 			backSideModel.traverse((c: Mesh | any) => {
 				if (c.isMesh) {
 					if ( materialMap.has( c.material ) ) {
@@ -150,17 +155,14 @@ export class SceneObject {
 					}
 
 					const material = c.material.clone();
-					material.color.set( 0xffffff );
-					material.roughness = 1.0;
-					material.colorWrite = false;
-					material.depthWrite = false;
-					material.transparent = true;
-					material.opacity = 0;
 					material.side =  BackSide;
+					material.stencilFail = IncrementWrapStencilOp;
+					material.stencilZFail = IncrementWrapStencilOp;
+					material.stencilZPass = IncrementWrapStencilOp;
+					material.depthWrite = false;
+					material.depthTest = false;
+					material.colorWrite = false;
 					material.stencilWrite = true;
-					material.stencilFail =  DecrementWrapStencilOp;
-					material.stencilZFail = DecrementWrapStencilOp;
-					material.stencilZPass =  DecrementWrapStencilOp;
 					material.clippingPlanes = [AppStore.sceneStore.clippingPlaneMin];
 
 					materialMap.set( c.material, material );
@@ -168,28 +170,30 @@ export class SceneObject {
 				}
 			});
 
-			const colliderBvh = new MeshBVH( mesh.geometry, { maxLeafTris: 3 } );
-			mesh.geometry.boundsTree = colliderBvh;
+			const colliderBvh = new MeshBVH( frontSideModel.geometry, { maxLeafTris: 3 } );
+			frontSideModel.geometry.boundsTree = colliderBvh;
 
-			const colliderMesh = new Mesh( mesh.geometry,  new MeshBasicMaterial( {
+			const colliderMesh = new Mesh( frontSideModel.geometry,  new MeshBasicMaterial( {
+				wireframe: true,
+				transparent: true,
+				opacity: 0.01,
 				depthWrite: false,
 			}));
 			colliderMesh.renderOrder = 2;
-			colliderMesh.position.copy( mesh.position );
-			colliderMesh.rotation.copy( mesh.rotation );
-			colliderMesh.scale.copy( mesh.scale );
+			colliderMesh.position.copy( frontSideModel.position );
+			colliderMesh.rotation.copy( frontSideModel.rotation );
+			colliderMesh.scale.copy( frontSideModel.scale );
 
 			const group = new Group();
 
-			group.add(mesh,
+			group.add(frontSideModel,
 				backSideModel,
 				surfaceModel,
 				colliderMesh,
 				clippingLineMin);
 
-			mesh.visible = true;
-			colliderMesh.visible = false;
-			backSideModel.visible = true;
+			group.children[3].visible = false;
+			group.children[2].visible = false;
 
 			return {
 				group: group,

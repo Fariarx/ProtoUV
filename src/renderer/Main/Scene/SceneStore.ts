@@ -118,8 +118,6 @@ export class SceneStore extends SceneInitializer {
 
 			line.renderOrder = 0.5;
 
-			scene.add(line);
-
 			return {
 				obj: line,
 				mat: this.materialLine,
@@ -132,6 +130,7 @@ export class SceneStore extends SceneInitializer {
 
 		this.grid = createPrinterGrid(this.gridSize, this.scene);
 		this.grid.obj.position.set(0, 0.00002, 0);
+		this.decorations.add(this.grid.obj);
 
 		this.updateCameraLookPosition();
 
@@ -145,7 +144,7 @@ export class SceneStore extends SceneInitializer {
 				AppStore.performSupports.addCursorToScene();
 			}, 100);
 
-			this.clippingPlaneMeshMin.scale.setScalar(Math.max(this.gridSize.x, this.gridSize.z) * 3);
+			this.clippingPlaneMeshMin.scale.setScalar(1000000);
 			this.stencilRenderer.setSize(this.printer.Resolution.X,this.printer.Resolution.Y);
 			this.sliceOrthographicCamera = new OrthographicCamera(
 

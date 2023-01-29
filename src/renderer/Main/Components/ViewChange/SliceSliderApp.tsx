@@ -38,8 +38,8 @@ export const SliceSliderApp = observer(() => {
 				else  {
 					AppStore.sceneStore.clippingSceneWorking = true;
 					AppStore.sceneStore.clippingScenePercent = n / 100000;
-					AppStore.sceneStore.animate();
 				}
+				AppStore.sceneStore.animate();
 			}}
 			/*onDoubleClick={() => {
 				AppStore.sceneStore.clippingSceneDirectionDown =

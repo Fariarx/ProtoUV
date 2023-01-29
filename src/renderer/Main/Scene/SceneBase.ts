@@ -30,6 +30,7 @@ import {
 import { OutlineEffect } from 'three/examples/jsm/effects/OutlineEffect';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial';
+import { NotEqualDepth } from 'three/src/constants';
 
 import { SceneObject } from './Entities/SceneObject';
 import {
@@ -42,11 +43,13 @@ import { Printer } from '../Printer/Configs/Printer';
 export abstract class SceneBase {
 	public renderer: WebGLRenderer = new WebGLRenderer({
 		antialias: true,
-		alpha:true,
+		alpha:true
 	});
 	public stencilRenderer: WebGLRenderer = new WebGLRenderer({
-		antialias: true,
-		alpha: false,
+		// warn! this enabled setting give some ghost pixels
+		antialias: false,
+		alpha:false,
+		depth: false
 	});
 	public sliceOrthographicCamera = new OrthographicCamera(
 		window.innerWidth / - 2,
@@ -74,13 +77,15 @@ export abstract class SceneBase {
   public clippingSceneWorking = false;
   public clippingSceneDirectionDown = true;
 
-  public clippingLineMin!: LineSegments;
   public clippingPlaneMin = new Plane();
-  public clippingPlaneMeshMin = new THREE.Mesh( new THREE.PlaneBufferGeometry(), new THREE.MeshStandardMaterial({
-  	color: '#56fd5f',  side: BackSide,
+  public clippingPlaneMeshMin = new THREE.Mesh( new THREE.PlaneBufferGeometry(), new THREE.MeshBasicMaterial ({
+  	color: '#fff',  side: BackSide,
   	transparent: true,
   	stencilWrite: true,
-  	depthTest: false,
+  	depthTest: true,
+  	depthWrite: true,
+  	depthFunc: NotEqualDepth,
+  	reflectivity: 0,
   	stencilRef: 0,
   	stencilFunc: THREE.NotEqualStencilFunc,
   	stencilFail: THREE.ReplaceStencilOp,
@@ -90,13 +95,14 @@ export abstract class SceneBase {
 
   public materialsForScene = {
   	default: {
-  		normal: new MeshStandardMaterial( {  color: '#ffa600', side: DoubleSide,
-  			stencilWrite: true, metalness: 0.1,
+  		normal: new MeshLambertMaterial( {  color: '#ffa600', side: DoubleSide,
+  			 metalness: 0.1,
   			clippingPlanes: [this.clippingPlaneMin]
   		} ),
-  		select: new MeshStandardMaterial( { color: '#ffffff', side: DoubleSide,
-  			stencilWrite: true, metalness: 0.1,
-  			clippingPlanes: [this.clippingPlaneMin] } ),
+  		select: new MeshLambertMaterial( { color: '#ffffff', side: DoubleSide,
+  			 metalness: 0.1,
+  			clippingPlanes: [this.clippingPlaneMin]
+  		} ),
   	} as MaterialForScene,
   };
 

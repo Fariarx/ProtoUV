@@ -3,6 +3,7 @@ import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { AppStore } from '../../../AppStore';
 import { config } from '../../../Shared/Config';
+import { ThreeHelper } from '../../../Shared/Helpers/Three';
 
 export const SliceSliderApp = observer(() => {
 	const refresh = () => {

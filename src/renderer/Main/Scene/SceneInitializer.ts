@@ -594,13 +594,17 @@ export class SceneInitializer extends SceneBase {
 	public updateTransformControls = () => {
 		const isWorkingInstrument = AppStore.transform.state !== TransformEnum.None;
 
-		AppStore.sceneStore.transformObjectGroup.position.setX(AppStore.sceneStore.gridSize.x / 2).setZ(AppStore.sceneStore.gridSize.z / 2).setY(0);
-		AppStore.sceneStore.transformObjectGroup.rotation.set(0,0,0);
-		AppStore.sceneStore.transformGroupMarker.position.setX(AppStore.sceneStore.gridSize.x / 2).setZ(AppStore.sceneStore.gridSize.z / 2).setY(0);
-		AppStore.sceneStore.transformGroupMarker.rotation.set(0,0,0);
-
 		if(isWorkingInstrument && AppStore.sceneStore.groupSelected.length)
 		{
+			const groupCenter = SceneObject.CalculateGroupCenter(this.groupSelected);
+			AppStore.sceneStore.transformObjectGroup.position.setX(groupCenter.x).setZ(groupCenter.z).setY(0);
+			AppStore.sceneStore.transformObjectGroup.rotation.set(0,0,0);
+			AppStore.sceneStore.transformGroupMarker.position.setX(groupCenter.x).setZ(groupCenter.z).setY(0);
+			AppStore.sceneStore.transformGroupMarker.rotation.set(0,0,0);
+
+			//const groupCenter = SceneObject.CalculateGroupCenter(this.groupSelected);
+			//ThreeHelper.DrawPoint(groupCenter);
+			//this.transformControls.position.set(groupCenter.x, groupCenter.y, groupCenter.z);
 			AppStore.sceneStore.transformControls.attach(AppStore.sceneStore.transformObjectGroup);
 			AppStore.sceneStore.transformControls.setMode(EnumHelpers
 				.valueOf(TransformEnum, AppStore.transform.state) as 'translate' | 'rotate' | 'scale');

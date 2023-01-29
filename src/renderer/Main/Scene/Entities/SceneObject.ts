@@ -32,6 +32,7 @@ import { MeshBVH } from 'three-mesh-bvh';
 
 import { AppStore } from '../../../AppStore';
 import { Dispatch } from '../../../Shared/Events';
+import { ThreeHelper } from '../../../Shared/Helpers/Three';
 import { SceneStore } from '../SceneStore';
 
 export class SceneObject {
@@ -352,9 +353,14 @@ export class SceneObject {
 	};
 
 	AlignToPlaneXZ = (gridVec: Vector3) => {
+		const fromCenter = new Vector3(
+			(gridVec.x / 2) - this.center.x,
+			this.mesh.position.y,
+			(gridVec.z / 2) - this.center.z);
+
 		Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
 			from: this.mesh.position.clone(),
-			to: this.mesh.position.clone().setX(gridVec.x / 2).setZ(gridVec.z / 2),
+			to: fromCenter,
 			sceneObject: this as SceneObject,
 			instrument: TransformEnum.Move
 		} as AppEventMoveObject);
@@ -554,14 +560,14 @@ export class SceneObject {
 		let delta: Vector3 = new Vector3();
 
 		objs.every(function (element, index) {
-			const position = element.mesh.position;
+			const mesh = element;
 
 			if (index === 0) {
-				delta = position.clone();
+				delta = mesh.center.clone();
 			} else {
-				delta.x = (delta.x + position.x) / 2;
-				delta.y = (delta.y + position.y) / 2;
-				delta.z = (delta.z + position.z) / 2;
+				delta.x = (delta.x + mesh.center.x) / 2;
+				delta.y = (delta.y +  mesh.center.y) / 2;
+				delta.z = (delta.z +  mesh.center.z) / 2;
 			}
 		});
 

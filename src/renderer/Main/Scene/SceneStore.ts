@@ -86,7 +86,7 @@ export class SceneStore extends SceneInitializer {
 			const plane2 = new Mesh(geometry, this.materialForPlaneShadow);
 			plane2.rotateX(-Math.PI / 2);
 			plane2.receiveShadow = true;
-			plane2.position.set(this.gridSize.x / 2, 0.1, this.gridSize.z / 2);
+			plane2.position.set(this.gridSize.x / 2, 0.0004, this.gridSize.z / 2);
 
 			this.decorations.add(plane2);
 		}
@@ -129,7 +129,7 @@ export class SceneStore extends SceneInitializer {
 		};
 
 		this.grid = createPrinterGrid(this.gridSize, this.scene);
-		this.grid.obj.position.set(0, 0.00002, 0);
+		this.grid.obj.position.set(0, 0.0002, 0);
 		this.decorations.add(this.grid.obj);
 
 		this.updateCameraLookPosition();

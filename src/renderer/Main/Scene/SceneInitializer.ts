@@ -988,6 +988,7 @@ export class SceneInitializer extends SceneBase {
 				this.clippingPlaneMeshMin.material.color = isShow
 					? new Color(this.clippingInnerColor) : new Color('#fff');
 			}
+			this.transformControls.visible = isShow;
 			this.objects.forEach(x => {
 				x.mesh.visible = isShow;
 				x.supports?.forEach(y =>
@@ -1010,6 +1011,8 @@ export class SceneInitializer extends SceneBase {
 		bridge.ipcRenderer.send('save-sliced-layer',
 			image.replace('data:image/png;base64,',''),
 			layer+'.png');
+
+		console.log(image);
 
 		return image;
 	};

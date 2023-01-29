@@ -45,6 +45,9 @@ export class AppStore {
 		{
 			AppStore.slice.run();
 		}
+		else {
+			AppStore.slice.reset();
+		}
 	}
 
 	protected state = Pages.Main;

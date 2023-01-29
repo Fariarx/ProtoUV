@@ -28,7 +28,8 @@ export const LineBottomApp = observer(() => {
 			borderRight: '1px solid '+ colors.background.darkest,
 			backgroundColor: app.progressPercent >= 1
 				? colors.interact.success : colors.interact.neutral2,
-			transition: '1s background'
+			transition: '1s background',
+			pointerEvents: 'none'
 		}}/>}
 		{app.progressPercent > 0 && <Box sx={{
 			position: 'absolute',

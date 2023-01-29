@@ -1,5 +1,5 @@
 import { makeObservable } from 'mobx';
-import { bridge } from 'renderer/Shared/Globals';
+import { MaxNumber, bridge } from 'renderer/Shared/Globals';
 import {
 	Mesh, OrthographicCamera,
 	PlaneGeometry,
@@ -146,13 +146,14 @@ export class SceneStore extends SceneInitializer {
 			}, 100);
 
 			this.clippingPlaneMeshMin.scale.setScalar(Math.max(this.gridSize.x, this.gridSize.z) * 3);
-			this.sliceRenderer.setSize(this.printer.Resolution.X, this.printer.Resolution.Y);
+			this.stencilRenderer.setSize(this.printer.Resolution.X,this.printer.Resolution.Y);
 			this.sliceOrthographicCamera = new OrthographicCamera(
-				this.printer.Resolution.X,
-				this.printer.Resolution.X,
-				this.printer.Resolution.Y,
-				this.printer.Resolution.Y,
-				0.00001,
+
+				this.gridSize.x / - 2,
+				this.gridSize.x / 2,
+				this.gridSize.z / 2,
+				this.gridSize.z / - 2,
+				0.0001,
 			);
 		}
 

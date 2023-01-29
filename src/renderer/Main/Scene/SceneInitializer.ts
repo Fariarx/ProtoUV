@@ -25,6 +25,7 @@ import {
 	TransformControls,
 } from 'three/examples/jsm/controls/TransformControls';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader';
+import { LinearEncoding } from 'three/src/constants';
 import { CONTAINED, MeshBVH } from 'three-mesh-bvh';
 import { Key } from 'ts-keycode-enum';
 import { container } from 'tsyringe';
@@ -41,9 +42,10 @@ import {
 	saveConfig,
 } from '../../Shared/Config';
 import { Dispatch } from '../../Shared/Events';
-import { MaxNumber } from '../../Shared/Globals';
+import { MaxNumber, bridge } from '../../Shared/Globals';
 import { EnumHelpers } from '../../Shared/Helpers/Enum';
 import * as OrientationHelper from '../../Shared/Helpers/OrientationHelper';
+import { ThreeHelper } from '../../Shared/Helpers/Three';
 import {
 	SubscribersKeyPressed,
 	isKeyPressed,
@@ -78,7 +80,9 @@ export class SceneInitializer extends SceneBase {
 		this.renderer.setClearColor(0x000000, 0);
 		this.renderer.sortObjects = true;
 
-		this.sliceRenderer.setClearColor(0x000000);
+		this.stencilRenderer.localClippingEnabled = true;
+		this.stencilRenderer.outputEncoding = LinearEncoding;
+		this.stencilRenderer.setClearColor(0x000000);
 
 		this.renderer.localClippingEnabled = true;
 		this.renderer.shadowMap.enabled = true;
@@ -363,7 +367,7 @@ export class SceneInitializer extends SceneBase {
 		this.transformControls.addEventListener( 'dragging-changed', this.transformControlsDragging);
 		this.transformControls.addEventListener( 'change', this.transformControlsUpdate);
 	};
-	public setupCanvas = (canvas: HTMLDivElement | null) => {
+	public setupCanvas = (canvas: HTMLDivElement | null, canvasSlice: HTMLDivElement | null) => {
 		this.stats.domElement.style.marginTop = '400px';
 		this.stats.domElement.style.marginLeft = '8px';
 		this.stats.domElement.style.opacity = '0.3';
@@ -371,6 +375,7 @@ export class SceneInitializer extends SceneBase {
 		this.setupOrientationHelper(canvas);
 		canvas?.appendChild(this.renderer.domElement);
 		canvas?.appendChild(this.stats.domElement);
+		canvasSlice?.appendChild(this.stencilRenderer.domElement);
 	};
 	public setupOrientationHelper = (canvas: HTMLDivElement | null) => {
 		const ohOptions = {
@@ -740,7 +745,7 @@ export class SceneInitializer extends SceneBase {
 		}
 	};
 	public clippingSomeShit = () => {
-		if (this.clippingScenePercent === -1)
+		if (!this.clippingSceneWorking)
 		{
 			this.clippingReset();
 			this.clippingPlaneMeshMin.visible = false;
@@ -768,9 +773,10 @@ export class SceneInitializer extends SceneBase {
 				const  tempVector2 = this.clippingBuffer.tempVector2;
 				const  tempVector3 = this.clippingBuffer.tempVector3;
 
-				this.clippingPlaneMeshMin.updateMatrixWorld();
+				this.clippingPlaneMeshMin.updateMatrixWorld(true);
 				this.clippingPlaneMeshMin.position.setY(this.clippingScenePercent * this.gridSize.y);
 				this.clippingPlaneMin.applyMatrix4( this.clippingPlaneMeshMin.matrixWorld );
+				this.clippingPlaneMeshMin.updateMatrixWorld(true);
 
 				this.clippingPlaneMin.constant = (this.clippingSceneDirectionDown ? 1 : -1) * this.clippingScenePercent * this.gridSize.y;
 				this.clippingPlaneMin.normal.set( 0, (this.clippingSceneDirectionDown ? -1 : 1), 0);
@@ -917,7 +923,6 @@ export class SceneInitializer extends SceneBase {
 			else {
 				SceneObject.UpdateSupports(this.objects, false);
 			}
-
 			this.renderer.render(this.scene, this.activeCamera);
 
 			if (this.temp.outlineTimer) {
@@ -934,6 +939,7 @@ export class SceneInitializer extends SceneBase {
 
 				this.renderer.render(this.scene, this.activeCamera);
 
+				this.outlineEffectRenderer.renderOutline(this.scene, this.activeCamera);
 				if (this.activeCamera.position.y >= 0)
 				{
 					// this.renderer.setSize( 333, 333 );
@@ -942,13 +948,24 @@ export class SceneInitializer extends SceneBase {
 					// console.log(screenshot);
 					// bridge.ipcRenderer.send('capture-page', screenshot.replace('data:image/png;base64,','')
 					// );
-					if (this.clippingScenePercent === -1) {
-						this.outlineEffectRenderer.renderOutline(this.scene, this.activeCamera);
+					if (!this.clippingSceneWorking) {
 					}
 				}
 			}, 500);
 
 			this.stats.update();
+
+			//this.stencilRenderer.clearDepth();
+			this.sliceOrthographicCamera.position.set(this.gridSize.x/2, 40, this.gridSize.z/2);
+			this.sliceOrthographicCamera.lookAt(this.gridSize.x/2, 0, this.gridSize.z/2);
+			this.stencilRenderer.render(this.scene, this.sliceOrthographicCamera);
+			const v = new Vector3();
+			ThreeHelper.DrawPoint(this.sliceOrthographicCamera.getWorldPosition(v));
+			//ThreeHelper.DrawDirLine(this.sliceOrthographicCamera.position,this.sliceOrthographicCamera.getWorldDirection(v) );
+
+			const screenshot = this.stencilRenderer.domElement.toDataURL('image/png');
+			//console.log(screenshot);
+			bridge.ipcRenderer.send('capture-page', screenshot.replace('data:image/png;base64,',''), '/screenshot.png');
 
 			/*if (this.isTransformWorking) {
         requestAnimationFrame(_animate);
@@ -963,6 +980,8 @@ export class SceneInitializer extends SceneBase {
 		requestAnimationFrame(_animate);
 	};
 
+	public sliceJob = () => {
+	};
 	public clippingBuffer = {
 		sceneGeometryCount: 0 as number,
 		sceneGeometryGrouped: null as null | Group,

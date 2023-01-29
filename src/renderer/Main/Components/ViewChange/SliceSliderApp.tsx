@@ -1,4 +1,5 @@
 import { Box, Slider } from '@mui/material';
+import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { AppStore } from '../../../AppStore';
 import { config } from '../../../Shared/Config';
@@ -27,14 +28,17 @@ export const SliceSliderApp = observer(() => {
 			orientation="vertical"
 			valueLabelDisplay="off"
 			min={-1}
-			max={100000}
+			max={100001}
 			value={AppStore.sceneStore.clippingScenePercent * 100000}
 			onChange={(_,n: number & any) => {
-				AppStore.sceneStore.clippingScenePercent = n < 0 ? -1 : n / 100000;
-				AppStore.sceneStore.animate();
-				if (AppStore.sceneStore.clippingScenePercent < 0 && n >= 0)
+				if (n < 0 || n > 100000)
 				{
-					refresh();
+					AppStore.sceneStore.clippingSceneWorking = false;
+				}
+				else  {
+					AppStore.sceneStore.clippingSceneWorking = true;
+					AppStore.sceneStore.clippingScenePercent = n / 100000;
+					AppStore.sceneStore.animate();
 				}
 			}}
 			/*onDoubleClick={() => {

@@ -73,6 +73,7 @@ export class SceneObject {
 		this.geometry = geometry;
 		this.geometry.scale(0.1, 0.1, 0.1);
 		this.mesh = new Mesh(geometry, sceneStore.materialForObjects.select);
+		this.mesh.renderOrder = 3;
 
 		this.minY = new Vector3();
 		this.maxY = new Vector3();
@@ -92,8 +93,6 @@ export class SceneObject {
 		const store = AppStore.sceneStore;
 
 		const _create = (geometry: BufferGeometry) => {
-			console.log(1);
-
 			const mesh = new Mesh(geometry);
 			mesh.updateMatrixWorld( true );
 			const surfaceModel = mesh.clone();

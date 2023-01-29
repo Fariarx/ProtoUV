@@ -137,15 +137,8 @@ const createWindow = async () => {
 		worker.on('error', error => mainWindow!.webContents.send('worker-slice', 'error in slice worker and ' + error));
 		worker.on('exit', code => mainWindow!.webContents.send('worker-slice', `worker exited with code ${code}`));
 	});
-	ipcMain.on('capture-page', (e, screenshot: string) => {
-		const b = atob(screenshot);
-		fs.writeFileSync(userData + '/slice/' + 'b.png',b , 'binary' );
-		const fere = Date.now();
-    mainWindow!.webContents.capturePage().then(image =>
-    {
-    	fs.writeFileSync(userData + '/slice/' + 'screen', image.toPNG() );
-    	console.log(Date.now() - fere);
-    });
+	ipcMain.on('capture-page', (e, screenshot: string, path: string) => {
+		fs.writeFileSync(userData + path, atob(screenshot), 'binary' );
 	});
 };
 

@@ -1,5 +1,5 @@
+
 export enum WorkerType {
-  SliceLayerScene,
   SliceFullScene
 }
 

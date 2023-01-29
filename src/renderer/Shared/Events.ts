@@ -164,13 +164,14 @@ const objectTransform = (message: AppEvent) => {
 		}
 	}
 
+	console.log('Move');
+
 	if(!event.renderBreak)
 	{
+		mesh.updateMatrixWorld(true);
+		AppStore.sceneStore.clippingReset();
+		AppStore.sceneStore.clippingSomeShit();
 		AppStore.sceneStore.animate();
-		setTimeout(() => {
-			AppStore.sceneStore.clippingReset();
-			AppStore.sceneStore.animate();
-		});
 	}
 };
 

@@ -4,15 +4,14 @@ import {
 } from 'mobx';
 import * as THREE from 'three';
 import {
+	BackSide,
 	DirectionalLight,
 	DoubleSide,
-	EqualDepth,
 	FrontSide,
 	Group,
 	LineSegments,
 	Material,
 	MeshLambertMaterial,
-	MeshPhongMaterial,
 	MeshStandardMaterial,
 	Object3D,
 	OrthographicCamera,
@@ -22,7 +21,7 @@ import {
 	ShaderMaterial,
 	ShadowMaterial,
 	Vector3,
-	WebGLRenderer,
+	WebGLRenderer
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import {
@@ -45,16 +44,16 @@ export abstract class SceneBase {
 		antialias: true,
 		alpha:true,
 	});
-	public sliceRenderer: WebGLRenderer = new WebGLRenderer({
+	public stencilRenderer: WebGLRenderer = new WebGLRenderer({
 		antialias: true,
-		alpha:false,
+		alpha: false,
 	});
 	public sliceOrthographicCamera = new OrthographicCamera(
 		window.innerWidth / - 2,
 		window.innerWidth / 2,
 		window.innerHeight / 2,
 		window.innerHeight / - 2,
-		0.000001,
+		0.0001,
 	);
 	public outlineEffectRenderer: OutlineEffect = new OutlineEffect( this.renderer, {
 		defaultThickness:0.0015
@@ -69,17 +68,19 @@ export abstract class SceneBase {
 		linewidth: 1.5
 	});
 
-	// [0, 1] or -1 to off
   @observable
-	public clippingScenePercent = 0.01;
+	public clippingScenePercent = 0;
+  @observable
+  public clippingSceneWorking = false;
   public clippingSceneDirectionDown = true;
 
   public clippingLineMin!: LineSegments;
   public clippingPlaneMin = new Plane();
   public clippingPlaneMeshMin = new THREE.Mesh( new THREE.PlaneBufferGeometry(), new THREE.MeshStandardMaterial({
-  	color: '#56fd5f',  side: DoubleSide,
+  	color: '#56fd5f',  side: BackSide,
   	transparent: true,
   	stencilWrite: true,
+  	depthTest: false,
   	stencilRef: 0,
   	stencilFunc: THREE.NotEqualStencilFunc,
   	stencilFail: THREE.ReplaceStencilOp,

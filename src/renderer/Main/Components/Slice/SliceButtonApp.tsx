@@ -30,20 +30,8 @@ export const SliceButtonApp = observer(() => {
 			backgroundColor: colors.background.black
 		}
 	}}  onClick={() => {
-		let _percent = 0;
 		Log('run slicing');
-		addJob(new Job({
-			name: WorkerType.SliceFullScene,
-			onResult: (result: SliceResult[]) => {
-				Log('slicing done');
-			},
-			onState: (percent: number) => {
-				if (Math.ceil(percent * 100) !== _percent) {
-					_percent = Math.ceil(percent * 100);
-					Log('slicing: ' + _percent + ' %');
-				}
-			}
-		}));
+		AppStore.sceneStore.sliceJob();
 	}}>
 		<Typography sx={{ mb: '4px' }}>
       Slice

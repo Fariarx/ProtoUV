@@ -131,14 +131,16 @@ const createWindow = async () => {
 		return { action: 'deny' };
 	});
 
-	ipcMain.on('worker-slice', (event, f, a, b) => {
-		const worker = new Worker('./src/workers/slice.worker.bundle.js', { workerData: [f, a, b, userData] });
-		worker.on('message', msg => mainWindow!.webContents.send('worker-slice', msg));
-		worker.on('error', error => mainWindow!.webContents.send('worker-slice', 'error in slice worker and ' + error));
-		worker.on('exit', code => mainWindow!.webContents.send('worker-slice', `worker exited with code ${code}`));
+	ipcMain.on('prepare-to-slicing', () => {
+		if (fs.existsSync(userData + '/slicing'))
+		{
+			fs.rmSync(userData + '/slicing', { recursive: true, force: true });
+		}
+		fs.mkdirSync(userData + '/slicing');
+		mainWindow?.webContents.send('prepare-to-slicing');
 	});
-	ipcMain.on('capture-page', (e, screenshot: string, path: string) => {
-		fs.writeFileSync(userData + path, atob(screenshot), 'binary' );
+	ipcMain.on('save-sliced-layer', (_, screenshot: string, path: string) => {
+		fs.writeFileSync(userData + '/slicing/' + path, atob(screenshot), 'binary' );
 	});
 };
 

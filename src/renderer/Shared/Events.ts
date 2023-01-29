@@ -164,8 +164,6 @@ const objectTransform = (message: AppEvent) => {
 		}
 	}
 
-	console.log('Move');
-
 	if(!event.renderBreak)
 	{
 		mesh.updateMatrixWorld(true);

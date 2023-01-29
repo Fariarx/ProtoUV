@@ -1,9 +1,11 @@
+import { slice } from 'lodash';
 import { runInAction } from 'mobx';
 import { WheelEvent } from 'React';
 import {
 	AmbientLight,
 	ArrowHelper,
 	BufferGeometry,
+	Color,
 	DirectionalLight,
 	Group,
 	Line3,
@@ -17,8 +19,7 @@ import {
 	PerspectiveCamera,
 	Plane,
 	Raycaster,
-	Vector3,
-	sRGBEncoding,
+	Vector3, sRGBEncoding
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import {
@@ -367,7 +368,7 @@ export class SceneInitializer extends SceneBase {
 		this.transformControls.addEventListener( 'dragging-changed', this.transformControlsDragging);
 		this.transformControls.addEventListener( 'change', this.transformControlsUpdate);
 	};
-	public setupCanvas = (canvas: HTMLDivElement | null, canvasSlice: HTMLDivElement | null) => {
+	public setupCanvas = (canvas: HTMLDivElement | null) => {
 		this.stats.domElement.style.marginTop = '400px';
 		this.stats.domElement.style.marginLeft = '8px';
 		this.stats.domElement.style.opacity = '0.3';
@@ -375,7 +376,6 @@ export class SceneInitializer extends SceneBase {
 		this.setupOrientationHelper(canvas);
 		canvas?.appendChild(this.renderer.domElement);
 		canvas?.appendChild(this.stats.domElement);
-		canvasSlice?.appendChild(this.stencilRenderer.domElement);
 	};
 	public setupOrientationHelper = (canvas: HTMLDivElement | null) => {
 		const ohOptions = {
@@ -960,31 +960,6 @@ export class SceneInitializer extends SceneBase {
 
 			this.stats.update();
 
-			const _hide = (isShow: boolean) => {
-				this.lightGroup.visible = isShow;
-				this.lightFromCamera.visible = isShow;
-				this.decorations.visible = isShow;
-				this.objects.forEach(x => {
-					x.mesh.visible = isShow;
-					x.supports?.forEach(y =>
-						y.visible = isShow);
-				});
-			};
-
-			_hide(false);
-			this.stencilRenderer.clearDepth();
-			this.sliceOrthographicCamera.position.set(this.gridSize.x/2, this.gridSize.y + 1, this.gridSize.z/2);
-			this.sliceOrthographicCamera.lookAt(this.gridSize.x/2, 0, this.gridSize.z/2);
-			this.stencilRenderer.render(this.scene, this.sliceOrthographicCamera);
-			_hide(true);
-			//const v = new Vector3();
-			//ThreeHelper.DrawPoint(this.sliceOrthographicCamera.getWorldPosition(v));
-			//ThreeHelper.DrawDirLine(this.sliceOrthographicCamera.position,this.sliceOrthographicCamera.getWorldDirection(v) );
-
-			const screenshot = this.stencilRenderer.domElement.toDataURL('image/png');
-			//console.log(screenshot);
-			bridge.ipcRenderer.send('capture-page', screenshot.replace('data:image/png;base64,',''), '/screenshot.png');
-
 			/*if (this.isTransformWorking) {
         requestAnimationFrame(_animate);
       }*/
@@ -998,8 +973,47 @@ export class SceneInitializer extends SceneBase {
 		requestAnimationFrame(_animate);
 	};
 
-	public sliceJob = () => {
+	public sliceLayer = (percent: number, layer: number) => {
+		this.clippingScenePercent = percent;
+
+		const _hide = (isShow: boolean) => {
+			this.clippingSceneWorking = !isShow;
+			this.lightGroup.visible = isShow;
+			this.lightFromCamera.visible = isShow;
+			this.decorations.visible = isShow;
+			if (this.clippingBuffer.intersectionMesh.outlineLines)
+			{
+				this.clippingBuffer.intersectionMesh.outlineLines.material.color = isShow
+					? new Color(this.clippingLineColor) : new Color('#fff');
+				this.clippingPlaneMeshMin.material.color = isShow
+					? new Color(this.clippingInnerColor) : new Color('#fff');
+			}
+			this.objects.forEach(x => {
+				x.mesh.visible = isShow;
+				x.supports?.forEach(y =>
+					y.visible = isShow);
+			});
+		};
+
+		_hide(false);
+		this.clippingSomeShit();
+
+		this.stencilRenderer.clearDepth();
+		this.sliceOrthographicCamera.position.set(this.gridSize.x/2, this.gridSize.y + 1, this.gridSize.z/2);
+		this.sliceOrthographicCamera.lookAt(this.gridSize.x/2, 0, this.gridSize.z/2);
+		this.stencilRenderer.render(this.scene, this.sliceOrthographicCamera);
+		_hide(true);
+
+		const image = this.stencilRenderer.domElement
+			.toDataURL('image/png');
+
+		bridge.ipcRenderer.send('save-sliced-layer',
+			image.replace('data:image/png;base64,',''),
+			layer+'.png');
+
+		return image;
 	};
+
 	public clippingBuffer = {
 		sceneGeometryCount: 0 as number,
 		sceneGeometryGrouped: null as null | Group,

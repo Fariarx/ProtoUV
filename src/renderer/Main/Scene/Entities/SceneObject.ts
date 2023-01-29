@@ -108,7 +108,7 @@ export class SceneObject {
 			linePosAttr.setUsage( DynamicDrawUsage );
 			lineGeometry.setAttribute( 'position', linePosAttr );
 			const clippingLineMin = new  LineSegments( lineGeometry, new LineBasicMaterial() );
-			clippingLineMin.material.color.set( 0x00acc1 ).convertSRGBToLinear();
+			clippingLineMin.material.color.set( AppStore.sceneStore.clippingLineColor ).convertSRGBToLinear();
 			clippingLineMin.frustumCulled = false;
 			clippingLineMin.renderOrder = 3;
 

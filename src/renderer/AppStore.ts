@@ -6,6 +6,8 @@ import { TransformStore } from './Main/Components/ToolsLeft/Transform/TransformS
 import { PerformSupportsStore } from './Main/Components/ToolsRight/Supports/PerformSupportsStore';
 import { ConsoleStore } from './Main/Console/ConsoleStore';
 import { SceneStore } from './Main/Scene/SceneStore';
+import { bridge } from './Shared/Globals';
+import { SlicingStore } from './Slicing/SlicingStore';
 
 export const Log = container.resolve(ConsoleStore).Add;
 
@@ -16,6 +18,7 @@ export class AppStore {
 	public static transform = container.resolve(TransformStore);
 	public static performSupports = container.resolve(PerformSupportsStore);
 	public static header = container.resolve(HeaderStore);
+	public static slice = container.resolve(SlicingStore);
 
 	public static get instance() {
 		return container.resolve(AppStore);
@@ -37,6 +40,11 @@ export class AppStore {
 	public static changeState(state: Pages) {
 		AppStore.sceneStore.updatePrinter();
 		AppStore.instance.state = state;
+
+		if (state === Pages.Slice)
+		{
+			AppStore.slice.run();
+		}
 	}
 
 	protected state = Pages.Main;
@@ -53,5 +61,6 @@ export enum Pages {
 	Main,
 	Configurator,
 	ConfiguratorManually,
-  ConfiguratorSupports
+  ConfiguratorSupports,
+  Slice
 }

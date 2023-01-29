@@ -18,6 +18,9 @@ const body = {
 			send: (channel: any, ...args: any) => {
 				ipcRenderer.send(channel, ...args);
 			},
+			sendSync: (channel: any, ...args: any) => {
+				ipcRenderer.sendSync(channel, ...args);
+			},
 			receive: (channel: any, listener: any) => {
 				ipcRenderer.on(channel, (event, ...args) => {
 					console.log(...args);

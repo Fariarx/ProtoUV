@@ -1,18 +1,14 @@
 import { Box } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { AppStore, Log } from 'renderer/AppStore';
+import { AppStore, Log, Pages } from 'renderer/AppStore';
 import { APP_BOTTOM_HEIGHT } from 'renderer/BottomApp';
 import { colors } from 'renderer/Shared/Config';
-import { Job, WorkerType } from 'renderer/Shared/Libs/Slice/Job';
-import { SliceResult } from 'renderer/Shared/Libs/Slice/Slice';
-import { addJob } from 'renderer/Shared/Libs/Slice/Workers';
 
 export const SliceButtonApp = observer(() => {
 	return <Box sx={{
 		position: 'fixed',
-		bottom: APP_BOTTOM_HEIGHT - 4 + 'px',
+		bottom: 10 + APP_BOTTOM_HEIGHT - 4 + 'px',
 		right: '4px',
 		backgroundColor: colors.background.dark,
 		borderRadius: '4px',
@@ -28,12 +24,13 @@ export const SliceButtonApp = observer(() => {
 		},
 		':active': {
 			backgroundColor: colors.background.black
-		}
+		},
+		opacity: AppStore.sceneStore.objects.length > 0 ? 1 : 0
 	}}  onClick={() => {
 		Log('run slicing');
-		AppStore.sceneStore.sliceJob();
+		AppStore.changeState(Pages.Slice);
 	}}>
-		<Typography sx={{ mb: '4px' }}>
+		<Typography>
       Slice
 		</Typography>
 	</Box>;

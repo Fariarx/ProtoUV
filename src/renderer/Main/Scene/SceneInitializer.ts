@@ -996,7 +996,7 @@ export class SceneInitializer extends SceneBase {
 		};
 		const _hideLine = (isShow: boolean) => {
 			this.clippingBuffer.intersectionMesh.outlineLines?.material.color.set(isShow ? this.clippingLineColor :'#919191' ).convertSRGBToLinear();
-			this.clippingPlaneMeshMin.material.color.set(isShow ? this.clippingLineColor : '#fff').convertSRGBToLinear();
+			this.clippingPlaneMeshMin.material.color.set(isShow ? this.clippingInnerColor : '#fff').convertSRGBToLinear();
 		};
 
 		_hide(false);

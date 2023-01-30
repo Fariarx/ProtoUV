@@ -17,6 +17,7 @@ import {
 	Log,
 	Pages,
 } from '../../AppStore';
+import { ThreeHelper } from '../../Shared/Helpers/Three';
 import { Grid } from '../../Shared/Libs/Tools';
 import { Printer } from '../Printer/Configs/Printer';
 
@@ -131,6 +132,7 @@ export class SceneStore extends SceneInitializer {
 		this.grid = createPrinterGrid(this.gridSize, this.scene);
 		this.grid.obj.position.set(0, 0.0002, 0);
 		this.decorations.add(this.grid.obj);
+		this.scene.add(this.decorations);
 
 		this.updateCameraLookPosition();
 

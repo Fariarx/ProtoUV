@@ -97,7 +97,7 @@ export abstract class SceneBase {
 
   public materialsForScene = {
   	default: {
-  		normal: new MeshLambertMaterial( {  color: '#ffa600', side: DoubleSide,
+  		normal: new MeshLambertMaterial( {  color: '#f1a217', side: DoubleSide,
   			 metalness: 0.1,
   			clippingPlanes: [this.clippingPlaneMin]
   		} ),

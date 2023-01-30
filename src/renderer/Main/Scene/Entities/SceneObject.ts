@@ -76,6 +76,7 @@ export class SceneObject {
 		this.geometry.scale(0.1, 0.1, 0.1);
 		this.mesh = new Mesh(geometry.clone(), sceneStore.materialForObjects.select);
 		this.mesh.renderOrder = 3;
+		this.mesh.receiveShadow = true;
 
 		this.minY = new Vector3();
 		this.maxY = new Vector3();
@@ -357,14 +358,14 @@ export class SceneObject {
 	};
 
 	AlignToPlaneXZ = (gridVec: Vector3) => {
-		const fromCenter = new Vector3(
-			(gridVec.x / 2) - this.center.x,
-			this.mesh.position.y,
-			(gridVec.z / 2) - this.center.z);
+		this.UpdateSize();
 
 		Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
 			from: this.mesh.position.clone(),
-			to: fromCenter,
+			to: new Vector3(
+				(gridVec.x / 2),
+				0,
+				(gridVec.z / 2)),
 			sceneObject: this as SceneObject,
 			instrument: TransformEnum.Move
 		} as AppEventMoveObject);

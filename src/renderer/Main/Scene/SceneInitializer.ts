@@ -976,6 +976,8 @@ export class SceneInitializer extends SceneBase {
 	public sliceLayer = (percent: number, layer: number) => {
 		this.clippingScenePercent = percent;
 
+		this.stencilRenderer.setPixelRatio(0.8);
+
 		const _hide = (isShow: boolean) => {
 			this.clippingSceneWorking = !isShow;
 			this.lightGroup.visible = isShow;
@@ -1012,7 +1014,7 @@ export class SceneInitializer extends SceneBase {
 			image.replace('data:image/png;base64,',''),
 			layer+'.png');
 
-		console.log(image);
+		//console.log(image);
 
 		return image;
 	};

@@ -3,6 +3,7 @@ import { makeAutoObservable } from 'mobx';
 import { SceneObject } from 'renderer/Main/Scene/Entities/SceneObject';
 import { singleton } from 'tsyringe';
 import { AppStore, Log, Pages } from '../AppStore';
+import { config } from '../Shared/Config';
 import { bridge } from '../Shared/Globals';
 
 @singleton()
@@ -19,11 +20,15 @@ export class SlicingStore {
 
 	public imageLargest = '';
 	public imageLargestSize = 0;
+	public workerCount = 0;
 
 	public run = () => {
 		this.isWorking = true;
-		bridge.ipcRenderer.send('prepare-to-slicing');
+
 		Log('run prepare to slicing...');
+
+		bridge.ipcRenderer.send('prepare-to-slicing');
+
 		bridge.ipcRenderer.receive('prepare-to-slicing', () => {
 			Log('prepare to slicing done!');
 			const maxObjectsPoint =  _.maxBy(AppStore.sceneStore.objects, (x: SceneObject) => x.maxY.y);
@@ -32,6 +37,11 @@ export class SlicingStore {
 			this.sliceCount = 1;
 			Log('slice layers max: ' + this.sliceCountMax);
 			this.animate();
+		});
+
+		bridge.ipcRenderer.receive('worker-info', (x: number) => {
+			Log(x+'');
+			this.workerCount = x;
 		});
 	};
 
@@ -53,23 +63,10 @@ export class SlicingStore {
 			return;
 		}
 
-		AppStore.instance.progressPercent = (this.sliceCount/this.sliceCountMax);
-
-		this.image =	AppStore.sceneStore.sliceLayer(
-			(this.sliceCount/this.sliceCountMax) * this.sliceTo / AppStore.sceneStore.gridSize.y,
-			this.sliceCount);
-
-		if (this.image.length > this.imageLargestSize)
+		if (this.sliceCount <= this.sliceCountMax && this.workerCount < config.workerCount)
 		{
-			this.imageLargest = this.image;
-			this.imageLargestSize = this.image.length;
-		}
-
-		this.sliceCount += 1;
-
-		if (!this.isWorking)
-		{
-			return;
+			bridge.ipcRenderer.send('worker', );
+			this.workerCount++;
 		}
 
 		if (this.sliceCount <= this.sliceCountMax) {

@@ -23,7 +23,7 @@ const body = {
 			},
 			receive: (channel: any, listener: any) => {
 				ipcRenderer.on(channel, (event, ...args) => {
-					console.log(...args);
+					console.log(args);
 					listener(...args);
 				});
 			},

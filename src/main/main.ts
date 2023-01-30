@@ -142,6 +142,34 @@ const createWindow = async () => {
 	ipcMain.on('save-sliced-layer', (_, screenshot: string, path: string) => {
 		fs.writeFileSync(userData + '/slicing/' + path, atob(screenshot), 'binary' );
 	});
+
+	let workers: BrowserWindow[] = [];
+
+	ipcMain.on('worker', (_, scene: string) => {
+		console.log(123);
+		const worker = new BrowserWindow({
+			//show: false,
+			//titleBarStyle: 'hidden',
+		});
+		console.log(scene);
+		worker.loadURL(resolveHtmlPath('index.html'));
+		worker.webContents.send('worker', scene);
+		workers.push(worker);
+
+		const send = () => mainWindow?.webContents.send('worker-info', workers.length);
+		const interval = setInterval(() => {
+			send();
+			if (!workers.length) {
+				clearInterval(interval);
+			}
+		}, 500);
+
+		send();
+	});
+	ipcMain.on('worker-shutdown', (e) => {
+		workers = workers.filter(worker => worker.webContents !== e.sender);
+		e.sender.delete();
+	});
 };
 
 /**

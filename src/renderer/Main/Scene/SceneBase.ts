@@ -49,7 +49,9 @@ export abstract class SceneBase {
 		// warn! this enabled setting give some ghost pixels
 		antialias: false,
 		alpha:false,
-		depth: false
+		depth: false,
+		preserveDrawingBuffer: true,
+		powerPreference: 'high-performance'
 	});
 	public sliceOrthographicCamera = new OrthographicCamera(
 		window.innerWidth / - 2,
@@ -134,6 +136,7 @@ export abstract class SceneBase {
   public printerName: string = config.printerName;
   public printer?: Printer;
 
+  @observable
   public scene: Scene = new Scene();
 
 	@observable

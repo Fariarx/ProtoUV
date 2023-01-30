@@ -3,10 +3,12 @@ import {
 	CssBaseline,
 	ThemeProvider
 } from '@mui/material';
+import _ from 'lodash';
 import { observer } from 'mobx-react';
 import { SnackbarProvider } from 'notistack';
 import { Route, MemoryRouter as Router, Routes } from 'react-router-dom';
 import './AppStore';
+import { Scene } from 'three';
 import { AppStore, Log, Pages } from './AppStore';
 import { LineBottomApp } from './BottomApp';
 import { ConfiguratorAutoApp } from './Configurator/ConfiguratorAutoApp';
@@ -17,7 +19,9 @@ import { ToolsLeftApp } from './Main/Components/ToolsLeft/ToolsLeftApp';
 import { ToolsRightApp } from './Main/Components/ToolsRight/ToolsRightApp';
 import { ViewChangeApp } from './Main/Components/ViewChange/ViewChangeApp';
 import { ConsoleApp } from './Main/Console/ConsoleApp';
+import { SceneObject } from './Main/Scene/Entities/SceneObject';
 import { SceneApp } from './Main/Scene/SceneApp';
+import { bridge } from './Shared/Globals';
 import { AnimationFade, AnimationGrow } from './Shared/Styled/Animation';
 import { FlexBoxColumn, FlexBoxRow } from './Shared/Styled/FlexBox';
 import { Sizes } from './Shared/Styled/Sizes';
@@ -98,3 +102,7 @@ export const App = () => <Router>
 
 Log('Application started');
 
+bridge.ipcRenderer.receive('worker', (scene: string) => {
+	AppStore.sceneStore.scene.clear();
+	AppStore.sceneStore.scene = JSON.parse(scene) as Scene;
+});

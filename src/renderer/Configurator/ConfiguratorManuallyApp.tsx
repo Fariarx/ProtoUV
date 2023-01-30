@@ -20,7 +20,7 @@ export const ConfiguratorManuallyApp = observer(() => {
 	}
 
 	const save = () => {
-		AppStore.sceneStore.printerName = config.printerName = printer.name;
+		AppStore.sceneStore.printerName = config.printerName = printer.Name;
 		Printer.SaveToFile(printer);
 		AppStore.sceneStore.printer = printer;
 		AppStore.changeState(Pages.Main);
@@ -42,7 +42,7 @@ export const ConfiguratorManuallyApp = observer(() => {
 				height: 'fit-content',
 				overflow: 'auto'
 			}}>
-				<NameField text={printer.name} setText={x => printer.name = x}/>
+				<NameField text={printer.Name} setText={x => printer.Name = x}/>
 				<GridFields obj={printer.Resolution} name={'Resolution'}/>
 				<Divider sx={{ mt: Sizes.twelve, mb: Sizes.twelve, transform: 'translateY(12px)', borderColor: colors.background.heavy }}/>
 				<GridFields obj={printer.Workspace} name={'Workspace'}/>

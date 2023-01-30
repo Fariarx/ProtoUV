@@ -4,24 +4,39 @@ import { bridge } from '../../../Shared/Globals';
 import { SupportPreset } from './Support';
 
 export class Printer {
-	name:string;
+	public Name:string;
 
-	Workspace: Workspace;
-	Resolution: Resolution;
-	PrintSettings: PrintSettings;
+	public Workspace: Workspace;
+	public Resolution: Resolution;
+	public PrintSettings: PrintSettings;
 
-	SupportPresets: SupportPreset[];
-	SupportPreset: SupportPreset;
+	public SupportPresets: SupportPreset[];
+	public SupportPreset: SupportPreset;
 
-	workerData: any = {};
+  public GCode: GCodePrinter;
 
 	constructor(_name?: string, _settings?: PrinterConfig) {
 		if (_name) {
-			this.name = _name;
+			this.Name = _name;
 		}
 		else {
-			this.name = 'Unknown';
+			this.Name = 'Unknown';
 		}
+
+    this.GCode = {
+      Start: `G21;
+G90;
+M106 S0;
+G28 Z0;`,
+      End:`M106 S0;
+G1 Z155 F25;
+M18;`,
+      ShowImage: 'M6054 "*x";',
+      MoveTo: 'G0 Z*x F*y;',
+      Delay: 'G4 P*x;',
+      LightOn: 'M106 S255;',
+      LightOff: 'M106 S0;',
+    }
 
 		if (!_settings) {
 			this.Workspace = {
@@ -40,16 +55,20 @@ export class Printer {
 				BottomExposureTime: 0,
 				LiftingHeight: 0,
 				LiftingSpeed: 0,
+        DelayTime: 0
 			};
 			this.SupportPreset = SupportPreset.Default();
 			this.SupportPresets = [this.SupportPreset];
 		}
 		else {
-			this.Workspace = _settings.Workspace;
-			this.Resolution = _settings.Resolution;
-			this.PrintSettings = _settings.PrintSettings;
-			this.SupportPreset = _settings.SupportPreset;
-			this.SupportPresets = _settings.SupportPresets;
+      this.Workspace = _settings.Workspace;
+      this.Resolution = _settings.Resolution;
+      this.PrintSettings = _settings.PrintSettings;
+      this.SupportPreset = _settings.SupportPreset;
+      this.SupportPresets = _settings.SupportPresets;
+      if (_settings.GCode) {
+        this.GCode = _settings.GCode;
+      }
 		}
 
 		if (!this.SupportPreset)
@@ -57,6 +76,10 @@ export class Printer {
 			this.SupportPreset = this.SupportPresets[0];
 		}
 	}
+
+  public ConstructGcodeStartAndEnd = () => {
+
+  };
 
 	static DEFAULT_CONFIG_NAME = 'Default Printer';
 	static CHANGED_DIR = '\\ChangedConfigsV';
@@ -81,7 +104,7 @@ export class Printer {
 			}
 
 			bridge.fs.writeFileSync(bridge.userData() + Printer.CHANGED_DIR +
-        _default.versionPrinterConfigs + '\\' + config.name + '.json',
+        _default.versionPrinterConfigs + '\\' + config.Name + '.json',
 			JSON.stringify(config),{ encoding:'utf8',flag:'w' });
 			return true;
 		}
@@ -163,6 +186,7 @@ export interface PrinterConfig {
   PrintSettings: PrintSettings;
   SupportPresets: SupportPreset[];
   SupportPreset: SupportPreset;
+  GCode: GCodePrinter;
 }
 export type Workspace = {
   SizeX: number;
@@ -180,4 +204,15 @@ export type PrintSettings = {
   BottomExposureTime: number;
   LiftingHeight: number;
   LiftingSpeed: number;
+  DelayTime: number;
 };
+export type GCodePrinter = {
+  Start: string;
+  ShowImage: string;
+  End: string;
+  MoveTo: string
+  Delay: string
+  LightOn: string
+  LightOff: string
+};
+

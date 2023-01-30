@@ -18,7 +18,7 @@ export const ConfiguratorSupport = observer(() => {
 	const preset = _.clone(printer.SupportPreset);
 
 	const save = () => {
-		AppStore.sceneStore.printerName = config.printerName = printer.name;
+		AppStore.sceneStore.printerName = config.printerName = printer.Name;
 		Printer.SaveToFile(printer);
 		AppStore.sceneStore.printer!.SupportPreset = preset;
 		AppStore.changeState(Pages.Main);

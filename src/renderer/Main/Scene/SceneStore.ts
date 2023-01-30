@@ -77,7 +77,7 @@ export class SceneStore extends SceneInitializer {
 			this.decorations.add(planeForSupports);
 
 			this.materialForPlane?.dispose();
-			this.materialForPlane = SceneStore.CreatePlaneMaterial(1 - (sizeXZ.x/sizeCeiledXZ.x), 1 - (sizeXZ.y/sizeCeiledXZ.y));
+			this.materialForPlane = SceneStore.CreatePlaneMaterial((1 - (sizeXZ.x/sizeCeiledXZ.x)) / 2, (1 - (sizeXZ.y/sizeCeiledXZ.y)) / 2);
 			const geometry = new PlaneGeometry(...sizeCeiledXZ.toArray());
 			const plane = new Mesh(geometry, this.materialForPlane );
 			plane.rotateX(-Math.PI / 2);
@@ -138,6 +138,8 @@ export class SceneStore extends SceneInitializer {
 
 		if (this.printer)
 		{
+      const sizeXZ = new Vector2(this.printer.Workspace.SizeX * 0.1, this.printer.Workspace.SizeY * 0.1);
+
 			setTimeout(() => {
 				if (bridge.isDebug())
 				{
@@ -149,11 +151,10 @@ export class SceneStore extends SceneInitializer {
 			this.clippingPlaneMeshMin.scale.setScalar(1000000);
 			this.stencilRenderer.setSize(this.printer.Resolution.X,this.printer.Resolution.Y);
 			this.sliceOrthographicCamera = new OrthographicCamera(
-
-				this.gridSize.x / - 2,
-				this.gridSize.x / 2,
-				this.gridSize.z / 2,
-				this.gridSize.z / - 2,
+        sizeXZ.x / - 2,
+        sizeXZ.x / 2,
+        sizeXZ.y / 2,
+        sizeXZ.y / - 2,
 				0.0001,
 			);
 		}

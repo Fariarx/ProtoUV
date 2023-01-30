@@ -23,7 +23,7 @@ export const ConfiguratorAutoApp = observer(() => {
 		}
 		else {
 			AppStore.sceneStore.printer = printer;
-			AppStore.sceneStore.printerName = config.printerName = printer.name;
+			AppStore.sceneStore.printerName = config.printerName = printer.Name;
 			AppStore.changeState(Pages.Main);
 			saveConfig();
 		}

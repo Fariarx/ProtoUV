@@ -142,6 +142,9 @@ const createWindow = async () => {
 	ipcMain.on('save-sliced-layer', (_, screenshot: string, path: string) => {
 		fs.writeFileSync(userData + '/slicing/' + path, atob(screenshot), 'binary' );
 	});
+  ipcMain.on('save-sliced-file', (_, file: string, path: string) => {
+    fs.writeFileSync(userData + '/slicing/' + path, file);
+  });
 
 	let workers: BrowserWindow[] = [];
 

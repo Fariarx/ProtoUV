@@ -141,7 +141,7 @@ export class SlicingStore {
 			this.isWorking = false;
       this.gcode += '\n\n' + AppStore.sceneStore.printer!.GCode.End;
       bridge.ipcRenderer.send('sliced-finalize',
-        this.gcode, config.pathToUVTools, UVToolsFormats[2]);
+        this.gcode, config.pathToUVTools, printer.Export.Encoder, printer.Export.Extencion);
 			Log('slicing done!');
 		}
 	};

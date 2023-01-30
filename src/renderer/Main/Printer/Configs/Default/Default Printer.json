@@ -31,5 +31,9 @@
       "Rays": 3,
       "Lifting": 5
     }
-  ]
+  ],
+  "Export": {
+    "Encoder": "Chitubox",
+    "Extencion": "ctb"
+  }
 }

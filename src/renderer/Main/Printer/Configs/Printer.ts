@@ -13,6 +13,8 @@ export class Printer {
 	public SupportPresets: SupportPreset[];
 	public SupportPreset: SupportPreset;
 
+  public Export: ExportToExtension;
+
   public GCode: GCodePrinter;
 
 	constructor(_name?: string, _settings?: PrinterConfig) {
@@ -59,6 +61,10 @@ M18;`,
 			};
 			this.SupportPreset = SupportPreset.Default();
 			this.SupportPresets = [this.SupportPreset];
+      this.Export = {
+        Encoder: "GenericZIP",
+        Extencion: "zip"
+      }
 		}
 		else {
       this.Workspace = _settings.Workspace;
@@ -66,6 +72,7 @@ M18;`,
       this.PrintSettings = _settings.PrintSettings;
       this.SupportPreset = _settings.SupportPreset;
       this.SupportPresets = _settings.SupportPresets;
+      this.Export = _settings.Export;
       if (_settings.GCode) {
         this.GCode = _settings.GCode;
       }
@@ -187,6 +194,7 @@ export interface PrinterConfig {
   SupportPresets: SupportPreset[];
   SupportPreset: SupportPreset;
   GCode: GCodePrinter;
+  Export: ExportToExtension;
 }
 export type Workspace = {
   SizeX: number;
@@ -215,4 +223,7 @@ export type GCodePrinter = {
   LightOn: string
   LightOff: string
 };
-
+export type ExportToExtension = {
+  Encoder: string,
+  Extencion: string
+};

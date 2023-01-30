@@ -141,7 +141,7 @@ const createWindow = async () => {
 	ipcMain.on('save-sliced-layer', (_, screenshot: string, path: string) => {
 		fs.writeFileSync(userData + '/slicing/' + path, atob(screenshot), 'binary' );
 	});
-  ipcMain.on('sliced-finalize', (_, gcode: string, pathToUVTools: string, encoder: string) => {
+  ipcMain.on('sliced-finalize', (_, gcode: string, pathToUVTools: string, encoder: string, extencion: string) => {
     fs.writeFileSync(userData + '/slicing/run.gcode', gcode);
 
     //const output = fs.createWriteStream(userData +'/target.zip');
@@ -150,15 +150,17 @@ const createWindow = async () => {
     //archive.directory(userData + '/slicing', false);
     //archive.finalize();
 
-    const child = child_process.execFile;
-    const executablePath = pathToUVTools;
-    const format = encoder.split(' ')[0];
-    const parameters = ["convert", userData +'\\_Sizzling_Hillar-Maimu.zip', 'ChituboxFile CTB'];
+    if (encoder !== "GenericZIP")
+    {
+      const child = child_process.execFile;
+      const executablePath = pathToUVTools;
+      const parameters = ["convert", userData +'\\target.zip', encoder, userData +'\\target.' + extencion];
 
-    child(executablePath, parameters, function(err, data) {
-      console.log(err)
-      console.log(data.toString());
-    });
+      child(executablePath, parameters, function(err, data) {
+        console.log(err)
+        console.log(data.toString());
+      });
+    }
   });
 
 	let workers: BrowserWindow[] = [];

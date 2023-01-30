@@ -1,7 +1,7 @@
 import { Restore } from './Libs/Restore';
 
 export const _default = {
-	version: 30,
+	version: 31,
 	versionPrinterConfigs: 30,
 	settings: {
 		ui: {
@@ -59,7 +59,7 @@ export const _default = {
 		},
 		workerCount: 10,
 		printerName: '',
-    pathToUVTools: 'C:\\Program Files\\UVtools\\UVtoolsCmd.exe'
+    pathToUVTools: 'C:\\Users\\admin\\Github\\ProtoUV\\uvtools\\UVtools.Cmd\\bin\\Debug\\net6.0\\UVtoolsCmd.exe'
 	}
 };
 

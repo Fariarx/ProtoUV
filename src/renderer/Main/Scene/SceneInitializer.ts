@@ -987,29 +987,28 @@ export class SceneInitializer extends SceneBase {
 			this.lightGroup.visible = isShow;
 			this.lightFromCamera.visible = isShow;
 			this.decorations.visible = isShow;
-			if (this.clippingBuffer.intersectionMesh.outlineLines)
-			{
-				this.clippingBuffer.intersectionMesh.outlineLines.material.color = isShow
-					? new Color(this.clippingLineColor) : new Color('#fff');
-				this.clippingPlaneMeshMin.material.color = isShow
-					? new Color(this.clippingInnerColor) : new Color('#fff');
-			}
 			this.transformControls.visible = isShow;
 			this.objects.forEach(x => {
-				x.mesh.visible = isShow;
-				x.supports?.forEach(y =>
-					y.visible = isShow);
+      	x.mesh.visible = isShow;
+      	x.supports?.forEach(y =>
+      		y.visible = isShow);
 			});
+		};
+		const _hideLine = (isShow: boolean) => {
+			this.clippingBuffer.intersectionMesh.outlineLines?.material.color.set(isShow ? this.clippingLineColor :'#919191' ).convertSRGBToLinear();
+			this.clippingPlaneMeshMin.material.color.set(isShow ? this.clippingLineColor : '#fff').convertSRGBToLinear();
 		};
 
 		_hide(false);
 		this.clippingSomeShit();
+		_hideLine(false);
 
 		this.stencilRenderer.clearDepth();
 		this.sliceOrthographicCamera.position.set(this.gridSize.x/2, this.gridSize.y + 1, this.gridSize.z/2);
 		this.sliceOrthographicCamera.lookAt(this.gridSize.x/2, 0, this.gridSize.z/2);
 		this.stencilRenderer.render(this.scene, this.sliceOrthographicCamera);
 		_hide(true);
+		_hideLine(true);
 
 		const image = this.stencilRenderer.domElement
 			.toDataURL('image/png');
@@ -1017,8 +1016,6 @@ export class SceneInitializer extends SceneBase {
 		bridge.ipcRenderer.send('save-sliced-layer',
 			image.replace('data:image/png;base64,',''),
 			layer+'.png');
-
-		//console.log(image);
 
 		return image;
 	};

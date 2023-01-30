@@ -23,6 +23,8 @@ export const Dispatch = (name: AppEventEnum, args: typeof AppEventArguments) => 
 };
 
 const Handler = (message: any) => {
+	AppStore.sceneStore.clippingReset();
+
 	switch (message.name) {
 		case AppEventEnum.ADD_OBJECT:
 			objectAdd(message);

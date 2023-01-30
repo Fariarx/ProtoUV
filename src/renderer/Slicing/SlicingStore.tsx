@@ -39,10 +39,10 @@ export class SlicingStore {
 			this.animate();
 		});
 
-		bridge.ipcRenderer.receive('worker-info', (x: number) => {
-			Log(x+'');
-			this.workerCount = x;
-		});
+		//bridge.ipcRenderer.receive('worker-info', (x: number) => {
+		//	Log(x+'');
+		//	this.workerCount = x;
+		//});
 	};
 
 	public reset = () => {
@@ -63,10 +63,42 @@ export class SlicingStore {
 			return;
 		}
 
-		if (this.sliceCount <= this.sliceCountMax && this.workerCount < config.workerCount)
+		let rendersCount = this.sliceCountMax / 100;
+
+		while (this.sliceCount <= this.sliceCountMax)
 		{
-			bridge.ipcRenderer.send('worker', );
-			this.workerCount++;
+			this.image = AppStore.sceneStore.sliceLayer(
+				(this.sliceCount/this.sliceCountMax) * this.sliceTo / AppStore.sceneStore.gridSize.y,
+				this.sliceCount);
+
+			this.sliceCount += 1;
+
+			if (this.sliceCount > this.sliceCountMax) {
+				AppStore.instance.progressPercent = 1;
+				break;
+			}
+			else {
+				AppStore.instance.progressPercent = (this.sliceCount/this.sliceCountMax);
+			}
+
+			rendersCount--;
+
+			if (rendersCount < 1)
+			{
+				break;
+			}
+
+			if (!this.isWorking)
+			{
+				Log('slicing cancelled!');
+				return;
+			}
+		}
+
+		if (this.image.length > this.imageLargestSize)
+		{
+			this.imageLargest = this.image;
+			this.imageLargestSize = this.image.length;
 		}
 
 		if (this.sliceCount <= this.sliceCountMax) {

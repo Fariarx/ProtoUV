@@ -203,14 +203,15 @@ export class SceneObject {
 			return {
 				group: group,
 				colliderMesh : colliderMesh,
-				outlineLines:clippingLineMin,
+				outlineLines: clippingLineMin,
 				colliderBvh :colliderBvh
 			};
 		};
 
 		if (store.clippingBuffer.sceneGeometryCount !== store.objects.length
       || store.objects.some(x => !x.clippingSnapshot || !x.clippingSnapshot.equals(x.mesh.matrixWorld))
-      || store.objects.length !== 0 && store.clippingBuffer.sceneGeometryGrouped === null)
+      || store.objects.length !== 0 && store.clippingBuffer.sceneGeometryGrouped === null
+      || store.clippingBuffer.sceneGeometryGrouped === null)
 		{
 			store.clippingBuffer.sceneGeometryCount = store.objects.length;
 
@@ -226,7 +227,7 @@ export class SceneObject {
 						y.geometry.clone().applyMatrix4(y.matrixWorld).applyMatrix4(support.matrixWorld)),
 					support.geometry.clone().applyMatrix4(support.matrixWorld)]));
 
-			const created = _create(mergeBufferGeometries(supportsGeometries?.every(x => x) ? objGeometries.concat(supportsGeometries) : objGeometries, false));
+			const created = _create(mergeBufferGeometries(objGeometries.concat(supportsGeometries?.filter(x => !!x) ?? [])));
 
 			//.concat(o.supports?.flatMap(s => s.geometry.clone().applyMatrix4(s.matrixWorld)) ?? [])
 			if(store.clippingBuffer?.sceneGeometryGrouped)

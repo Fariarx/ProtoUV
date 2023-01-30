@@ -76,8 +76,8 @@ export abstract class SceneBase {
   public clippingSceneDirectionDown = true;
 
   public clippingPlaneMin = new Plane();
-  public clippingInnerColor = '#388816';
-  public clippingLineColor = '#41ff00';
+  public clippingInnerColor = 0x388816;
+  public clippingLineColor = 0x41ff00;
   public clippingPlaneMeshMin = new THREE.Mesh( new THREE.PlaneBufferGeometry(), new THREE.MeshBasicMaterial ({
   	color: this.clippingInnerColor,  side: BackSide,
   	transparent: true,

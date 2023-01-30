@@ -24,7 +24,8 @@ export const SlicingApp = observer(() => {
 				backgroundColor: colors.interact.warning
 			},
 			width: 'fit-content',
-			mr: '2px'
+			mr: '2px',
+			position: 'fixed'
 		}} onClick={() => {
 			AppStore.slice.reset();
 			AppStore.changeState(Pages.Main);

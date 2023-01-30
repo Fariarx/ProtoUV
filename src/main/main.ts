@@ -150,6 +150,18 @@ const createWindow = async () => {
 		const worker = new BrowserWindow({
 			//show: false,
 			//titleBarStyle: 'hidden',
+			webPreferences: {
+				preload: app.isPackaged
+					? path.join(__dirname, 'preload.js')
+					: path.join(__dirname, '../../.erb/dll/preload.js'),
+				webSecurity: false,
+				sandbox: false,
+				nodeIntegration: true,
+				devTools: isDebug,
+				nodeIntegrationInWorker: true,
+				nodeIntegrationInSubFrames: true
+			},
+			titleBarStyle: 'hidden',
 		});
 		console.log(scene);
 		worker.loadURL(resolveHtmlPath('index.html'));

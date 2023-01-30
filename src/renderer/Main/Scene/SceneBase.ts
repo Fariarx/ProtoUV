@@ -63,10 +63,6 @@ export abstract class SceneBase {
 	public outlineEffectRenderer: OutlineEffect = new OutlineEffect( this.renderer, {
 		defaultThickness:0.0015
 	});
-	public materialForSupports = {
-		normal: new MeshLambertMaterial({ transparent: true, opacity: 0.6, color: '#5bc3fc' }),
-		preview: new MeshLambertMaterial({ transparent: true, opacity: 0.3, color: '#80ffaa' })
-	};
 
 	public materialLine = new LineMaterial({
 		color: 0xa1a1a1,
@@ -110,10 +106,18 @@ export abstract class SceneBase {
   	} as MaterialForScene,
   };
 
+  public materialForSupports = {
+  	normal: new MeshLambertMaterial({ color: '#5bc3fc', side: DoubleSide,
+  		clippingPlanes: [this.clippingPlaneMin] }),
+  	preview: new MeshLambertMaterial({ transparent: true, opacity: 0.3, color: '#80ffaa',
+  		clippingPlanes: [this.clippingPlaneMin] })
+  };
+
   public materialForPlaneShadow: Material = new ShadowMaterial({
   	color: '#444444',
   	side: FrontSide,
   });
+
   public materialForPlane?: Material;
   public materialForObjects: MaterialForScene = this.materialsForScene.default;
   public perspectiveCamera = new PerspectiveCamera(

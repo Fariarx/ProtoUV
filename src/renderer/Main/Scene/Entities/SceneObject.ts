@@ -25,9 +25,10 @@ import {
 	Matrix4,
 	Mesh,
 	MeshBasicMaterial,
+	TrianglesDrawMode,
 	Vector3
 } from 'three';
-import { mergeBufferGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils';
+import { mergeBufferGeometries, mergeVertices, toTrianglesDrawMode } from 'three/examples/jsm/utils/BufferGeometryUtils';
 import { MeshBVH } from 'three-mesh-bvh';
 
 import { AppStore } from '../../../AppStore';
@@ -94,6 +95,8 @@ export class SceneObject {
 
 	static CreateClippingGroup = () => {
 		const store = AppStore.sceneStore;
+
+		let hasChanges = false;
 
 		const _create = (geometry: BufferGeometry) => {
 			const frontSideModel = new Mesh(geometry);
@@ -215,9 +218,17 @@ export class SceneObject {
 				x.clippingSnapshot = x.mesh.matrixWorld.clone();
 			});
 
-			const created = _create(mergeBufferGeometries(store.objects
-				.map(o => o.mesh.geometry.clone().applyMatrix4(o.mesh.matrixWorld))));
+			const objGeometries = store.objects
+				.map(o => o.mesh.geometry.toNonIndexed().clone().applyMatrix4(o.mesh.matrixWorld));
+			const supportsGeometries = store.objects
+				.flatMap(obj => obj.supports?.flatMap(support =>
+					[...support.children.flatMap((y: Mesh & any) =>
+						y.geometry.clone().applyMatrix4(y.matrixWorld).applyMatrix4(support.matrixWorld)),
+					support.geometry.clone().applyMatrix4(support.matrixWorld)]));
 
+			const created = _create(mergeBufferGeometries(supportsGeometries?.every(x => x) ? objGeometries.concat(supportsGeometries) : objGeometries, false));
+
+			//.concat(o.supports?.flatMap(s => s.geometry.clone().applyMatrix4(s.matrixWorld)) ?? [])
 			if(store.clippingBuffer?.sceneGeometryGrouped)
 			{
 				store.scene.remove(store.clippingBuffer.sceneGeometryGrouped);
@@ -239,7 +250,17 @@ export class SceneObject {
 				...AppStore.sceneStore.clippingBuffer,
 				...result
 			};
+
+			hasChanges = true;
 		}
+
+		if (AppStore.sceneStore.clippingBuffer.clippingPercent !== AppStore.sceneStore.clippingScenePercent)
+		{
+			AppStore.sceneStore.clippingBuffer.clippingPercent = AppStore.sceneStore.clippingScenePercent;
+			hasChanges = true;
+		}
+
+		return hasChanges;
 	};
 
 	UpdateSelection = () => {
@@ -647,3 +668,7 @@ export class SceneObject {
 		AppStore.sceneStore.animate();
 	};
 }
+function toCreasedNormals(arg0: any) {
+	throw new Error('Function not implemented.');
+}
+

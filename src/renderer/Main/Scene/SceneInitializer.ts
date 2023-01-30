@@ -755,19 +755,23 @@ export class SceneInitializer extends SceneBase {
 			this.clippingPlaneMeshMin.visible = false;
 			this.materialsForScene.default.select.clippingPlanes = [];
 			this.materialsForScene.default.normal.clippingPlanes = [];
+			this.materialForSupports.normal.clippingPlanes = [];
+			this.materialForSupports.preview.clippingPlanes = [];
 			return;
 		}
 		else {
 			this.clippingPlaneMeshMin.visible = true;
 			this.materialsForScene.default.select.clippingPlanes = [this.clippingPlaneMin];
 			this.materialsForScene.default.normal.clippingPlanes = [this.clippingPlaneMin];
+			this.materialForSupports.normal.clippingPlanes = [this.clippingPlaneMin];
+			this.materialForSupports.preview.clippingPlanes = [this.clippingPlaneMin];
 		}
 
 		if (this.objects.length > 0)
 		{
-			SceneObject.CreateClippingGroup();
+			const needUpdate = SceneObject.CreateClippingGroup();
 
-			if (this.clippingBuffer.sceneGeometryGrouped) {
+			if (this.clippingBuffer.sceneGeometryGrouped && needUpdate) {
 				const intersect = this.clippingBuffer.intersectionMesh;
 				const  inverseMatrix = this.clippingBuffer.inverseMatrix;
 				const  localPlane = this.clippingBuffer.localPlane;
@@ -1029,6 +1033,7 @@ export class SceneInitializer extends SceneBase {
 			colliderBvh : null as null | MeshBVH,
 		},
 
+		clippingPercent: 0,
 		inverseMatrix: new Matrix4(),
 		localPlane: new Plane(),
 		tempLine: new  Line3(),

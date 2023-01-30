@@ -86,8 +86,8 @@ const _supportCreator = (
 	const material = AppStore.sceneStore.materialForSupports.normal;
 	const extrudeSettings = {
 		steps: 100,
+		extrudePath: spline,
 		bevelEnabled: false,
-		extrudePath: spline
 	};
 
 	const pts1 = [], count = 6;
@@ -98,7 +98,11 @@ const _supportCreator = (
 	}
 
 	const shape1 = new  Shape( pts1 );
-	const geometry1 = new  ExtrudeGeometry( shape1, extrudeSettings );
+
+	const geometry1 = new  ExtrudeGeometry( shape1, extrudeSettings )
+		.deleteAttribute('uv')
+		.toNonIndexed();
+
 	const mesh1 = new Mesh(geometry1, material);
 
 	// Create bottom
@@ -122,7 +126,10 @@ const createCylinder = (
 	diameterBottom: number,
 	diameterTop: number
 ) => {
-	const geometry = new CylinderGeometry( diameterTop, diameterBottom,  height , 6); //to mm
+	const geometry = new CylinderGeometry( diameterTop, diameterBottom,  height , 6)
+		.deleteAttribute('uv')
+		.toNonIndexed();
+
 	const mesh = new Mesh( geometry, material );
 	const center = new Vector3((positionEnd.x + positionStart.x) / 2, (positionEnd.y + positionStart.y) / 2, (positionEnd.z + positionStart.z) / 2);
 
@@ -139,7 +146,10 @@ const createContactSphere = (
 	positionStart: Vector3,
 	diameter: number
 ) => {
-	const geometry = new SphereGeometry( diameter * 1.025, 9, 9);
+	const geometry = new SphereGeometry( diameter * 1.025, 9, 9)
+		.deleteAttribute('uv')
+		.toNonIndexed();
+
 	const mesh = new Mesh( geometry, material );
 
 	mesh.position.set(positionStart.x, positionStart.y, positionStart.z);

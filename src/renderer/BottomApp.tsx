@@ -1,6 +1,5 @@
-import { Box, LinearProgress, Tooltip, Typography } from '@mui/material';
+import { Box, Tooltip, Typography } from '@mui/material';
 import { observer } from 'mobx-react';
-import { randInt } from 'three/src/math/MathUtils';
 import { AppStore } from './AppStore';
 import { colors } from './Shared/Config';
 import { bridge } from './Shared/Globals';

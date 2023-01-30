@@ -1,8 +1,8 @@
 import { Restore } from './Libs/Restore';
 
 export const _default = {
-	version: 27,
-	versionPrinterConfigs: 27,
+	version: 30,
+	versionPrinterConfigs: 30,
 	settings: {
 		ui: {
 			opacity: 0.8,
@@ -58,7 +58,8 @@ export const _default = {
 			}
 		},
 		workerCount: 10,
-		printerName: ''
+		printerName: '',
+    pathToUVTools: 'C:\\Program Files\\UVtools\\UVtoolsCmd.exe'
 	}
 };
 

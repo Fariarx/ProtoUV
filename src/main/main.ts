@@ -1,10 +1,9 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore: Unreachable code error
-
 import electron, { BrowserWindow, app, dialog, ipcMain, shell } from 'electron';
 import fs from 'fs';
 import path from 'path';
-import { Worker } from 'worker_threads';
+import child_process from 'child_process';
+import archiver from 'archiver';
+
 import { resolveHtmlPath } from './util';
 
 const userData = electron.app.getPath('userData');
@@ -142,8 +141,24 @@ const createWindow = async () => {
 	ipcMain.on('save-sliced-layer', (_, screenshot: string, path: string) => {
 		fs.writeFileSync(userData + '/slicing/' + path, atob(screenshot), 'binary' );
 	});
-  ipcMain.on('save-sliced-file', (_, file: string, path: string) => {
-    fs.writeFileSync(userData + '/slicing/' + path, file);
+  ipcMain.on('sliced-finalize', (_, gcode: string, pathToUVTools: string, encoder: string) => {
+    fs.writeFileSync(userData + '/slicing/run.gcode', gcode);
+
+    //const output = fs.createWriteStream(userData +'/target.zip');
+    //const archive = archiver('zip');
+    //archive.pipe(output);
+    //archive.directory(userData + '/slicing', false);
+    //archive.finalize();
+
+    const child = child_process.execFile;
+    const executablePath = pathToUVTools;
+    const format = encoder.split(' ')[0];
+    const parameters = ["convert", userData +'\\_Sizzling_Hillar-Maimu.zip', 'ChituboxFile CTB'];
+
+    child(executablePath, parameters, function(err, data) {
+      console.log(err)
+      console.log(data.toString());
+    });
   });
 
 	let workers: BrowserWindow[] = [];

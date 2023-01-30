@@ -1,5 +1,5 @@
 import { makeObservable } from 'mobx';
-import { MaxNumber, bridge } from 'renderer/Shared/Globals';
+import { bridge } from 'renderer/Shared/Globals';
 import {
 	Mesh, OrthographicCamera,
 	PlaneGeometry,
@@ -17,7 +17,6 @@ import {
 	Log,
 	Pages,
 } from '../../AppStore';
-import { ThreeHelper } from '../../Shared/Helpers/Three';
 import { Grid } from '../../Shared/Libs/Tools';
 import { Printer } from '../Printer/Configs/Printer';
 

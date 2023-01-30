@@ -6,7 +6,6 @@ import { TransformStore } from './Main/Components/ToolsLeft/Transform/TransformS
 import { PerformSupportsStore } from './Main/Components/ToolsRight/Supports/PerformSupportsStore';
 import { ConsoleStore } from './Main/Console/ConsoleStore';
 import { SceneStore } from './Main/Scene/SceneStore';
-import { bridge } from './Shared/Globals';
 import { SlicingStore } from './Slicing/SlicingStore';
 
 export const Log = container.resolve(ConsoleStore).Add;

@@ -3,7 +3,6 @@ import {
 	CssBaseline,
 	ThemeProvider
 } from '@mui/material';
-import _ from 'lodash';
 import { observer } from 'mobx-react';
 import { SnackbarProvider } from 'notistack';
 import { Route, MemoryRouter as Router, Routes } from 'react-router-dom';
@@ -19,7 +18,6 @@ import { ToolsLeftApp } from './Main/Components/ToolsLeft/ToolsLeftApp';
 import { ToolsRightApp } from './Main/Components/ToolsRight/ToolsRightApp';
 import { ViewChangeApp } from './Main/Components/ViewChange/ViewChangeApp';
 import { ConsoleApp } from './Main/Console/ConsoleApp';
-import { SceneObject } from './Main/Scene/Entities/SceneObject';
 import { SceneApp } from './Main/Scene/SceneApp';
 import { bridge } from './Shared/Globals';
 import { AnimationFade, AnimationGrow } from './Shared/Styled/Animation';

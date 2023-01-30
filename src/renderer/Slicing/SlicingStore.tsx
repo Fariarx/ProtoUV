@@ -4,7 +4,7 @@ import { SceneObject } from 'renderer/Main/Scene/Entities/SceneObject';
 import { singleton } from 'tsyringe';
 import { AppStore, Log, Pages } from '../AppStore';
 import { config } from '../Shared/Config';
-import { bridge } from '../Shared/Globals';
+import { bridge, UVToolsFormats } from '../Shared/Globals';
 
 @singleton()
 export class SlicingStore {
@@ -140,9 +140,8 @@ export class SlicingStore {
 		else {
 			this.isWorking = false;
       this.gcode += '\n\n' + AppStore.sceneStore.printer!.GCode.End;
-      bridge.ipcRenderer.send('save-sliced-file',
-        this.gcode,
-        'run.gcode');
+      bridge.ipcRenderer.send('sliced-finalize',
+        this.gcode, config.pathToUVTools, UVToolsFormats[2]);
 			Log('slicing done!');
 		}
 	};

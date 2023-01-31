@@ -25,15 +25,13 @@ import {
 	Matrix4,
 	Mesh,
 	MeshBasicMaterial,
-	TrianglesDrawMode,
 	Vector3
 } from 'three';
-import { mergeBufferGeometries, mergeVertices, toTrianglesDrawMode } from 'three/examples/jsm/utils/BufferGeometryUtils';
+import { mergeBufferGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils';
 import { MeshBVH } from 'three-mesh-bvh';
 
 import { AppStore } from '../../../AppStore';
 import { Dispatch } from '../../../Shared/Events';
-import { ThreeHelper } from '../../../Shared/Helpers/Three';
 import { SceneStore } from '../SceneStore';
 
 export class SceneObject {

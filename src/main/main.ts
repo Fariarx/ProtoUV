@@ -1,4 +1,4 @@
-import electron, { BrowserWindow, app, dialog, ipcMain, shell, SaveDialogReturnValue } from 'electron';
+import electron, { BrowserWindow, app, dialog, ipcMain, shell } from 'electron';
 import fs from 'fs';
 import path from 'path';
 import child_process from 'child_process';
@@ -178,7 +178,7 @@ const createWindow = async () => {
                   fs.rmSync(filePath, { force: true })
                 }
                 fs.copyFileSync(userData + '\\target.' + extencion, filePath);
-                mainWindow?.webContents.send('sliced-finalize-result', null, 'done, file successfully written', filePath);
+                mainWindow?.webContents.send('sliced-finalize-result', null, 'done, file successfully written', path.dirname(filePath));
               } else {
                 mainWindow?.webContents.send('sliced-finalize-result', 'file to save not selected');
               }

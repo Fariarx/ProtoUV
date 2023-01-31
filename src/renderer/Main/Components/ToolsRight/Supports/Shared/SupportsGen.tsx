@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { AppStore } from 'renderer/AppStore';
 import { Printer } from 'renderer/Main/Printer/Configs/Printer';
 import { toUnits } from 'renderer/Shared/Globals';
-import { CatmullRomCurve3, CylinderGeometry, ExtrudeGeometry, Material, Mesh, MeshLambertMaterial, Shape, SphereGeometry, Vector2, Vector3 } from 'three';
+import { CatmullRomCurve3, CylinderGeometry, ExtrudeGeometry, Material, Mesh, Shape, SphereGeometry, Vector2, Vector3 } from 'three';
 import { SupportsRays } from './SupportsRays';
 import { PositionProbe, VoxelizationFreeSpace } from './SupportsVoxelization';
 

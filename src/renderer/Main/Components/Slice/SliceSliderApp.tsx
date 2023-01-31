@@ -9,7 +9,7 @@ import { SceneObject } from '../../Scene/Entities/SceneObject';
 export const SliceSliderApp = observer(() => {
 	if (AppStore.sceneStore.objects.length === 0)
 	{
-		return;
+		return <Box/>;
 	}
 
 	const maxObjectsPoint =  _.maxBy(AppStore.sceneStore.objects, (x: SceneObject) => x.maxY.y);

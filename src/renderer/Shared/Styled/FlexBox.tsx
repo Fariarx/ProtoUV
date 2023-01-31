@@ -1,5 +1,5 @@
 import { Box, styled } from '@mui/material';
-import { ReactChildren, createRef, useEffect } from 'react';
+import { createRef, useEffect } from 'react';
 
 export const FlexBox = styled(Box)({
 	display: 'flex',

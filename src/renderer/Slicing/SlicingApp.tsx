@@ -43,7 +43,6 @@ export const SlicingApp = observer(() => {
         },
         width: 'fit-content',
         mr: '2px', position: 'unset',
-        border: '1px solid ' + colors.interact.neutral2,
         color: 'white'
       }} onClick={() => {
         AppStore.slice.reset();
@@ -64,7 +63,7 @@ export const SlicingApp = observer(() => {
           },
           width: 'fit-content',
           mr: '2px', position: 'unset',
-          border: '1px solid ' + colors.interact.neutral2,
+          border: '1px solid ' + colors.interact.neutral,
           color: 'white'
         }} onClick={() => {
           AppStore.slice.save(false);

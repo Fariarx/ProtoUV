@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { makeAutoObservable } from 'mobx';
-import { AppStore, Log } from 'renderer/AppStore';
+import { AppStore } from 'renderer/AppStore';
 import { SceneObject } from 'renderer/Main/Scene/Entities/SceneObject';
 import { Dispatch } from 'renderer/Shared/Events';
 import { toUnits } from 'renderer/Shared/Globals';

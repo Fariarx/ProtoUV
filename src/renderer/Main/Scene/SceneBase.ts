@@ -9,10 +9,8 @@ import {
 	DoubleSide,
 	FrontSide,
 	Group,
-	LineSegments,
 	Material,
 	MeshLambertMaterial,
-	MeshStandardMaterial,
 	Object3D,
 	OrthographicCamera,
 	PerspectiveCamera,
@@ -70,7 +68,7 @@ export abstract class SceneBase {
 	});
 
   @observable
-	public clippingScenePercent = 0;
+	public clippingScenePercent = 1;
   @observable
   public clippingSceneWorking = false;
   public clippingSceneDirectionDown = true;
@@ -96,11 +94,9 @@ export abstract class SceneBase {
   public materialsForScene = {
   	default: {
   		normal: new MeshLambertMaterial( {  color: '#f1a217', side: DoubleSide,
-  			 metalness: 0.1,
   			clippingPlanes: [this.clippingPlaneMin]
   		} ),
   		select: new MeshLambertMaterial( { color: '#98de9c', side: DoubleSide,
-  			 metalness: 0.1,
   			clippingPlanes: [this.clippingPlaneMin]
   		} ),
   	} as MaterialForScene,

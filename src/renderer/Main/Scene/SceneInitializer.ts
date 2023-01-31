@@ -1,11 +1,9 @@
-import { slice } from 'lodash';
 import { runInAction } from 'mobx';
 import { WheelEvent } from 'React';
 import {
 	AmbientLight,
 	ArrowHelper,
 	BufferGeometry,
-	Color,
 	DirectionalLight,
 	Group,
 	Line3,
@@ -43,10 +41,9 @@ import {
 	saveConfig,
 } from '../../Shared/Config';
 import { Dispatch } from '../../Shared/Events';
-import { MaxNumber, bridge } from '../../Shared/Globals';
+import { bridge } from '../../Shared/Globals';
 import { EnumHelpers } from '../../Shared/Helpers/Enum';
 import * as OrientationHelper from '../../Shared/Helpers/OrientationHelper';
-import { ThreeHelper } from '../../Shared/Helpers/Three';
 import {
 	SubscribersKeyPressed,
 	isKeyPressed,
@@ -369,10 +366,12 @@ export class SceneInitializer extends SceneBase {
 		this.transformControls.addEventListener( 'change', this.transformControlsUpdate);
 	};
 	public setupCanvas = (canvas: HTMLDivElement | null) => {
-		this.stats.domElement.style.marginTop = '400px';
-		this.stats.domElement.style.marginLeft = '8px';
+		this.stats.domElement.style.marginLeft = '46px';
 		this.stats.domElement.style.opacity = '0.3';
 		this.stats.domElement.style.zIndex = '1';
+		this.stats.domElement.style.position = 'fixed';
+		this.stats.domElement.style.top = 'unset';
+		this.stats.domElement.style.bottom = 'calc(15% + 56px)';
 		this.setupOrientationHelper(canvas);
 		canvas?.appendChild(this.renderer.domElement);
 		canvas?.appendChild(this.stats.domElement);

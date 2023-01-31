@@ -74,8 +74,9 @@ export class SceneObject {
 		this.geometry = geometry;
 		this.geometry.scale(0.1, 0.1, 0.1);
 		this.mesh = new Mesh(geometry.clone(), sceneStore.materialForObjects.select);
-		this.mesh.renderOrder = 3;
-		this.mesh.receiveShadow = true;
+		//this.mesh.renderOrder = 3;
+		//	this.mesh.receiveShadow = true;
+		this.mesh.castShadow = true;
 
 		this.minY = new Vector3();
 		this.maxY = new Vector3();
@@ -666,8 +667,5 @@ export class SceneObject {
 		AppStore.sceneStore.updateSelectionChanged();
 		AppStore.sceneStore.animate();
 	};
-}
-function toCreasedNormals(arg0: any) {
-	throw new Error('Function not implemented.');
 }
 

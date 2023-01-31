@@ -85,8 +85,16 @@ export class SceneStore extends SceneInitializer {
 
 			const plane2 = new Mesh(geometry, this.materialForPlaneShadow);
 			plane2.rotateX(-Math.PI / 2);
+			plane2.position.set(this.gridSize.x / 2, 0.0003, this.gridSize.z / 2);
 			plane2.receiveShadow = true;
-			plane2.position.set(this.gridSize.x / 2, 0.0004, this.gridSize.z / 2);
+			this.lightShadow.shadow.mapSize.width = 8192;
+			this.lightShadow.shadow.mapSize.height = 8192;
+			this.lightShadow.shadow.camera.top = 500;
+			this.lightShadow.shadow.camera.bottom = -500;
+			this.lightShadow.shadow.camera.left = 500;
+			this.lightShadow.shadow.camera.right = -500;
+			this.lightShadow.shadow.camera.far = 500;
+			this.lightShadow.position.setY(499);
 
 			this.decorations.add(plane2);
 		}
@@ -137,7 +145,7 @@ export class SceneStore extends SceneInitializer {
 
 		if (this.printer)
 		{
-      const sizeXZ = new Vector2(this.printer.Workspace.SizeX * 0.1, this.printer.Workspace.SizeY * 0.1);
+			const sizeXZ = new Vector2(this.printer.Workspace.SizeX * 0.1, this.printer.Workspace.SizeY * 0.1);
 
 			setTimeout(() => {
 				if (bridge.isDebug())
@@ -150,10 +158,10 @@ export class SceneStore extends SceneInitializer {
 			this.clippingPlaneMeshMin.scale.setScalar(1000000);
 			this.stencilRenderer.setSize(this.printer.Resolution.X,this.printer.Resolution.Y);
 			this.sliceOrthographicCamera = new OrthographicCamera(
-        sizeXZ.x / - 2,
-        sizeXZ.x / 2,
-        sizeXZ.y / 2,
-        sizeXZ.y / - 2,
+				sizeXZ.x / - 2,
+				sizeXZ.x / 2,
+				sizeXZ.y / 2,
+				sizeXZ.y / - 2,
 				0.0001,
 			);
 		}

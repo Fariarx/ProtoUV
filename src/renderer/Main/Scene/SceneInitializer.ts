@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { runInAction } from 'mobx';
 import { WheelEvent } from 'React';
 import {
@@ -5,6 +6,7 @@ import {
 	ArrowHelper,
 	BufferGeometry,
 	DirectionalLight,
+	DirectionalLightHelper,
 	Group,
 	Line3,
 	LineSegments,
@@ -16,8 +18,7 @@ import {
 	PCFSoftShadowMap,
 	PerspectiveCamera,
 	Plane,
-	Raycaster,
-	Vector3, sRGBEncoding
+	Raycaster, Vector3, sRGBEncoding
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import {
@@ -84,7 +85,6 @@ export class SceneInitializer extends SceneBase {
 
 		this.renderer.localClippingEnabled = true;
 		this.renderer.shadowMap.enabled = true;
-		this.renderer.shadowMap.type = PCFSoftShadowMap;
 		this.renderer.outputEncoding = sRGBEncoding;
 
 		this.clippingPlaneMeshMin.rotateX(Math.PI / 2);
@@ -154,15 +154,15 @@ export class SceneInitializer extends SceneBase {
 	};
 	private setupLight = () => {
 		this.lightGroup = new Group();
-		this.lightShadow = new DirectionalLight(0xffffff, 0.25);
-		this.lightFromCamera = new DirectionalLight('#ecd7ff', 0.5);
+		this.lightFromCamera = new DirectionalLight('#0xffffff', 0.7);
 		this.lightFromCamera.castShadow = false;
 		this.lightGroup.attach( this.lightFromCamera );
 
-		const light1 = new AmbientLight( 0xffffff , 0.3); // soft white light
+		const light1 = new AmbientLight( 0xffffff , 0.1); // soft white light
 		this.lightGroup.attach( light1 );
-		this.lightShadow.position.set( this.gridSize.x / 2, 10, this.gridSize.z / 2 ); //default; light shining from top
-		this.lightShadow.castShadow = true; // default false
+
+		this.lightShadow = new DirectionalLight(0xffffff, 0.3);
+		this.lightShadow.castShadow = true;
 
 		const target = new Object3D();
 
@@ -924,6 +924,13 @@ export class SceneInitializer extends SceneBase {
 
 			this.lightFromCamera.position.set(this.activeCamera.position.x, this.activeCamera.position.y, this.activeCamera.position.z);
 
+			const lookAt = _.minBy(this.groupSelected, x => x.center);
+
+			if (lookAt)
+			{
+				this.lightFromCamera.lookAt(lookAt.center);
+			}
+
 			if (this.activeCamera.position.y >= 0)
 			{
 				SceneObject.UpdateSupports(this.objects, true);
@@ -959,7 +966,7 @@ export class SceneInitializer extends SceneBase {
 						this.outlineEffectRenderer.renderOutline(this.scene, this.activeCamera);
 					}
 				}
-			}, 500);
+			}, 50);
 
 			this.stats.update();
 

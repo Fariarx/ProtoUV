@@ -67,92 +67,95 @@ export abstract class SceneBase {
 		linewidth: 1.5
 	});
 
-  @observable
+	@observable
 	public clippingScenePercent = 1;
-  @observable
-  public clippingSceneWorking = false;
-  public clippingSceneDirectionDown = true;
+	@observable
+	public clippingSceneWorking = false;
+	public clippingSceneDirectionDown = true;
 
-  public clippingPlaneMin = new Plane();
-  public clippingInnerColor = 0x388816;
-  public clippingLineColor = 0x41ff00;
-  public clippingPlaneMeshMin = new THREE.Mesh( new THREE.PlaneBufferGeometry(), new THREE.MeshBasicMaterial ({
-  	color: this.clippingInnerColor,  side: BackSide,
-  	transparent: true,
-  	stencilWrite: true,
-  	depthTest: true,
-  	depthWrite: true,
-  	depthFunc: NotEqualDepth,
-  	reflectivity: 0,
-  	stencilRef: 0,
-  	stencilFunc: THREE.NotEqualStencilFunc,
-  	stencilFail: THREE.ReplaceStencilOp,
-  	stencilZFail: THREE.ReplaceStencilOp,
-  	stencilZPass: THREE.ReplaceStencilOp,
-  }));
+	public clippingPlaneMin = new Plane();
+	public clippingInnerColor = 0x388816;
+	public clippingLineColor = 0x41ff00;
+	public clippingPlaneMeshMin = new THREE.Mesh( new THREE.PlaneBufferGeometry(),
+		new THREE.MeshBasicMaterial ({
+			color: this.clippingInnerColor,	side: BackSide,
+			transparent: true,
+			stencilWrite: true,
+			depthTest: true,
+			depthWrite: true,
+			depthFunc: NotEqualDepth,
+			reflectivity: 0,
+			stencilRef: 0,
+			stencilFunc: THREE.NotEqualStencilFunc,
+			stencilFail: THREE.ReplaceStencilOp,
+			stencilZFail: THREE.ReplaceStencilOp,
+			stencilZPass: THREE.ReplaceStencilOp,
+		}));
 
-  public materialsForScene = {
-  	default: {
-  		normal: new MeshLambertMaterial( {  color: '#f1a217', side: DoubleSide,
-  			clippingPlanes: [this.clippingPlaneMin]
-  		} ),
-  		select: new MeshLambertMaterial( { color: '#98de9c', side: DoubleSide,
-  			clippingPlanes: [this.clippingPlaneMin]
-  		} ),
-  	} as MaterialForScene,
-  };
+	public materialsForScene = {
+		default: {
+			normal: new MeshLambertMaterial( {	color: '#f1a217', side: DoubleSide,
+				clippingPlanes: [this.clippingPlaneMin]
+			} ),
+			select: new MeshLambertMaterial( { color: '#98de9c', side: DoubleSide,
+				clippingPlanes: [this.clippingPlaneMin]
+			} ),
+		} as MaterialForScene,
+	};
 
-  public materialForSupports = {
-  	normal: new MeshLambertMaterial({ color: '#5bc3fc', side: DoubleSide,
-  		clippingPlanes: [this.clippingPlaneMin] }),
-  	preview: new MeshLambertMaterial({ transparent: true, opacity: 0.3, color: '#80ffaa',
-  		clippingPlanes: [this.clippingPlaneMin] })
-  };
+	public materialForSupports = {
+		normal: new MeshLambertMaterial({ color: '#5bc3fc', side: DoubleSide,
+			clippingPlanes: [this.clippingPlaneMin] }),
+		preview: new MeshLambertMaterial({ transparent: true, opacity: 0.3, color: '#80ffaa',
+			clippingPlanes: [this.clippingPlaneMin] })
+	};
 
-  public materialForPlaneShadow: Material = new ShadowMaterial({
-  	color: '#444444',
-  	side: FrontSide,
-  });
+	public materialForPlaneShadow: Material = new ShadowMaterial({
+		color: '#000000',
+		side: FrontSide,
+		transparent: true,
+		opacity: 0.4
+	});
 
-  public materialForPlane?: Material;
-  public materialForObjects: MaterialForScene = this.materialsForScene.default;
-  public perspectiveCamera = new PerspectiveCamera(
-  	60,
-  	window.innerWidth / window.innerHeight,
-  	0.01,
-  	1000
-  );
-  public orthographicCamera = new OrthographicCamera(
-  	window.innerWidth / - 2,
-  	window.innerWidth / 2,
-  	window.innerHeight / 2,
-  	window.innerHeight / - 2,
-  	0.0001,
-  );
-  public activeCamera: OrthographicCamera | PerspectiveCamera = this.perspectiveCamera;
+	public materialForPlane?: Material;
+	public materialForObjects: MaterialForScene = this.materialsForScene.default;
+	public perspectiveCamera = new PerspectiveCamera(
+		60,
+		window.innerWidth / window.innerHeight,
+		0.01,
+		1000
+	);
+	public orthographicCamera = new OrthographicCamera(
+		window.innerWidth / - 2,
+		window.innerWidth / 2,
+		window.innerHeight / 2,
+		window.innerHeight / - 2,
+		0.0001,
+	);
+	public activeCamera: OrthographicCamera | PerspectiveCamera = this.perspectiveCamera;
 
-  public stats = Stats();
+	public stats = Stats();
 
-  public printerName: string = config.printerName;
-  public printer?: Printer;
-
-  @observable
-  public scene: Scene = new Scene();
+	public printerName: string = config.printerName;
+	public printer?: Printer;
 
 	@observable
-  public groupSelected: SceneObject[] = [];
+	public scene: Scene = new Scene();
 
-  @computed
+	@observable
+	public groupSelected: SceneObject[] = [];
+
+	@computed
 	public get groupSelectedLast () {
 		return this.groupSelected[this.groupSelected.length - 1];
 	}
 
-  public decorations: Group = new Group();
-  public transformObjectGroup: Object3D = new Object3D();
-  public transformGroupMarker: Object3D = new Object3D();
+	public decorations: Group = new Group();
+	public transformObjectGroup: Object3D = new Object3D();
+	public transformGroupMarker: Object3D = new Object3D();
 
 	@observable
-  public objects: SceneObject[] = [];
+	public objects: SceneObject[] = [];
 
 	public grid!: SceneGrid;
 	public gridSize: Vector3 = new Vector3(1, 1, 1);

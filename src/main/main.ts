@@ -1,4 +1,4 @@
-import electron, { BrowserWindow, app, dialog, ipcMain, shell } from 'electron';
+import electron, { BrowserWindow, app, dialog, ipcMain, shell, SaveDialogReturnValue } from 'electron';
 import fs from 'fs';
 import path from 'path';
 import child_process from 'child_process';
@@ -141,25 +141,70 @@ const createWindow = async () => {
 	ipcMain.on('save-sliced-layer', (_, screenshot: string, path: string) => {
 		fs.writeFileSync(userData + '/slicing/' + path, atob(screenshot), 'binary' );
 	});
-  ipcMain.on('sliced-finalize', (_, gcode: string, pathToUVTools: string, encoder: string, extencion: string) => {
-    fs.writeFileSync(userData + '/slicing/run.gcode', gcode);
+  ipcMain.on('sliced-finalize', (_, gcode: string, pathToUVTools: string,
+    encoder: string, extencion: string, fileNameToSave: string, filePath: string,
+    saveAutomatically: boolean
+  ) => {
+    try {
+      fs.writeFileSync(userData + '/slicing/run.gcode', gcode);
 
-    //const output = fs.createWriteStream(userData +'/target.zip');
-    //const archive = archiver('zip');
-    //archive.pipe(output);
-    //archive.directory(userData + '/slicing', false);
-    //archive.finalize();
+      const output = fs.createWriteStream(userData + '/target.zip');
+      const archive = archiver('zip');
+      archive.pipe(output);
+      archive.directory(userData + '/slicing', false);
+      archive.finalize();
 
-    if (encoder !== "GenericZIP")
-    {
       const child = child_process.execFile;
       const executablePath = pathToUVTools;
-      const parameters = ["convert", userData +'\\target.zip', encoder, userData +'\\target.' + extencion];
+      const parameters = ["convert", userData + '\\target.zip', encoder, userData + '\\target.' + extencion];
 
-      child(executablePath, parameters, function(err, data) {
-        console.log(err)
-        console.log(data.toString());
+      const _process = child(executablePath, parameters);
+
+      _process.on('close', (code) => {
+        if (code === 1) {
+          const options = {
+            title: "Save file",
+            defaultPath: filePath + '\\' + fileNameToSave + '.' + extencion,
+            buttonLabel: "Save",
+            filters: [
+              { name: encoder, extensions: [extencion] }
+            ]
+          };
+
+          const save = ({ filePath }: any) => {
+            try {
+              if (filePath) {
+                if (fs.existsSync(filePath)) {
+                  fs.rmSync(filePath, { force: true })
+                }
+                fs.copyFileSync(userData + '\\target.' + extencion, filePath);
+                mainWindow?.webContents.send('sliced-finalize-result', null, 'done, file successfully written', filePath);
+              } else {
+                mainWindow?.webContents.send('sliced-finalize-result', 'file to save not selected');
+              }
+            } catch (e) {
+              mainWindow?.webContents.send('sliced-finalize-result', 'save error: ' + e);
+            }
+          };
+
+          if (saveAutomatically && fs.existsSync(filePath))
+          {
+            save({
+                filePath: options.defaultPath
+              })
+          }
+          else {
+            dialog.showSaveDialog(mainWindow!, options).then(save as any);
+          }
+        }
+        else {
+          mainWindow?.webContents.send('sliced-finalize-result', 'error code from uvtools: ' + code);
+        }
       });
+    }
+    catch (e)
+    {
+      mainWindow?.webContents.send('sliced-finalize-result', 'finalize error: ' + e);
     }
   });
 

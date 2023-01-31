@@ -7,7 +7,7 @@ import { config, saveConfig } from '../Shared/Config';
 import { colors } from '../Shared/Config';
 import { FlexBoxColumn, FlexBoxColumnFit, flexChildrenCenter } from '../Shared/Styled/FlexBox';
 import { Sizes } from '../Shared/Styled/Sizes';
-import { GridFields, NameField } from './Shared/Edit';
+import { GridFields, StringFields } from './Shared/Edit';
 
 export let tempPrinter: Printer | undefined;
 
@@ -27,27 +27,31 @@ export const ConfiguratorManuallyApp = observer(() => {
 		saveConfig();
 	};
 
-	return <FlexBoxColumn>
+	return <FlexBoxColumn sx={{
+    width: '100%',
+    height: '100%',
+    padding: Sizes.multiply(Sizes.twentyFour, 2),
+  }}>
 		<FlexBoxColumn sx={{
-			width: 'unset',
-			height: 'unset',
+			width: '100%',
+			height: '100%',
+      overflow: 'auto',
 			flexGrow: 1,
-			...flexChildrenCenter,
-			padding: Sizes.multiply(Sizes.twentyFour, 2),
-			pt: 0,
-			pb: 0
+			...flexChildrenCenter
 		}}>
 			<FlexBoxColumnFit sx={{
-				minHeight: '100px',
 				height: 'fit-content',
-				overflow: 'auto'
 			}}>
-				<NameField text={printer.Name} setText={x => printer.Name = x}/>
+				<StringFields text={printer.Name} setText={x => printer.Name = x} label={'Configuration name'} autoFocus/>
 				<GridFields obj={printer.Resolution} name={'Resolution'}/>
 				<Divider sx={{ mt: Sizes.twelve, mb: Sizes.twelve, transform: 'translateY(12px)', borderColor: colors.background.heavy }}/>
 				<GridFields obj={printer.Workspace} name={'Workspace'}/>
 				<Divider sx={{ mt: Sizes.twelve, mb: Sizes.twelve, transform: 'translateY(12px)', borderColor: colors.background.heavy }}/>
 				<GridFields obj={printer.PrintSettings} name={'Print Settings'}/>
+        <StringFields  text={printer.Export.Encoder+', ' + printer.Export.Extencion} label={"Encoder, extension"} sx={{ mt: '12px' }}  setText={x => {
+          printer.Export.Encoder = x.split(',')[0].trim();
+          printer.Export.Extencion = x.split(',')[1].trim();
+        }}/>
 				<ButtonGroup variant="outlined" sx={{
 					width: Sizes.multiply(Sizes.twentyFour, 12),
 					mt: Sizes.twentyFour

@@ -3,8 +3,8 @@ import { makeAutoObservable } from 'mobx';
 import { SceneObject } from 'renderer/Main/Scene/Entities/SceneObject';
 import { singleton } from 'tsyringe';
 import { AppStore, Log, Pages } from '../AppStore';
-import { config } from '../Shared/Config';
-import { bridge, UVToolsFormats } from '../Shared/Globals';
+import { config, saveConfig } from '../Shared/Config';
+import { bridge } from '../Shared/Globals';
 
 @singleton()
 export class SlicingStore {
@@ -61,6 +61,13 @@ export class SlicingStore {
 		this.imageLargest = '';
 		this.imageLargestSize = 0;
 	};
+
+  public save = (saveAutomatically: boolean) => {
+    bridge.ipcRenderer.send('sliced-finalize',
+      this.gcode, config.pathToUVTools, AppStore.sceneStore.printer!.Export.Encoder,
+      AppStore.sceneStore.printer!.Export.Extencion, AppStore.sceneStore.objects[0].name,
+      config.pathToSave, saveAutomatically);
+  };
 
 	private animate = () => {
 		if (AppStore.getState() !== Pages.Slice || !this.isWorking)
@@ -140,8 +147,26 @@ export class SlicingStore {
 		else {
 			this.isWorking = false;
       this.gcode += '\n\n' + AppStore.sceneStore.printer!.GCode.End;
-      bridge.ipcRenderer.send('sliced-finalize',
-        this.gcode, config.pathToUVTools, printer.Export.Encoder, printer.Export.Extencion);
+
+      if (config.saveAutomatically)
+      {
+        this.save(true);
+      }
+
+      bridge.ipcRenderer.receive('sliced-finalize-result', (error: string | null, success: string | null, filePath?: string) => {
+        if (error)
+        {
+          Log(error);
+        }
+        if (success)
+        {
+          config.pathToSave = filePath ?? config.pathToSave;
+          saveConfig();
+          Log(success + ' to: ' + filePath);
+          AppStore.changeState(Pages.Main);
+        }
+      });
+
 			Log('slicing done!');
 		}
 	};

@@ -1,8 +1,10 @@
+import { Tooltip } from '@mui/material';
 import { observer } from 'mobx-react-lite';
 import { AppStore, Pages } from '../AppStore';
 import { BigButton } from '../Main/Components/Slice/SliceButtonApp';
-import { colors } from '../Shared/Config';
-import { FlexBoxColumn } from '../Shared/Styled/FlexBox';
+import { colors, config, saveConfig } from '../Shared/Config';
+import { FlexBoxColumn, FlexBoxRow } from '../Shared/Styled/FlexBox';
+import { SwitchAndroid } from '../Shared/Styled/SwitchAndroid';
 
 export const SlicingApp = observer(() => {
 	return <FlexBoxColumn>
@@ -15,23 +17,62 @@ export const SlicingApp = observer(() => {
 				height: '100%'
 			}}
 		/>}
-		<BigButton sx={{
-			opacity: 0.6,
-			':hover':{
-				backgroundColor: colors.interact.warning
-			},
-			':activate': {
-				backgroundColor: colors.interact.warning
-			},
-			width: 'fit-content',
-			mr: '2px',
-			position: 'fixed'
-		}} onClick={() => {
-			AppStore.slice.reset();
-			AppStore.changeState(Pages.Main);
-		}}>
-      Cancel
-		</BigButton>
+		<FlexBoxRow sx={{
+      width:'fit-content',
+      height:'fit-content',
+      position: 'fixed',
+      bottom: '30px',
+      right: '4px',
+      gap: '4px'
+    }}>
+      <Tooltip title={"Autosave to last folder" + (config.pathToSave ? ': ' + config.pathToSave : '')} arrow placement={'top'}>
+       <SwitchAndroid value={config.saveAutomatically} onChange={(_, e) => {
+        config.saveAutomatically = e;
+        saveConfig();
+      }}/>
+      </Tooltip>
+      <BigButton sx={{
+        opacity: 0.8,
+        ':hover':{
+          backgroundColor: colors.interact.warning,
+          color: 'black'
+        },
+        ':activate': {
+          backgroundColor: colors.interact.warning,
+          color: 'black'
+        },
+        width: 'fit-content',
+        mr: '2px', position: 'unset',
+        border: '1px solid ' + colors.interact.neutral2,
+        color: 'white'
+      }} onClick={() => {
+        AppStore.slice.reset();
+        AppStore.changeState(Pages.Main);
+      }}>
+        Cancel
+      </BigButton>
+      {AppStore.slice.sliceCount > AppStore.slice.sliceCountMax && <>
+        <BigButton sx={{
+          opacity: 0.8,
+          ':hover':{
+            backgroundColor: colors.interact.success,
+            color: 'black'
+          },
+          ':activate': {
+            backgroundColor: colors.interact.success,
+            color: 'black'
+          },
+          width: 'fit-content',
+          mr: '2px', position: 'unset',
+          border: '1px solid ' + colors.interact.neutral2,
+          color: 'white'
+        }} onClick={() => {
+          AppStore.slice.save(false);
+        }}>
+          Select path to save
+        </BigButton>
+      </>}
+    </FlexBoxRow>
 	</FlexBoxColumn>;
 });
 

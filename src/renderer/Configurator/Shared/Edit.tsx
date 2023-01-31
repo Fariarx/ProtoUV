@@ -19,13 +19,13 @@ export const GridFields = (props: {obj: any, name: string}) => <FlexBoxColumnFit
 	</Typography>
 	<Grid container spacing={2} sx={{ width: '100%', height: 'unset' }} >
 		{Object.entries(props.obj)
-			.map((x: [string, unknown]) => x[0] === 'Name' ? <Box/> :<Grid key={x[0]} item xs={3}>
+			.map((x: [string, unknown]) => x[1] === 'Name' ? <Box/> :<Grid key={x[0]} item xs={3}>
 				<NumberField {...props} pair={x}/>
 			</Grid>)}
 	</Grid>
 </FlexBoxColumnFit>;
 
-export const NameField = (props: {text: string, setText: (str: string) => void}) => {
+export const StringFields = (props: {text: string, setText: (str: string) => void, label?:string, autoFocus?: boolean, sx?:any}) => {
 	const [error, setterError] = useState(false);
 
 	return <FlexBoxColumnFit sx={{
@@ -33,12 +33,12 @@ export const NameField = (props: {text: string, setText: (str: string) => void})
 		maxWidth: '1000px',
 		height: 'unset'
 	}}>
-		<TextField autoFocus
+		<TextField autoFocus={props.autoFocus}
 			variant="filled"
 			error={error}
 			defaultValue={props.text}
-			label={'Configuration name'}
-			sx={{ width: '70%' }}
+			label={props.label}
+			sx={{ width: '70%', ...props.sx }}
 			onChange={(y) => {
 				if (y.currentTarget.value && y.currentTarget.value.length > 3 && y.currentTarget.value.length < 128)
 				{

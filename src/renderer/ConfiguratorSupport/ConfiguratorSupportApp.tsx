@@ -2,7 +2,7 @@ import { Box, Button, ButtonGroup } from '@mui/material';
 import _ from 'lodash';
 import { observer } from 'mobx-react';
 import { AppStore, Pages } from 'renderer/AppStore';
-import { GridFields, NameField } from 'renderer/Configurator/Shared/Edit';
+import { GridFields, StringFields } from 'renderer/Configurator/Shared/Edit';
 import { Printer } from 'renderer/Main/Printer/Configs/Printer';
 import { config, saveConfig } from 'renderer/Shared/Config';
 import { FlexBoxColumn, FlexBoxColumnFit, flexChildrenCenter } from 'renderer/Shared/Styled/FlexBox';
@@ -40,7 +40,7 @@ export const ConfiguratorSupport = observer(() => {
 				height: 'fit-content',
 				overflow: 'auto'
 			}}>
-				<NameField text={preset.Name} setText={x => preset.Name = x}/>
+				<StringFields text={preset.Name} setText={x => preset.Name = x}/>
 				<GridFields obj={preset} name={'Supports preset edit'}/>
 
 				<ButtonGroup variant="outlined" sx={{

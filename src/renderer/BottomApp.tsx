@@ -55,27 +55,12 @@ export const LineBottomApp = observer(() => {
       	height: '18px',
       	alignSelf: 'center',
       	justifySelf: 'center',
-      	marginRight: '4px',
+      	marginRight: '12px',
+      	marginBottom: '2px'
       }} />}
-			<Typography variant={'body2'} sx={{
-				minWidth: 'max-content',
-				backgroundColor: colors.background.commonest,
-				border: '1px solid ' + colors.background.warm,
-				pl: '4px', pr: '4px', pb: '1px', mr: '8px',
-				height: '18px',
-				width:'fit-content',
-				borderRadius: '2px',
-				alignSelf: 'center',
-				justifySelf: 'center',
-				display: 'flex',
-				justifyContent: 'center',
-				alignContent: 'center',
-				fontFamily: 'sans-serif',
-				fontSize: Sizes.twelve,
-				color: colors.typography.background,
-			}} onClick={() => bridge.shell.openExternal(AppLinkReleases)}>
-				{ AppVersion }
-			</Typography>
+			<Text>
+				Version: { AppVersion }
+			</Text>
 			<Text>
 				{'Project directory: '} {/*Директория первого файла*/}
 				<span style={{ fontWeight: 'bold', display: 'inline-flex' }}>

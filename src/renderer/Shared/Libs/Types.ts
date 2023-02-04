@@ -1,4 +1,4 @@
-import { Euler, Mesh, Vector3 } from 'three';
+import { Euler, Matrix4, Mesh, Vector3 } from 'three';
 import { SceneObject } from '../../Main/Scene/Entities/SceneObject';
 
 export enum AppEventEnum {
@@ -40,8 +40,13 @@ export type AppEventMoveObject = {
   sceneObject: SceneObject;
   actionBreak: true | undefined;
   renderBreak: true | undefined;
-  deletedSupports: Mesh[] | undefined;
-  deletedSupportsDisabled: true | undefined;
+  meshBefore: {
+    rotation: Euler;
+    position: Vector3;
+    scale: Vector3;
+  } | undefined;
+  supportsBefore: Mesh[] | undefined;
+  supportsDisabled: true | undefined;
   id: number | undefined;
 };
 

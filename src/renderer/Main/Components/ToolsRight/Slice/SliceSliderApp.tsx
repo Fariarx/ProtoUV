@@ -2,9 +2,9 @@ import { Box, Slider } from '@mui/material';
 import _ from 'lodash';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { AppStore } from '../../../AppStore';
-import { config } from '../../../Shared/Config';
-import { SceneObject } from '../../Scene/Entities/SceneObject';
+import { AppStore } from '../../../../AppStore';
+import { config } from '../../../../Shared/Config';
+import { SceneObject } from '../../../Scene/Entities/SceneObject';
 
 export const SliceSliderApp = observer(() => {
 	if (AppStore.sceneStore.objects.length === 0)

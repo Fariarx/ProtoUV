@@ -29,6 +29,13 @@ export class SceneStore extends SceneInitializer {
 		this.updateCameraLookPosition();
 		this.animate();
 		makeObservable(this);
+
+		setTimeout(() => {
+			if (bridge.isDebug())
+			{
+				AppStore.sceneStore.handleLoadFile('C:\\Users\\admin\\Downloads\\Old\\V7_Infinity_Cube_Hinge.stl');
+			}
+		}, 100);
 	}
 
 	public setup() {
@@ -148,10 +155,6 @@ export class SceneStore extends SceneInitializer {
 			const sizeXZ = new Vector2(this.printer.Workspace.SizeX * 0.1, this.printer.Workspace.SizeY * 0.1);
 
 			setTimeout(() => {
-				if (bridge.isDebug())
-				{
-					AppStore.sceneStore.handleLoadFile('C:\\Users\\admin\\Downloads\\Old\\V7_Infinity_Cube_Hinge.stl');
-				}
 				AppStore.performSupports.addCursorToScene();
 			}, 100);
 

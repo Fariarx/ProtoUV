@@ -1,25 +1,28 @@
+import _ from 'lodash';
 import { Key } from 'ts-keycode-enum';
 
-const keysPressed: Array<Key> = [];
-
+export const KeysPressed: Array<Key> = [];
 export const SubscribersKeyPressed: ((k: Key) => void)[] = [];
 export const isKeyPressed = (key: Key) => {
-	return keysPressed.indexOf(key) !== -1;
+	return KeysPressed.indexOf(key) !== -1;
+};
+export const isKeySequencePressed = (keys: Key[]) => {
+	return _.isEqual(KeysPressed, keys);
 };
 
 window.addEventListener( 'keydown', (e)=>{
-	if (keysPressed.indexOf(e.keyCode as Key) === -1)
+	if (KeysPressed.indexOf(e.keyCode as Key) === -1)
 	{
-		keysPressed.push(e.keyCode as Key);
+		KeysPressed.push(e.keyCode as Key);
 	}
 
 	SubscribersKeyPressed.forEach(x => x(e.keyCode as Key));
 }, false);
 window.addEventListener( 'keyup',(e)=>{
-	const index = keysPressed.indexOf(e.keyCode as Key);
+	const index = KeysPressed.indexOf(e.keyCode as Key);
 
 	if (index > -1)
 	{
-		keysPressed.splice(index, 1);
+		KeysPressed.splice(index, 1);
 	}
 }, false );

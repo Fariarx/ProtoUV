@@ -38,6 +38,7 @@ export class AppStore {
 
 	public static changeState(state: Pages) {
 		AppStore.sceneStore.updatePrinter();
+		AppStore.sceneStore.resetAnyTools();
 		AppStore.instance.state = state;
 
 		if (state === Pages.Slice)

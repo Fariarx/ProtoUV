@@ -1,10 +1,51 @@
 import { runInAction } from 'mobx';
 import { clearSupportCreateBuffer } from 'renderer/Main/Components/ToolsRight/Supports/Shared/SupportsGen';
 import { Mesh, Vector3 } from 'three';
+import { Key } from 'ts-keycode-enum';
 import { SceneObject } from './../Main/Scene/Entities/SceneObject';
 import { config } from './Config';
+import { SubscribersKeyPressed, isKeySequencePressed } from './Libs/Keys';
 import { AppEvent, AppEventAddObject, AppEventArguments, AppEventDeleteObject, AppEventEditSupports, AppEventEnum, AppEventMoveObject, TransformEnum } from './Libs/Types';
 import { AppStore } from '../AppStore';
+
+SubscribersKeyPressed.push(() => {
+	if (isKeySequencePressed([Key.Ctrl, Key.Z]))
+	{
+		RevertLastEvent(false);
+	}
+});
+
+const isCancelPressed = () => isKeySequencePressed([Key.Ctrl, Key.Shift, Key.Z]);
+
+SubscribersKeyPressed.push(() => {
+	if (isCancelPressed())
+	{
+		RevertLastEvent(true);
+	}
+});
+
+const RevertLastEvent = (isDoubleReverted: boolean) => {
+	const event = (isDoubleReverted ? eventListReverted : eventList).pop();
+
+	if (event) {
+		for(let index = 0; index < eventListeners.length; index++)
+		{
+			eventListeners[index](event.name, event.args);
+		}
+
+		if (isDoubleReverted)
+		{
+			if (Handler(event, undefined, true)) {
+				eventList.push(event);
+			}
+			return;
+		}
+
+		if (Handler(event, true)) {
+			eventListReverted.push(event);
+		}
+	}
+};
 
 export const Dispatch = (name: AppEventEnum, args: typeof AppEventArguments) => {
 	const message = {
@@ -18,25 +59,30 @@ export const Dispatch = (name: AppEventEnum, args: typeof AppEventArguments) => 
 	}
 
 	if (Handler(message)) {
-		eventList.push(message);
+
+		if (!isCancelPressed())
+		{
+			eventList.push(message);
+			eventListReverted = [];
+		}
 	}
 };
 
-const Handler = (message: any) => {
+const Handler = (message: any, isReversed?: true, isRestored?: true) => {
 	AppStore.sceneStore.clippingReset();
 
 	switch (message.name) {
 		case AppEventEnum.ADD_OBJECT:
-			objectAdd(message);
+			objectAdd(message, isReversed, isRestored);
 			break;
 		case AppEventEnum.DELETE_OBJECT:
-			objectDelete(message);
+			objectDelete(message, isReversed);
 			break;
 		case AppEventEnum.TRANSFORM_OBJECT:
-			objectTransform(message);
+			objectTransform(message, isReversed);
 			break;
 		case AppEventEnum.EDIT_SUPPORTS:
-			editSupports(message);
+			editSupports(message, isReversed);
 			break;
 	}
 
@@ -67,27 +113,49 @@ export const DeleteListener = (listener: object) => {
 const eventList = new Array<AppEvent>();
 const eventListeners: ((message: AppEventEnum, args?: object) => void)[] = [];
 
-const objectAdd = (message: AppEvent) => {
+let eventListReverted = new Array<AppEvent>();
+
+const objectAdd = (message: AppEvent, isReversed?: true, isRestored?: true) => {
+	console.log('Add scene object', isReversed);
+
 	const args = message.args as AppEventAddObject;
 	const app = AppStore.instance;
 	const scene = AppStore.sceneStore;
 
+	const update = () => {
+		scene.updateSelectionChanged();
+		scene.updateTransformControls();
+		setTimeout(() => {
+			scene.clippingReset();
+			scene.animate();
+		});
+	};
+
+	if (isReversed)
+	{
+    args!.object.Hide();
+    update();
+    return;
+	}
+
+	if (isRestored)
+	{
+    args!.object.Show();
+    update();
+    return;
+	}
+
 	SceneObject.DeselectAllObjects();
-	scene.objects.push(args!.object);
-	args!.object.AddToScene(true);
-	args!.object.AlignToPlaneXZ(scene.gridSize);
-	args!.object.AlignToPlanePreparedToPrint();
-	args!.object.AlignToPlaneY();
-  args!.object.AlignByOtherSceneItems();
-  scene.updateSelectionChanged();
-  scene.updateTransformControls();
+	scene.objects.push(args.object);
+	args.object.AddToScene(true);
+	args.object.AlignToPlaneXZ(scene.gridSize);
+	args.object.AlignToPlanePreparedToPrint();
+	args.object.AlignToPlaneY();
+	args.object.AlignByOtherSceneItems();
 
-  setTimeout(() => {
-  	scene.clippingReset();
-  	scene.animate();
-  });
+	update();
 
-  runInAction(() => {
+	runInAction(() => {
   	if (args?.source && !app.projectFolder)
   	{
   		const path = (args.source as string).split('\\');
@@ -96,73 +164,116 @@ const objectAdd = (message: AppEvent) => {
   	}
 
   	app.fileCount = scene.objects.length;
-  });
+	});
+
 };
 
-const objectDelete = (message: AppEvent) => {
+const objectDelete = (message: AppEvent, isReversed?: true) => {
+	console.log('Delete scene object', isReversed);
+
 	const args = message.args as AppEventDeleteObject;
+	const scene = AppStore.sceneStore;
 
-	args.object.Dispose();
+	const update = () => {
+		scene.updateSelectionChanged();
+		scene.updateTransformControls();
+		setTimeout(() => {
+			scene.clippingReset();
+			scene.animate();
+		});
+	};
+
+	if (isReversed)
+	{
+		args.object.Show();
+	}
+	else {
+		args.object.Hide();
+	}
+
+	update();
 };
 
-const objectTransform = (message: AppEvent) => {
+const objectTransform = (message: AppEvent, isReversed?: true) => {
 	const event = message.args as AppEventMoveObject;
 	const mesh: Mesh = event.sceneObject.mesh;
 
 	if (!event.actionBreak) {
-		if (!event.instrument) {
-			event.instrument = AppStore.transform.state;
-		}
 
-		if (event.sceneObject.supports?.length && !event.deletedSupportsDisabled)
+		if (event.sceneObject.supports?.length && !event.supportsDisabled)
 		{
-			event.deletedSupports = event.sceneObject.supports;
-			AppStore.sceneStore.removeSupports(event.sceneObject);
+			event.supportsBefore = event.sceneObject.supports;
+			event.sceneObject.RemoveSupports();
 		}
 
-		const minScale = config.scene.sharpness;
+		if (isReversed)
+		{
+			mesh.position.set(event.meshBefore!.position.x,
+        event.meshBefore!.position.y,
+        event.meshBefore!.position.z);
+			mesh.rotation.set(event.meshBefore!.rotation.x,
+        event.meshBefore!.rotation.y,
+        event.meshBefore!.rotation.z);
+			mesh.scale.set(event.meshBefore!.scale.x,
+        event.meshBefore!.scale.y,
+        event.meshBefore!.scale.z);
+		}
+		else
+		{
+			if (!event.instrument) {
+				event.instrument = AppStore.transform.state;
+			}
 
-		switch (event.instrument) {
-			case TransformEnum.Move:
-				if (event.to.isDifferent)
-				{
-					mesh.position.add(event.to as Vector3);
-				}
-				else {
-					mesh.position.set(event.to.x, event.to.y, event.to.z);
-				}
-				break;
-			case TransformEnum.Rotate:
-				if (event.to.isDifferent)
-				{
-					mesh.rotation.setFromVector3(event.to as Vector3);
-				}
-				else {
-					mesh.rotation.set(event.to.x, event.to.y, event.to.z);
-				}
-				break;
-			case TransformEnum.Scale:
-				if(event.to.x < minScale)
-				{
-					event.to.x = minScale;
-				}
-				if(event.to.y < minScale)
-				{
-					event.to.y = minScale;
-				}
-				if(event.to.z < minScale)
-				{
-					event.to.z = minScale;
-				}
+			event.meshBefore =  {
+				rotation: mesh.rotation.clone(),
+				position: mesh.position.clone(),
+				scale: mesh.scale.clone()
+			};
 
-				if (event.to.isDifferent)
-				{
-					mesh.scale.add(event.to as Vector3);
-				}
-				else {
-					mesh.scale.set(event.to.x, event.to.y, event.to.z);
-				}
-				break;
+			const minScale = config.scene.sharpness;
+
+			switch (event.instrument) {
+				case TransformEnum.Move:
+					if (event.to.isDifferent)
+					{
+						mesh.position.add(event.to as Vector3);
+					}
+					else {
+						mesh.position.set(event.to.x, event.to.y, event.to.z);
+					}
+					break;
+				case TransformEnum.Rotate:
+					if (event.to.isDifferent)
+					{
+						mesh.rotation.setFromVector3(event.to as Vector3);
+					}
+					else {
+						mesh.rotation.set(event.to.x, event.to.y, event.to.z);
+					}
+					break;
+				case TransformEnum.Scale:
+					if(event.to.x < minScale)
+					{
+						event.to.x = minScale;
+					}
+					if(event.to.y < minScale)
+					{
+						event.to.y = minScale;
+					}
+					if(event.to.z < minScale)
+					{
+						event.to.z = minScale;
+					}
+
+					if (event.to.isDifferent)
+					{
+						mesh.scale.add(event.to as Vector3);
+					}
+					else {
+						mesh.scale.set(event.to.x, event.to.y, event.to.z);
+					}
+					break;
+			}
 		}
 	}
 
@@ -175,12 +286,28 @@ const objectTransform = (message: AppEvent) => {
 	}
 };
 
-const editSupports = (message: AppEvent) => {
+const editSupports = (message: AppEvent, isReversed?: true) => {
 	const event = message.args as AppEventEditSupports;
 
-	event.oldSupports = event.object.supports;
+	if (isReversed)
+	{
+		event.object.RemoveSupports();
+		event.object.supports = event.oldSupports;
 
-	AppStore.sceneStore.removeSupports(event.object);
+		if (event.oldSupports?.length)
+		{
+			AppStore.sceneStore.scene.add(...event.oldSupports);
+		}
+		else {
+			event.object.supports = undefined;
+		}
+
+		AppStore.sceneStore.animate();
+		return;
+	}
+
+	event.oldSupports = event.object.supports;
+	event.object.RemoveSupports();
 
 	if (event.supports?.length)
 	{

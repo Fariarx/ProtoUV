@@ -4,15 +4,16 @@ import { useEffect } from 'react';
 import { AppStore } from 'renderer/AppStore';
 import { APP_BOTTOM_HEIGHT_PX } from 'renderer/BottomApp';
 import { container } from 'tsyringe';
+import { ListObjects } from './ListObjectsApp';
+import { PrinterApp } from './PrinterApp';
+import { SliceButtonApp } from './Slice/SliceButtonApp';
+import { PerformSupportsApp } from './Supports/PerformSupportsApp';
+import { ToolsRightStore } from './ToolsRightStore';
 import { APP_HEADER_HEIGHT_PX } from '../../../HeaderApp';
 import { colors, config, saveConfig } from '../../../Shared/Config';
 import { SubscribersMouseMove, SubscribersMouseUp } from '../../../Shared/Libs/Listerners';
-import { FlexBoxColumn, FlexBoxRow} from '../../../Shared/Styled/FlexBox';
+import { FlexBoxColumn, FlexBoxRow } from '../../../Shared/Styled/FlexBox';
 import { Sizes } from '../../../Shared/Styled/Sizes';
-import { ListObjects } from './ListObjectsApp';
-import { PrinterApp } from './PrinterApp';
-import { PerformSupportsApp } from './Supports/PerformSupportsApp';
-import { ToolsRightStore } from './ToolsRightStore';
 
 export const TOOLS_TAB_MIN_SIZE = 150;
 export const TOOLS_TAB_MAX_SIZE = 400;
@@ -66,6 +67,7 @@ export const ToolsRightApp = observer(() => {
 			<PrinterApp/>
 			<ListObjects/>
 			<PerformSupportsApp/>
+			<SliceButtonApp/>
 		</FlexBoxColumn>
 	</FlexBoxRow>;
 });

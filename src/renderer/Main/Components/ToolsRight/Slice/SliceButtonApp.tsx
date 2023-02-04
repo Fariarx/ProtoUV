@@ -1,16 +1,21 @@
 import { Box, styled } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { observer } from 'mobx-react-lite';
-import { AppStore, Log, Pages } from 'renderer/AppStore';
-import { APP_BOTTOM_HEIGHT } from 'renderer/BottomApp';
-import { colors } from 'renderer/Shared/Config';
+import { container } from 'tsyringe';
+import { AppStore, Log, Pages } from '../../../../AppStore';
+import { APP_BOTTOM_HEIGHT } from '../../../../BottomApp';
+import { colors } from '../../../../Shared/Config';
+import { Sizes } from '../../../../Shared/Styled/Sizes';
+import { ToolsRightStore } from '../ToolsRightStore';
 
 export const SliceButtonApp = observer(() => {
 	return <BigButton sx={{
 		display: AppStore.sceneStore.objects.length > 0 ? 'flex' : 'none',
-		position: 'fixed',
-		bottom: 10 + APP_BOTTOM_HEIGHT - 4 + 'px',
-		right: '4px',
+		border: '1px solid ' + colors.background.darkest,
+		borderRadius: Sizes.four + ' 0' + ' 0 ' + Sizes.four,
+		borderRight: 'unset',
+		width: '100%',
+		mt: 1
 	}}  onClick={() => {
 		Log('run slicing');
 		AppStore.changeState(Pages.Slice);
@@ -22,7 +27,7 @@ export const SliceButtonApp = observer(() => {
 });
 
 export const BigButton = styled(Box)(() => ({
-	backgroundColor: colors.background.dark,
+	backgroundColor: colors.background.heavy,
 	borderRadius: '4px',
 	width: '150px',
 	height: '36px',

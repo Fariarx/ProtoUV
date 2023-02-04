@@ -22,7 +22,7 @@ export class SlicingStore {
 	public imageLargestSize = 0;
 	public workerCount = 0;
 
-  public gcode = '';
+	public gcode = '';
 
 	public run = () => {
 		this.isWorking = true;
@@ -32,16 +32,16 @@ export class SlicingStore {
 		bridge.ipcRenderer.send('prepare-to-slicing');
 
 		bridge.ipcRenderer.receive('prepare-to-slicing', () => {
-      this.reset();
+			this.reset();
 			Log('prepare to slicing done!');
-      this.isWorking = true;
+			this.isWorking = true;
 			const maxObjectsPoint =  _.maxBy(AppStore.sceneStore.objects, (x: SceneObject) => x.maxY.y);
 			this.sliceTo = Math.min(AppStore.sceneStore.gridSize.y, maxObjectsPoint!.maxY.y);
 			this.sliceCountMax =  Math.ceil(this.sliceTo / (AppStore.sceneStore.printer!.PrintSettings.LayerHeight * 0.1));
 			this.sliceCount = 0;
-      this.gcode = AppStore.sceneStore.printer!.GCode.Start;
+			this.gcode = AppStore.sceneStore.printer!.GCode.Start;
 			this.animate();
-      Log('slice layers max: ' + this.sliceCountMax);
+			Log('slice layers max: ' + this.sliceCountMax);
 		});
 
 		//bridge.ipcRenderer.receive('worker-info', (x: number) => {
@@ -52,7 +52,7 @@ export class SlicingStore {
 
 	public reset = () => {
 		AppStore.instance.progressPercent = 0;
-    this.gcode = '';
+		this.gcode = '';
 		this.isWorking = false;
 		this.sliceCount = 0;
 		this.sliceCountMax = 0;
@@ -62,26 +62,26 @@ export class SlicingStore {
 		this.imageLargestSize = 0;
 	};
 
-  public save = (saveAutomatically: boolean) => {
-    bridge.ipcRenderer.send('sliced-finalize',
-      this.gcode, config.pathToUVTools, AppStore.sceneStore.printer!.Export.Encoder,
+	public save = (saveAutomatically: boolean) => {
+		bridge.ipcRenderer.send('sliced-finalize',
+			this.gcode, config.pathToUVTools, AppStore.sceneStore.printer!.Export.Encoder,
       AppStore.sceneStore.printer!.Export.Extencion, AppStore.sceneStore.objects[0].name,
       config.pathToSave, saveAutomatically);
-  };
+	};
 
 	private animate = () => {
 		if (AppStore.getState() !== Pages.Slice || !this.isWorking)
 		{
-      Log('slice not ready');
+			Log('slice not ready');
 			this.isWorking = false;
 			return;
 		}
 
-    const sharpness = config.scene.sharpness.toString().length - 2;
-    const layerHeight = (AppStore.sceneStore.printer!.PrintSettings.LayerHeight * 0.1);
-    const printer = AppStore.sceneStore.printer!;
+		const sharpness = config.scene.sharpness.toString().length - 2;
+		const layerHeight = (AppStore.sceneStore.printer!.PrintSettings.LayerHeight * 0.1);
+		const printer = AppStore.sceneStore.printer!;
 
-		let rendersCount = this.sliceCountMax / 100;
+		let rendersCount = 1;
 
 		while (this.sliceCount <= this.sliceCountMax)
 		{
@@ -89,27 +89,26 @@ export class SlicingStore {
 				(this.sliceCount/this.sliceCountMax) * this.sliceTo / AppStore.sceneStore.gridSize.y,
 				this.sliceCount);
 
-      Log('slice: ' + ((this.sliceCount/this.sliceCountMax)*100).toFixed(1) + '%');
+			Log('slice: ' + ((this.sliceCount/this.sliceCountMax)*100).toFixed(1) + '%');
 
-      const moveTo = (layerHeight * this.sliceCount)* 10;
+			const moveTo = (layerHeight * this.sliceCount)* 10;
 
-      this.gcode += '\n\n' + printer.GCode.ShowImage.replace('*x', this.sliceCount.toString());
-      this.gcode += '\n' + printer.GCode.MoveTo
-        .replace('*x', (moveTo + printer.PrintSettings.LiftingHeight).toFixed(sharpness))
-        .replace('*y', printer.PrintSettings.LiftingSpeed.toString());
-      this.gcode += '\n' + printer.GCode.MoveTo
-        .replace('*x', (moveTo).toFixed(sharpness))
-        .replace('*y', printer.PrintSettings.LiftingSpeed.toString());
-      this.gcode += '\n' + printer.GCode.Delay
-        .replace('*x', (printer.PrintSettings.DelayTime*1000).toString());
-      this.gcode += '\n' + printer.GCode.LightOn;
-      this.gcode += '\n' + printer.GCode.Delay
-        .replace('*x', (printer.PrintSettings.BottomLayers >= this.sliceCount
-          ? printer.PrintSettings.BottomExposureTime * 1000
-          : printer.PrintSettings.ExposureTime * 1000)
-          .toString());
-      this.gcode += '\n' + printer.GCode.LightOff;
-
+			this.gcode += '\n\n' + printer.GCode.ShowImage.replace('*x', this.sliceCount.toString());
+			this.gcode += '\n' + printer.GCode.MoveTo
+				.replace('*x', (moveTo + printer.PrintSettings.LiftingHeight).toFixed(sharpness))
+				.replace('*y', printer.PrintSettings.LiftingSpeed.toString());
+			this.gcode += '\n' + printer.GCode.MoveTo
+				.replace('*x', (moveTo).toFixed(sharpness))
+				.replace('*y', printer.PrintSettings.LiftingSpeed.toString());
+			this.gcode += '\n' + printer.GCode.Delay
+				.replace('*x', (printer.PrintSettings.DelayTime*1000).toString());
+			this.gcode += '\n' + printer.GCode.LightOn;
+			this.gcode += '\n' + printer.GCode.Delay
+				.replace('*x', (printer.PrintSettings.BottomLayers >= this.sliceCount
+					? printer.PrintSettings.BottomExposureTime * 1000
+					: printer.PrintSettings.ExposureTime * 1000)
+					.toString());
+			this.gcode += '\n' + printer.GCode.LightOff;
 
 			this.sliceCount += 1;
 
@@ -146,26 +145,26 @@ export class SlicingStore {
 		}
 		else {
 			this.isWorking = false;
-      this.gcode += '\n\n' + AppStore.sceneStore.printer!.GCode.End;
+			this.gcode += '\n\n' + AppStore.sceneStore.printer!.GCode.End;
 
-      if (config.saveAutomatically)
-      {
-        this.save(true);
-      }
+			if (config.saveAutomatically)
+			{
+				this.save(true);
+			}
 
-      bridge.ipcRenderer.receive('sliced-finalize-result', (error: string | null, success: string | null, filePath?: string) => {
-        if (error)
-        {
-          Log(error);
-        }
-        if (success)
-        {
-          config.pathToSave = filePath ?? config.pathToSave;
-          saveConfig();
-          Log(success + ' to: ' + filePath);
-          AppStore.changeState(Pages.Main);
-        }
-      });
+			bridge.ipcRenderer.receive('sliced-finalize-result', (error: string | null, success: string | null, filePath?: string) => {
+				if (error)
+				{
+					Log(error);
+				}
+				if (success)
+				{
+					config.pathToSave = filePath ?? config.pathToSave;
+					saveConfig();
+					Log(success + ' to: ' + filePath);
+					AppStore.changeState(Pages.Main);
+				}
+			});
 
 			Log('slicing done!');
 		}

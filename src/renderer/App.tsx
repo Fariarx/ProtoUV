@@ -30,7 +30,7 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { SupportsRemoveCircleApp } from './Main/Components/ToolsRight/Supports/Shared/SupportsRemoveCircleApp';
 import { ConfiguratorSupport } from './ConfiguratorSupport/ConfiguratorSupportApp';
-import { SliceButtonApp } from './Main/Components/Slice/SliceButtonApp';
+import { SliceButtonApp } from './Main/Components/ToolsRight/Slice/SliceButtonApp';
 import { SlicingApp } from './Slicing/SlicingApp';
 
 UpdateScheme();

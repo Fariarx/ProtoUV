@@ -6,7 +6,6 @@ import {
 	ArrowHelper,
 	BufferGeometry,
 	DirectionalLight,
-	DirectionalLightHelper,
 	Group,
 	Line3,
 	LineSegments,
@@ -15,57 +14,44 @@ import {
 	Mesh,
 	Object3D,
 	OrthographicCamera,
-	PCFSoftShadowMap,
 	PerspectiveCamera,
 	Plane,
-	Raycaster, Vector3, sRGBEncoding
+	Raycaster,
+	Vector3,
+	sRGBEncoding
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import {
-	TransformControls,
-} from 'three/examples/jsm/controls/TransformControls';
+import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader';
 import { LinearEncoding } from 'three/src/constants';
 import { CONTAINED, MeshBVH } from 'three-mesh-bvh';
 import { Key } from 'ts-keycode-enum';
 import { container } from 'tsyringe';
-
 import { SceneObject } from './Entities/SceneObject';
 import { SceneBase } from './SceneBase';
-import {
-	AppStore,
-	Log,
-} from '../../AppStore';
+import { AppStore, Log, Pages } from '../../AppStore';
 import { APP_HEADER_HEIGHT } from '../../HeaderApp';
-import {
-	config,
-	saveConfig,
-} from '../../Shared/Config';
+import { config, saveConfig } from '../../Shared/Config';
 import { Dispatch } from '../../Shared/Events';
 import { bridge } from '../../Shared/Globals';
 import { EnumHelpers } from '../../Shared/Helpers/Enum';
 import * as OrientationHelper from '../../Shared/Helpers/OrientationHelper';
-import {
-	SubscribersKeyPressed,
-	isKeyPressed,
-} from '../../Shared/Libs/Keys';
+import { SubscribersKeyPressed, isKeyPressed } from '../../Shared/Libs/Keys';
 import {
 	SubscribersDoubleMouseClick,
 	SubscribersMouseDown,
 	SubscribersMouseMove,
 	SubscribersMouseUp,
-	SubscribersWindowResize,
+	SubscribersWindowResize
 } from '../../Shared/Libs/Listerners';
 import {
 	AppEventEnum,
 	AppEventMoveObject,
 	AppEventSelectionChanged,
 	SupportsEnum,
-	TransformEnum,
+	TransformEnum
 } from '../../Shared/Libs/Types';
-import {
-	clearSupportCreateBuffer,
-} from '../Components/ToolsRight/Supports/Shared/SupportsGen';
+import { clearSupportCreateBuffer } from '../Components/ToolsRight/Supports/Shared/SupportsGen';
 import { ToolsRightStore } from '../Components/ToolsRight/ToolsRightStore';
 
 export class SceneInitializer extends SceneBase {
@@ -551,6 +537,10 @@ export class SceneInitializer extends SceneBase {
 		});
 
 		SubscribersDoubleMouseClick.push(() => {
+			if (!AppStore.isState(Pages.Main))
+			{
+				return;
+			}
 			AppStore.transform.changeState(TransformEnum.None === AppStore.transform.state
 				? TransformEnum.Move
 				: TransformEnum.None);
@@ -678,13 +668,6 @@ export class SceneInitializer extends SceneBase {
 
 			this.orientationHelperOrthographic.domElement.style.right = container.resolve(ToolsRightStore).width + 'px';
 			this.orientationHelperPerspective.domElement.style.right = container.resolve(ToolsRightStore).width + 'px';
-		}
-	};
-	public removeSupports = (obj: SceneObject) => {
-		if (obj.supports?.length)
-		{
-			this.scene.remove(...obj.supports);
-			obj.supports = undefined;
 		}
 	};
 	public handleLoadFile = (file: string) => {

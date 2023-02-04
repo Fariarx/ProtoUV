@@ -1,9 +1,8 @@
 import { Box, Typography } from '@mui/material';
 import { MdEdit } from '@react-icons/all-files/md/MdEdit';
 import { observer } from 'mobx-react-lite';
-import { AppStore, Log, Pages } from 'renderer/AppStore';
+import { AppStore, Pages } from 'renderer/AppStore';
 import { colors } from 'renderer/Shared/Config';
-import { SupportsEnum } from 'renderer/Shared/Libs/Types';
 import { Sizes } from 'renderer/Shared/Styled/Sizes';
 import { ToolButton } from './Supports/Shared/ToolButton';
 
@@ -15,9 +14,9 @@ export const PrinterApp = observer(() => {
 		padding: '4px',
 		paddingLeft: 1,
 		border: '1px solid ' + colors.background.darkest,
+		borderRadius: Sizes.four + ' 0' + ' 0 ' + Sizes.four,
 		borderRight: 'unset',
 		backgroundColor: colors.background.dark,
-		borderRadius: Sizes.four + ' 0' + ' 0 ' + Sizes.four,
 		userSelect: 'none',
 		mt: 1,
 	}}>

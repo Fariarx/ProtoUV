@@ -9,9 +9,9 @@ import { container } from 'tsyringe';
 import { AppStore, Pages } from './AppStore';
 import { BindItem, HeaderStore } from './HeaderStore';
 import { colors } from './Shared/Config';
-import { bridge } from './Shared/Globals';
+import { AppLink, AppVersion, bridge } from './Shared/Globals';
 import logo1 from './Shared/Image/uv128_v1.png';
-import { emptyFunc, linearGenerator } from './Shared/Libs/Tools';
+import { linearGenerator } from './Shared/Libs/Tools';
 import { AnimationGrow } from './Shared/Styled/Animation';
 import { FlexBoxRow, FlexBoxRowFit } from './Shared/Styled/FlexBox';
 import { Sizes } from './Shared/Styled/Sizes';
@@ -56,16 +56,13 @@ export const HeaderApp = observer(() => {
 							name: 'Open',
 							func: () => { bridge.openFileDialog().filePaths.forEach((filePath: string) =>
 								AppStore.sceneStore.handleLoadFile(filePath)); }
-						},{
-							name: 'Save',
-							func: emptyFunc
 						}]}/>
 						<MenuHeaderItem name={'Help'} store={store} binds={[{
 							name: 'Open settings folder',
 							func: () => bridge.shell.openPath(bridge.userData())
 						}, {
 							name: 'About',
-							func: emptyFunc
+							func: () => bridge.shell.openExternal(AppLink)
 						}]}/>
 					</FlexBoxRow>
 				</FlexBoxRow>
@@ -78,6 +75,25 @@ export const HeaderApp = observer(() => {
 					'-webkit-app-region': 'drag',
 				}}>
 			</FlexBoxRow>
+			<Typography variant={'body2'} sx={{
+				flex:'auto',
+				minWidth: 'max-content',
+				backgroundColor: colors.background.commonest,
+				border: '1px solid ' + colors.background.warm,
+				pl: '4px', pr: '4px', pb: '1px', mt: '1px', mr: '2px',
+				height: '18px',
+				borderRadius: '2px',
+				alignSelf: 'center',
+				justifySelf: 'center',
+				display: 'flex',
+				justifyContent: 'center',
+				alignContent: 'center',
+				fontFamily: 'sans-serif',
+				fontSize: Sizes.twelve,
+				color: colors.typography.background,
+			}} onDoubleClick={() => bridge.shell.openExternal(AppLink)}>
+				alpha {AppVersion}
+			</Typography>
 			<ButtonGroup >
 				<IconButtonSmall onClick={bridge.minimize} sx={{
 					borderRadius: 0,

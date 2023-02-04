@@ -88,9 +88,9 @@ M18;`,
 
 	};
 
-	static DEFAULT_CONFIG_NAME = 'defaultconfigs Printer';
+	static DEFAULT_CONFIG_NAME = 'Default Printer';
 	static CHANGED_DIR = '\\ChangedConfigsV';
-	static CONFIG_DIR = 'assets/defaultconfigs/';
+	static CONFIG_DIR = bridge.assetsPath() + '/defaultconfigs/';
 
 	static LoadDefaultConfigFromFile = function () {
 		try {

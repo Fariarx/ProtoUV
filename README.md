@@ -18,6 +18,11 @@
 
 The software is actively development, refined and improved if there is a demand for it. At the time of launch, the program is at the **alpha**🔥 testing stage.
 
+## Known printers
+
+So far, there are not so many configurations, but in the future it is planned to fix this.
+Most of the known formats for photopolymer printers are 😺**supported by the program**.
+
 ## Deployment
 
 Clone the repo and install dependencies:

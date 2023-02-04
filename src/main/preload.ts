@@ -13,6 +13,7 @@ const body = {
 		close: () => ipcRenderer.send('electron.closeWindow'),
 		userData: () => ipcRenderer.sendSync('electron.userData'),
 		isDebug: () => ipcRenderer.sendSync('electron.isDebug'),
+		assetsPath: () => ipcRenderer.sendSync('electron.assetsPath'),
 		ipcRenderer: {
 			...ipcRenderer,
 			send: (channel: any, ...args: any) => {

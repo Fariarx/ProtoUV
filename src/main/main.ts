@@ -70,8 +70,7 @@ const installExtensions = async () => {
 	return installer
 		.default(
 			extensions.map((name) => installer[name]),
-			forceDownload
-		)
+			forceDownload)
 		.catch(console.log);
 };
 
@@ -87,6 +86,10 @@ const createWindow = async () => {
 	const getAssetPath = (...paths: string[]): string => {
 		return path.join(RESOURCES_PATH, ...paths);
 	};
+
+	ipcMain.on('electron.assetsPath', (event: any) => {
+		event.returnValue = getAssetPath();
+	});
 
 	mainWindow = new BrowserWindow({
 		show: false,

@@ -98,7 +98,7 @@ export class SlicingStore {
 
 	public save = (saveAutomatically: boolean) => {
 		bridge.ipcRenderer.send('sliced-finalize',
-			this.gcode, config.pathToUVTools, AppStore.sceneStore.printer!.Export.Encoder,
+			this.gcode, bridge.assetsPath() + config.pathToUVTools, AppStore.sceneStore.printer!.Export.Encoder,
       AppStore.sceneStore.printer!.Export.Extencion, AppStore.sceneStore.objects[0].name,
       config.pathToSave, saveAutomatically);
 	};

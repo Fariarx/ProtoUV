@@ -59,7 +59,7 @@ export const _default = {
 		},
 		workerCount: 10,
 		printerName: '',
-		pathToUVTools: 'assets/uvtools/UVtoolsCmd.exe',
+		pathToUVTools: '/uvtools/UVtoolsCmd.exe',
 		pathToSave: 'C:\\',
 		saveAutomatically: false
 	}

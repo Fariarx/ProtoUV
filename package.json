@@ -2,7 +2,7 @@
   "name": "protouv",
   "description": "A foundation for scalable desktop apps",
   "scripts": {
-    "build": "concurrently \"yarn run build:main\" \"yarn run build:renderer\"",
+    "build": "concurrently \"yarn run build:main\" \"yarn run build:renderer\" \"electron-builder --win\"",
     "build:main": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.main.prod.ts",
     "build:renderer": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.prod.ts",
     "rebuild": "electron-rebuild --parallel --types prod,dev,optional --module-dir release/app",

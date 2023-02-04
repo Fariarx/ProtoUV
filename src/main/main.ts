@@ -170,62 +170,62 @@ const createWindow = async () => {
 			const archive = archiver('zip');
 			archive.pipe(output);
 			archive.directory(userData + '/slicing', false);
-			archive.finalize();
+			archive.finalize().then(() => {
+				const child = child_process.execFile;
+				const executablePath = pathToUVTools;
+				const parameters = ['convert', userData + '\\target.zip', encoder, userData + '\\target.' + extencion];
 
-			const child = child_process.execFile;
-			const executablePath = pathToUVTools;
-			const parameters = ['convert', userData + '\\target.zip', encoder, userData + '\\target.' + extencion];
+				const _process = child(executablePath, parameters);
 
-			const _process = child(executablePath, parameters);
+        _process.stdout!.on('data', (data) => {
+        	console.log(`stdout: ${data}`);
+        });
 
-      _process.stdout!.on('data', (data) => {
-      	console.log(`stdout: ${data}`);
-      });
+        _process.stderr!.on('data', (data) => {
+        	console.error(`stderr: ${data}`);
+        });
+        _process.on('close', (code) => {
+        	if (code === 1) {
+        		const options = {
+        			title: 'Save file',
+        			defaultPath: filePath + '\\' + fileNameToSave + '.' + extencion,
+        			buttonLabel: 'Save',
+        			filters: [
+        				{ name: encoder, extensions: [extencion] }
+        			]
+        		};
 
-      _process.stderr!.on('data', (data) => {
-      	console.error(`stderr: ${data}`);
-      });
-      _process.on('close', (code) => {
-      	if (code === 1) {
-      		const options = {
-      			title: 'Save file',
-      			defaultPath: filePath + '\\' + fileNameToSave + '.' + extencion,
-      			buttonLabel: 'Save',
-      			filters: [
-      				{ name: encoder, extensions: [extencion] }
-      			]
-      		};
+        		const save = ({ filePath }: any) => {
+        			try {
+        				if (filePath) {
+        					if (fs.existsSync(filePath)) {
+        						fs.rmSync(filePath, { force: true });
+        					}
+        					fs.copyFileSync(userData + '\\target.' + extencion, filePath);
+        					mainWindow?.webContents.send('sliced-finalize-result', null, 'done, file successfully written', path.dirname(filePath));
+        				} else {
+        					mainWindow?.webContents.send('sliced-finalize-result', 'file to save not selected');
+        				}
+        			} catch (e) {
+        				mainWindow?.webContents.send('sliced-finalize-result', 'save error: ' + e);
+        			}
+        		};
 
-      		const save = ({ filePath }: any) => {
-      			try {
-      				if (filePath) {
-      					if (fs.existsSync(filePath)) {
-      						fs.rmSync(filePath, { force: true });
-      					}
-      					fs.copyFileSync(userData + '\\target.' + extencion, filePath);
-      					mainWindow?.webContents.send('sliced-finalize-result', null, 'done, file successfully written', path.dirname(filePath));
-      				} else {
-      					mainWindow?.webContents.send('sliced-finalize-result', 'file to save not selected');
-      				}
-      			} catch (e) {
-      				mainWindow?.webContents.send('sliced-finalize-result', 'save error: ' + e);
-      			}
-      		};
-
-      		if (saveAutomatically && fs.existsSync(filePath))
-      		{
-      			save({
-      				filePath: options.defaultPath
-      			});
-      		}
-      		else {
-      			dialog.showSaveDialog(mainWindow!, options).then(save as any);
-      		}
-      	}
-      	else {
-      		mainWindow?.webContents.send('sliced-finalize-result', 'error code from uvtools: ' + code);
-      	}
-      });
+        		if (saveAutomatically && fs.existsSync(filePath))
+        		{
+        			save({
+        				filePath: options.defaultPath
+        			});
+        		}
+        		else {
+        			dialog.showSaveDialog(mainWindow!, options).then(save as any);
+        		}
+        	}
+        	else {
+        		mainWindow?.webContents.send('sliced-finalize-result', 'error code from uvtools: ' + code);
+        	}
+        });
+			});
 		}
 		catch (e)
 		{

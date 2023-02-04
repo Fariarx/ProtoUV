@@ -1,4 +1,5 @@
 import archiver from 'archiver';
+import axios from 'axios';
 import child_process from 'child_process';
 import electron, { BrowserWindow, app, dialog, ipcMain, shell } from 'electron';
 import fs from 'fs';
@@ -119,6 +120,21 @@ const createWindow = async () => {
 			mainWindow.minimize();
 		} else {
 			mainWindow.show();
+
+			axios.get('https://img.shields.io/github/v/release/fariarx/ProtoUV')
+				.then(res => {
+					const headerDate = res.headers && res.headers.date ? res.headers.date : 'no response date';
+					console.log('Status Code:', res.status);
+					console.log('Date in Response header:', headerDate);
+
+					if (res.status === 200)
+					{
+						mainWindow?.webContents.send('version-info', res.data);
+					}
+				})
+				.catch(err => {
+					console.log('Error: ', err.message);
+				});
 		}
 	});
 

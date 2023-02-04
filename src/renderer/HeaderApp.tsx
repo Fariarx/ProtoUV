@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { Box, ButtonGroup, Divider, IconButton, MenuItem, Typography, styled } from '@mui/material';
+import { Box, ButtonGroup, Divider, IconButton, MenuItem, SvgIcon, Typography, styled } from '@mui/material';
 import { VscChromeClose } from '@react-icons/all-files/vsc/VscChromeClose';
 import { VscChromeMaximize } from '@react-icons/all-files/vsc/VscChromeMaximize';
 import { VscChromeMinimize } from '@react-icons/all-files/vsc/VscChromeMinimize';
@@ -75,25 +75,6 @@ export const HeaderApp = observer(() => {
 					'-webkit-app-region': 'drag',
 				}}>
 			</FlexBoxRow>
-			<Typography variant={'body2'} sx={{
-				flex:'auto',
-				minWidth: 'max-content',
-				backgroundColor: colors.background.commonest,
-				border: '1px solid ' + colors.background.warm,
-				pl: '4px', pr: '4px', pb: '1px', mt: '1px', mr: '2px',
-				height: '18px',
-				borderRadius: '2px',
-				alignSelf: 'center',
-				justifySelf: 'center',
-				display: 'flex',
-				justifyContent: 'center',
-				alignContent: 'center',
-				fontFamily: 'sans-serif',
-				fontSize: Sizes.twelve,
-				color: colors.typography.background,
-			}} onDoubleClick={() => bridge.shell.openExternal(AppLink)}>
-				alpha {AppVersion}
-			</Typography>
 			<ButtonGroup >
 				<IconButtonSmall onClick={bridge.minimize} sx={{
 					borderRadius: 0,

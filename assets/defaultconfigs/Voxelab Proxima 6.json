@@ -1,0 +1,39 @@
+{
+  "Workspace": {
+    "SizeX": 82.62,
+    "SizeY": 130.56,
+    "Height": 155
+  },
+  "Resolution": {
+    "X": 1620,
+    "Y": 2560
+  },
+  "PrintSettings": {
+    "LayerHeight": 0.04,
+    "BottomLayers": 6,
+    "ExposureTime": 7,
+    "BottomExposureTime": 75,
+    "LiftingHeight": 3.5,
+    "LiftingSpeed": 90,
+    "DelayTime": 0
+  },
+  "SupportPresets": [
+    {
+      "Name": "Default",
+      "ConnectionSphere": 0.5,
+      "Head": 0.4,
+      "Body": 0.5,
+      "Indent": 0.6,
+      "Angle": 56,
+      "PlatformWidth": 3,
+      "PlatformHeight": 0.8,
+      "Density": 10,
+      "Rays": 3,
+      "Lifting": 5
+    }
+  ],
+  "Export": {
+    "Encoder": "FDG",
+    "Extencion": "fdg"
+  }
+}

@@ -57,6 +57,7 @@ export class AppStore {
 	public fileCount = 0;
 	public projectFolder?: string;
 	public progressPercent = 0;
+	public newVersion = '';
 }
 
 export enum Pages {

@@ -315,7 +315,7 @@ var OrientationHelper = function ( camera, controls, options, labels ) {
 
 		}
 
-		// Default: Cube
+		// defaultconfigs: Cube
 		if ( ! model3D ) {
 
 			var cube = _createCube( 1 );

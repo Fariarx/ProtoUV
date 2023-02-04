@@ -19,7 +19,7 @@ import { ToolsRightApp } from './Main/Components/ToolsRight/ToolsRightApp';
 import { ViewChangeApp } from './Main/Components/ViewChange/ViewChangeApp';
 import { ConsoleApp } from './Main/Console/ConsoleApp';
 import { SceneApp } from './Main/Scene/SceneApp';
-import { bridge } from './Shared/Globals';
+import { AppVersion, bridge } from './Shared/Globals';
 import { AnimationFade, AnimationGrow } from './Shared/Styled/Animation';
 import { FlexBoxColumn, FlexBoxRow } from './Shared/Styled/FlexBox';
 import { Sizes } from './Shared/Styled/Sizes';
@@ -99,8 +99,17 @@ export const App = () => <Router>
 </Router>;
 
 Log('Application started');
+Log('Version: ' + AppVersion);
 
 bridge.ipcRenderer.receive('worker', (scene: string) => {
 	AppStore.sceneStore.scene.clear();
 	AppStore.sceneStore.scene = JSON.parse(scene) as Scene;
+});
+
+bridge.ipcRenderer.receive('version-info', (svg: string) => {
+	if (!svg.toLowerCase().includes(AppVersion.toLowerCase()))
+	{
+		Log('Update found');
+		AppStore.instance.newVersion = svg;
+	}
 });

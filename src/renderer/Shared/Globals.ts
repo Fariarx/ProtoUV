@@ -7,7 +7,8 @@ export const bridge = window.electron.ipcRenderer.window;
 
 export const AppName = 'protouv';
 export const AppLink = 'https://github.com/Fariarx/ProtoUV';
-export const AppVersion = '0.01';
+export const AppLinkReleases = 'https://github.com/Fariarx/ProtoUV/releases';
+export const AppVersion = 'alpha 0.01';
 
 THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
 THREE.BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;

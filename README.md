@@ -1,153 +1,51 @@
-<img src=".erb/img/erb-banner.svg" width="100%" />
 
-<br>
+## About
 
 <p>
-  Electron React Boilerplate uses <a href="https://electron.atom.io/">Electron</a>, <a href="https://facebook.github.io/react/">React</a>, <a href="https://github.com/reactjs/react-router">React Router</a>, <a href="https://webpack.js.org/">Webpack</a> and <a href="https://www.npmjs.com/package/react-refresh">React Fast Refresh</a>.
+  ProtoUV it's open-source slicer for a photopolymer 3d printers, written on TypeScript with base on Electron. Uses <a href="https://facebook.github.io/react/">React</a>, <a href="https://threejs.org/">ThreeJs</a>, <a href="https://threejs.org/">ThreeJs</a>, <a href="https://www.electronjs.org/">Electron</a>, <a href="https://github.com/sn4k3/UVtools">uvtools</a> and many other deps. 
 </p>
+<img src="assets/screen.png" width="100%" />
 
-<br>
+[![License](https://img.shields.io/github/license/fariarx/ProtoUV?style=for-the-badge)](https://github.com/sn4k3/UVtools/blob/master/LICENSE)
+[![GitHub repo size](https://img.shields.io/github/repo-size/fariarx/ProtoUV?style=for-the-badge)](#)
+[![Code size](https://img.shields.io/github/languages/code-size/fariarx/ProtoUV?style=for-the-badge)](#)
+[![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/fariarx/ProtoUV?include_prereleases&style=for-the-badge)](https://github.com/fariarx/ProtoUV/releases)
+[![Downloads](https://img.shields.io/github/downloads/fariarx/ProtoUV/total?style=for-the-badge)](https://github.com/fariarx/ProtoUV/releases)
 
-<div align="center">
+<img src="assets/icon.png" width="200px" />
 
-[![Build Status][github-actions-status]][github-actions-url]
-[![Github Tag][github-tag-image]][github-tag-url]
-[![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/Fjy3vfgy5q)
+## Program support
 
-[![OpenCollective](https://opencollective.com/protouv-594/backers/badge.svg)](#backers)
-[![OpenCollective](https://opencollective.com/protouv-594/sponsors/badge.svg)](#sponsors)
-[![StackOverflow][stackoverflow-img]][stackoverflow-url]
+The software is actively development, refined and improved if there is a demand for it. At the time of launch, the program is at the **alpha**🔥 testing stage.
 
-</div>
-
-## Install
+## Deployment
 
 Clone the repo and install dependencies:
 
 ```bash
-git clone --depth 1 --branch main https://github.com/protouv/protouv.git your-project-name
-cd your-project-name
-npm install
+git clone --depth 1 --branch main https://github.com/Fariarx/ProtoUV.git protouv
+cd protouv
+yarn install
+yarn run start
 ```
-
-**Having issues installing? See our [debugging guide](https://github.com/protouv/protouv/issues/400)**
-
-## Starting Development
-
-Start the app in the `dev` environment:
-
-```bash
-npm start
-```
-
-## Packaging for Production
-
-To package apps for the local platform:
-
-```bash
-npm run package
-```
-
-## Docs
-
-See our [docs and guides here](https://protouv.js.org/docs/installation)
-
-## Community
-
-Join our Discord: https://discord.gg/Fjy3vfgy5q
 
 ## Donations
 
 **Donations will ensure the following:**
 
 - 🔨 Long term maintenance of the project
-- 🛣 Progress on the [roadmap](https://protouv.js.org/docs/roadmap)
 - 🐛 Quick responses to bug reports and help requests
 
-## Backers
+All my work here is given for free (OpenSource), it took some long month to development, test and polish the program and the best solutions for him. If you're happy to contribute for a better program and for my work i will appreciate the tip.
+Use one of the following methods:
 
-Support us with a monthly donation and help us continue our activities. [[Become a backer](https://opencollective.com/protouv-594#backer)]
+2. [x] Dogecoin🐶 DNhTndaAoj99GwT1KksPVSdyG41c4gjbPJ
+1. [x] Paypal https://paypal.me/Fariarx
 
-<a href="https://opencollective.com/protouv-594/backer/0/website" target="_blank"><img src="https://opencollective.com/protouv-594/backer/0/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/backer/1/website" target="_blank"><img src="https://opencollective.com/protouv-594/backer/1/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/backer/2/website" target="_blank"><img src="https://opencollective.com/protouv-594/backer/2/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/backer/3/website" target="_blank"><img src="https://opencollective.com/protouv-594/backer/3/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/backer/4/website" target="_blank"><img src="https://opencollective.com/protouv-594/backer/4/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/backer/5/website" target="_blank"><img src="https://opencollective.com/protouv-594/backer/5/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/backer/6/website" target="_blank"><img src="https://opencollective.com/protouv-594/backer/6/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/backer/7/website" target="_blank"><img src="https://opencollective.com/protouv-594/backer/7/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/backer/8/website" target="_blank"><img src="https://opencollective.com/protouv-594/backer/8/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/backer/9/website" target="_blank"><img src="https://opencollective.com/protouv-594/backer/9/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/backer/10/website" target="_blank"><img src="https://opencollective.com/protouv-594/backer/10/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/backer/11/website" target="_blank"><img src="https://opencollective.com/protouv-594/backer/11/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/backer/12/website" target="_blank"><img src="https://opencollective.com/protouv-594/backer/12/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/backer/13/website" target="_blank"><img src="https://opencollective.com/protouv-594/backer/13/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/backer/14/website" target="_blank"><img src="https://opencollective.com/protouv-594/backer/14/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/backer/15/website" target="_blank"><img src="https://opencollective.com/protouv-594/backer/15/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/backer/16/website" target="_blank"><img src="https://opencollective.com/protouv-594/backer/16/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/backer/17/website" target="_blank"><img src="https://opencollective.com/protouv-594/backer/17/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/backer/18/website" target="_blank"><img src="https://opencollective.com/protouv-594/backer/18/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/backer/19/website" target="_blank"><img src="https://opencollective.com/protouv-594/backer/19/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/backer/20/website" target="_blank"><img src="https://opencollective.com/protouv-594/backer/20/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/backer/21/website" target="_blank"><img src="https://opencollective.com/protouv-594/backer/21/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/backer/22/website" target="_blank"><img src="https://opencollective.com/protouv-594/backer/22/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/backer/23/website" target="_blank"><img src="https://opencollective.com/protouv-594/backer/23/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/backer/24/website" target="_blank"><img src="https://opencollective.com/protouv-594/backer/24/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/backer/25/website" target="_blank"><img src="https://opencollective.com/protouv-594/backer/25/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/backer/26/website" target="_blank"><img src="https://opencollective.com/protouv-594/backer/26/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/backer/27/website" target="_blank"><img src="https://opencollective.com/protouv-594/backer/27/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/backer/28/website" target="_blank"><img src="https://opencollective.com/protouv-594/backer/28/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/backer/29/website" target="_blank"><img src="https://opencollective.com/protouv-594/backer/29/avatar.svg"></a>
+## Maintainer
 
-## Sponsors
-
-Become a sponsor and get your logo on our README on Github with a link to your site. [[Become a sponsor](https://opencollective.com/protouv-594-594#sponsor)]
-
-<a href="https://opencollective.com/protouv-594/sponsor/0/website" target="_blank"><img src="https://opencollective.com/protouv-594/sponsor/0/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/sponsor/1/website" target="_blank"><img src="https://opencollective.com/protouv-594/sponsor/1/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/sponsor/2/website" target="_blank"><img src="https://opencollective.com/protouv-594/sponsor/2/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/sponsor/3/website" target="_blank"><img src="https://opencollective.com/protouv-594/sponsor/3/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/sponsor/4/website" target="_blank"><img src="https://opencollective.com/protouv-594/sponsor/4/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/sponsor/5/website" target="_blank"><img src="https://opencollective.com/protouv-594/sponsor/5/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/sponsor/6/website" target="_blank"><img src="https://opencollective.com/protouv-594/sponsor/6/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/sponsor/7/website" target="_blank"><img src="https://opencollective.com/protouv-594/sponsor/7/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/sponsor/8/website" target="_blank"><img src="https://opencollective.com/protouv-594/sponsor/8/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/sponsor/9/website" target="_blank"><img src="https://opencollective.com/protouv-594/sponsor/9/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/sponsor/10/website" target="_blank"><img src="https://opencollective.com/protouv-594/sponsor/10/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/sponsor/11/website" target="_blank"><img src="https://opencollective.com/protouv-594/sponsor/11/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/sponsor/12/website" target="_blank"><img src="https://opencollective.com/protouv-594/sponsor/12/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/sponsor/13/website" target="_blank"><img src="https://opencollective.com/protouv-594/sponsor/13/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/sponsor/14/website" target="_blank"><img src="https://opencollective.com/protouv-594/sponsor/14/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/sponsor/15/website" target="_blank"><img src="https://opencollective.com/protouv-594/sponsor/15/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/sponsor/16/website" target="_blank"><img src="https://opencollective.com/protouv-594/sponsor/16/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/sponsor/17/website" target="_blank"><img src="https://opencollective.com/protouv-594/sponsor/17/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/sponsor/18/website" target="_blank"><img src="https://opencollective.com/protouv-594/sponsor/18/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/sponsor/19/website" target="_blank"><img src="https://opencollective.com/protouv-594/sponsor/19/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/sponsor/20/website" target="_blank"><img src="https://opencollective.com/protouv-594/sponsor/20/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/sponsor/21/website" target="_blank"><img src="https://opencollective.com/protouv-594/sponsor/21/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/sponsor/22/website" target="_blank"><img src="https://opencollective.com/protouv-594/sponsor/22/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/sponsor/23/website" target="_blank"><img src="https://opencollective.com/protouv-594/sponsor/23/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/sponsor/24/website" target="_blank"><img src="https://opencollective.com/protouv-594/sponsor/24/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/sponsor/25/website" target="_blank"><img src="https://opencollective.com/protouv-594/sponsor/25/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/sponsor/26/website" target="_blank"><img src="https://opencollective.com/protouv-594/sponsor/26/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/sponsor/27/website" target="_blank"><img src="https://opencollective.com/protouv-594/sponsor/27/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/sponsor/28/website" target="_blank"><img src="https://opencollective.com/protouv-594/sponsor/28/avatar.svg"></a>
-<a href="https://opencollective.com/protouv-594/sponsor/29/website" target="_blank"><img src="https://opencollective.com/protouv-594/sponsor/29/avatar.svg"></a>
-
-## Maintainers
-
-- [Amila Welihinda](https://github.com/amilajack)
-- [John Tran](https://github.com/jooohhn)
-- [C. T. Lin](https://github.com/chentsulin)
-- [Jhen-Jie Hong](https://github.com/jhen0409)
+- [Chall4](https://github.com/fariarx) 
 
 ## License
 
-MIT © [Electron React Boilerplate](https://github.com/protouv)
-
-[github-actions-status]: https://github.com/protouv/protouv/workflows/Test/badge.svg
-[github-actions-url]: https://github.com/protouv/protouv/actions
-[github-tag-image]: https://img.shields.io/github/tag/protouv/protouv.svg?label=version
-[github-tag-url]: https://github.com/protouv/protouv/releases/latest
-[stackoverflow-img]: https://img.shields.io/badge/stackoverflow-electron_react_boilerplate-blue.svg
-[stackoverflow-url]: https://stackoverflow.com/questions/tagged/protouv
+MIT © [ProtoUV](https://github.com/Fariarx/ProtoUV)

@@ -88,9 +88,9 @@ M18;`,
 
 	};
 
-	static DEFAULT_CONFIG_NAME = 'Default Printer';
+	static DEFAULT_CONFIG_NAME = 'defaultconfigs Printer';
 	static CHANGED_DIR = '\\ChangedConfigsV';
-	static CONFIG_DIR = '.\\src\\renderer\\Main\\Printer\\Configs\\Default\\';
+	static CONFIG_DIR = 'assets/defaultconfigs/';
 
 	static LoadDefaultConfigFromFile = function () {
 		try {

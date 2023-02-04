@@ -1,8 +1,9 @@
 import { Box, Tooltip, Typography } from '@mui/material';
 import { observer } from 'mobx-react';
+import React from 'react';
 import { AppStore } from './AppStore';
 import { colors } from './Shared/Config';
-import { bridge } from './Shared/Globals';
+import {  AppLinkReleases, AppVersion, bridge } from './Shared/Globals';
 import { FlexBoxColumn, FlexBoxRow } from './Shared/Styled/FlexBox';
 import { Sizes } from './Shared/Styled/Sizes';
 
@@ -47,6 +48,35 @@ export const LineBottomApp = observer(() => {
 			justifyContent: 'flex-end',
 			borderTop: '1px solid ' + colors.background.darkest
 		}}>
+			<Typography variant={'body2'} sx={{
+				minWidth: 'max-content',
+				backgroundColor: colors.background.commonest,
+				border: '1px solid ' + colors.background.warm,
+				pl: AppStore.instance.newVersion ? 0 : '4px', pr: '4px', pb: '1px', mr: '6px',
+				height: '18px',
+				width:'fit-content',
+				borderRadius: '2px',
+				alignSelf: 'center',
+				justifySelf: 'center',
+				display: 'flex',
+				justifyContent: 'center',
+				alignContent: 'center',
+				fontFamily: 'sans-serif',
+				fontSize: Sizes.twelve,
+				color: colors.typography.background,
+			}} onClick={() => bridge.shell.openExternal(AppLinkReleases)}>
+				{AppStore.instance.newVersion ? <>
+					<img src={`data:image/svg+xml;base64,${
+						btoa(unescape(encodeURIComponent(AppStore.instance.newVersion)))}`
+					} alt="" style={{
+						height: '18px',
+						alignSelf: 'center',
+						justifySelf: 'center',
+						marginRight: '4px'
+					}} />
+            update found, now is {AppVersion}
+				</> : AppVersion }
+			</Typography>
 			<Text>
 				{'Project directory: '} {/*Директория первого файла*/}
 				<span style={{ fontWeight: 'bold', display: 'inline-flex' }}>

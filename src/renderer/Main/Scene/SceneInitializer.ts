@@ -966,10 +966,21 @@ export class SceneInitializer extends SceneBase {
 		requestAnimationFrame(_animate);
 	};
 
-	public sliceLayer = (percent: number, layer: number) => {
+	public sliceLayer = (percent: number, layer: number, type: SliceType) => {
 		this.clippingScenePercent = percent;
 
-		this.stencilRenderer.setPixelRatio(0.8);
+		switch (type)
+		{
+			case SliceType.Normal:
+				this.stencilRenderer.setSize(this.printer!.Resolution.X,this.printer!.Resolution.Y);
+				break;
+			case SliceType.Preview:
+				this.stencilRenderer.setSize(386, 223);
+				break;
+			case SliceType.PreviewCropping:
+				this.stencilRenderer.setSize(259, 150);
+				break;
+		}
 
 		const _hide = (isShow: boolean) => {
 			this.clippingSceneWorking = !isShow;
@@ -978,9 +989,9 @@ export class SceneInitializer extends SceneBase {
 			this.decorations.visible = isShow;
 			this.transformControls.visible = isShow;
 			this.objects.forEach(x => {
-      	x.mesh.visible = isShow;
-      	x.supports?.forEach(y =>
-      		y.visible = isShow);
+				x.mesh.visible = isShow;
+				x.supports?.forEach(y =>
+					y.visible = isShow);
 			});
 		};
 		const _hideLine = (isShow: boolean) => {
@@ -1002,9 +1013,24 @@ export class SceneInitializer extends SceneBase {
 		const image = this.stencilRenderer.domElement
 			.toDataURL('image/png');
 
-		bridge.ipcRenderer.send('save-sliced-layer',
-			image.replace('data:image/png;base64,',''),
-			layer+'.png');
+		switch (type)
+		{
+			case SliceType.Normal:
+				bridge.ipcRenderer.send('save-sliced-layer',
+					image.replace('data:image/png;base64,',''),
+					layer+'.png');
+				break;
+			case SliceType.Preview:
+				bridge.ipcRenderer.send('save-sliced-layer',
+					image.replace('data:image/png;base64,',''),
+					'preview.png');
+				break;
+			case SliceType.PreviewCropping:
+				bridge.ipcRenderer.send('save-sliced-layer',
+					image.replace('data:image/png;base64,',''),
+					'preview_cropping.png');
+				break;
+		}
 
 		return image;
 	};
@@ -1028,4 +1054,10 @@ export class SceneInitializer extends SceneBase {
 		tempVector2: new Vector3(),
 		tempVector3: new Vector3()
 	};
+}
+
+export enum SliceType {
+  Normal,
+  Preview,
+  PreviewCropping
 }

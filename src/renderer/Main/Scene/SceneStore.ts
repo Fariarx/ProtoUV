@@ -159,7 +159,6 @@ export class SceneStore extends SceneInitializer {
 			}, 100);
 
 			this.clippingPlaneMeshMin.scale.setScalar(1000000);
-			this.stencilRenderer.setSize(this.printer.Resolution.X,this.printer.Resolution.Y);
 			this.sliceOrthographicCamera = new OrthographicCamera(
 				sizeXZ.x / - 2,
 				sizeXZ.x / 2,

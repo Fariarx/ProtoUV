@@ -1,7 +1,7 @@
 import { Log } from 'renderer/AppStore';
+import { SupportPreset } from './Support';
 import { _default } from '../../../Shared/Config';
 import { bridge } from '../../../Shared/Globals';
-import { SupportPreset } from './Support';
 
 export class Printer {
 	public Name:string;
@@ -13,9 +13,9 @@ export class Printer {
 	public SupportPresets: SupportPreset[];
 	public SupportPreset: SupportPreset;
 
-  public Export: ExportToExtension;
+	public Export: ExportToExtension;
 
-  public GCode: GCodePrinter;
+	public GCode: GCodePrinter;
 
 	constructor(_name?: string, _settings?: PrinterConfig) {
 		if (_name) {
@@ -25,20 +25,20 @@ export class Printer {
 			this.Name = 'Unknown';
 		}
 
-    this.GCode = {
-      Start: `G21;
+		this.GCode = {
+			Start: `G21;
 G90;
 M106 S0;
 G28 Z0;`,
-      End:`M106 S0;
-G1 Z155 F25;
+			End:`M106 S0;
+G1 Z*x F25;
 M18;`,
-      ShowImage: 'M6054 "*x";',
-      MoveTo: 'G0 Z*x F*y;',
-      Delay: 'G4 P*x;',
-      LightOn: 'M106 S255;',
-      LightOff: 'M106 S0;',
-    }
+			ShowImage: 'M6054 "*x";',
+			MoveTo: 'G0 Z*x F*y;',
+			Delay: 'G4 P*x;',
+			LightOn: 'M106 S255;',
+			LightOff: 'M106 S0;',
+		};
 
 		if (!_settings) {
 			this.Workspace = {
@@ -57,25 +57,25 @@ M18;`,
 				BottomExposureTime: 0,
 				LiftingHeight: 0,
 				LiftingSpeed: 0,
-        DelayTime: 0
+				DelayTime: 0
 			};
 			this.SupportPreset = SupportPreset.Default();
 			this.SupportPresets = [this.SupportPreset];
-      this.Export = {
-        Encoder: "GenericZIP",
-        Extencion: "zip"
-      }
+			this.Export = {
+				Encoder: 'GenericZIP',
+				Extencion: 'zip'
+			};
 		}
 		else {
-      this.Workspace = _settings.Workspace;
-      this.Resolution = _settings.Resolution;
-      this.PrintSettings = _settings.PrintSettings;
-      this.SupportPreset = _settings.SupportPreset;
-      this.SupportPresets = _settings.SupportPresets;
-      this.Export = _settings.Export;
-      if (_settings.GCode) {
-        this.GCode = _settings.GCode;
-      }
+			this.Workspace = _settings.Workspace;
+			this.Resolution = _settings.Resolution;
+			this.PrintSettings = _settings.PrintSettings;
+			this.SupportPreset = _settings.SupportPreset;
+			this.SupportPresets = _settings.SupportPresets;
+			this.Export = _settings.Export;
+			if (_settings.GCode) {
+				this.GCode = _settings.GCode;
+			}
 		}
 
 		if (!this.SupportPreset)
@@ -84,9 +84,9 @@ M18;`,
 		}
 	}
 
-  public ConstructGcodeStartAndEnd = () => {
+	public ConstructGcodeStartAndEnd = () => {
 
-  };
+	};
 
 	static DEFAULT_CONFIG_NAME = 'Default Printer';
 	static CHANGED_DIR = '\\ChangedConfigsV';
@@ -218,12 +218,12 @@ export type GCodePrinter = {
   Start: string;
   ShowImage: string;
   End: string;
-  MoveTo: string
-  Delay: string
-  LightOn: string
-  LightOff: string
+  MoveTo: string;
+  Delay: string;
+  LightOn: string;
+  LightOff: string;
 };
 export type ExportToExtension = {
-  Encoder: string,
-  Extencion: string
+  Encoder: string;
+  Extencion: string;
 };

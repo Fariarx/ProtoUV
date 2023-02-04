@@ -9,10 +9,10 @@
     "Y": 2560
   },
   "PrintSettings": {
-    "LayerHeight": 0.05,
+    "LayerHeight": 0.04,
     "BottomLayers": 6,
-    "ExposureTime": 4.5,
-    "BottomExposureTime": 60,
+    "ExposureTime": 7,
+    "BottomExposureTime": 75,
     "LiftingHeight": 3.5,
     "LiftingSpeed": 90,
     "DelayTime": 0

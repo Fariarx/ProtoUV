@@ -19,7 +19,8 @@ export class SlicingStore {
 	public sliceTo = 0;
 	public image = '';
 
-	public imageLargest = 0;
+	public imageLargest = '';
+	public imageLargestLayer = 0;
 	public imageLargestSize = 0;
 	public workerCount = 0;
 
@@ -80,11 +81,6 @@ export class SlicingStore {
 			this.animate();
 			Log('slice layers max: ' + this.sliceCountMax);
 		});
-
-		//bridge.ipcRenderer.receive('worker-info', (x: number) => {
-		//	Log(x+'');
-		//	this.workerCount = x;
-		//});
 	};
 
 	public reset = () => {
@@ -95,7 +91,8 @@ export class SlicingStore {
 		this.sliceCountMax = 0;
 		this.sliceTo = 0;
 		this.image = '';
-		this.imageLargest = 0;
+		this.imageLargest = '';
+		this.imageLargestLayer = 0;
 		this.imageLargestSize = 0;
 	};
 
@@ -130,8 +127,7 @@ export class SlicingStore {
 
 			const moveTo = (layerHeight * this.sliceCount)* 10;
 
-			this.gcode += '\n\n;LAYER_START:' + this.sliceCount;
-			this.gcode += '\n' + printer.GCode.ShowImage.replace('*x', this.sliceCount.toString());
+			this.gcode += '\n\n' + printer.GCode.ShowImage.replace('*x', (this.sliceCount + 1).toString());
 			this.gcode += '\n' + printer.GCode.MoveTo
 				.replace('*x', (moveTo + printer.PrintSettings.LiftingHeight).toFixed(sharpness))
 				.replace('*y', printer.PrintSettings.LiftingSpeed.toString());
@@ -147,7 +143,6 @@ export class SlicingStore {
 					: printer.PrintSettings.ExposureTime * 1000)
 					.toString());
 			this.gcode += '\n' + printer.GCode.LightOff;
-			this.gcode += '\n;LAYER_END';
 
 			this.sliceCount += 1;
 
@@ -176,8 +171,9 @@ export class SlicingStore {
 		if (this.image.length > this.imageLargestSize
       && this.sliceCount > printer.PrintSettings.BottomLayers)
 		{
-			this.imageLargest = this.sliceCount;
+			this.imageLargestLayer = this.sliceCount;
 			this.imageLargestSize = this.image.length;
+			this.imageLargest = this.image;
 		}
 
 		if (this.sliceCount <= this.sliceCountMax) {
@@ -191,14 +187,15 @@ export class SlicingStore {
 			this.gcode += '\n;END_GCODE_END';
 
 			AppStore.sceneStore.sliceLayer(
-				(this.imageLargest/this.sliceCountMax) * this.sliceTo / AppStore.sceneStore.gridSize.y,
-				this.imageLargest, SliceType.Preview);
+				(this.imageLargestLayer/this.sliceCountMax) * this.sliceTo / AppStore.sceneStore.gridSize.y,
+				this.imageLargestLayer, SliceType.Preview);
 			AppStore.sceneStore.sliceLayer(
-				(this.imageLargest/this.sliceCountMax) * this.sliceTo / AppStore.sceneStore.gridSize.y,
-				this.imageLargest, SliceType.PreviewCropping);
+				(this.imageLargestLayer/this.sliceCountMax) * this.sliceTo / AppStore.sceneStore.gridSize.y,
+				this.imageLargestLayer, SliceType.PreviewCropping);
 
 			if (config.saveAutomatically)
 			{
+				console.log(config.saveAutomatically);
 				this.save(true);
 			}
 

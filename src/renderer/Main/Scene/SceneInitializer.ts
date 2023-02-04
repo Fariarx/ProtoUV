@@ -1018,7 +1018,7 @@ export class SceneInitializer extends SceneBase {
 			case SliceType.Normal:
 				bridge.ipcRenderer.send('save-sliced-layer',
 					image.replace('data:image/png;base64,',''),
-					layer+'.png');
+					(layer + 1)+'.png');
 				break;
 			case SliceType.Preview:
 				bridge.ipcRenderer.send('save-sliced-layer',

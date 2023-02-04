@@ -1,8 +1,8 @@
 import { Restore } from './Libs/Restore';
 
 export const _default = {
-	version: 34,
-	versionPrinterConfigs: 30,
+	version: 35,
+	versionPrinterConfigs: 0,
 	settings: {
 		ui: {
 			opacity: 0.8,
@@ -59,9 +59,9 @@ export const _default = {
 		},
 		workerCount: 10,
 		printerName: '',
-    pathToUVTools: 'C:\\Users\\admin\\Github\\ProtoUV\\uvtools\\UVtools.Cmd\\bin\\Debug\\net6.0\\UVtoolsCmd.exe',
-    pathToSave: 'C:\\',
-    saveAutomatically: true
+		pathToUVTools: 'C:\\Users\\admin\\Github\\ProtoUV\\uvtools\\UVtools.Cmd\\bin\\Debug\\net6.0\\UVtoolsCmd.exe',
+		pathToSave: 'C:\\',
+		saveAutomatically: false
 	}
 };
 

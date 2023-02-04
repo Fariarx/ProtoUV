@@ -48,7 +48,7 @@ export const LineBottomApp = observer(() => {
 			justifyContent: 'flex-end',
 			borderTop: '1px solid ' + colors.background.darkest
 		}}>
-			{AppStore.instance.newVersion &&
+			{!!AppStore.instance.newVersion && !AppStore.instance.newVersion.includes(AppVersion) &&
       <img src={`data:image/svg+xml;base64,${
       	btoa(unescape(encodeURIComponent(AppStore.instance.newVersion)))}`
       } alt="" style={{
@@ -57,7 +57,8 @@ export const LineBottomApp = observer(() => {
       	justifySelf: 'center',
       	marginRight: '12px',
       	marginBottom: '2px'
-      }} />}
+      }}
+      onClick={() => bridge.shell.openExternal(AppLinkReleases)}/>}
 			<Text>
 				Version: { AppVersion }
 			</Text>

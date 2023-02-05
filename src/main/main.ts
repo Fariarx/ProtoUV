@@ -206,39 +206,45 @@ const createWindow = async () => {
 		encoder: string, extencion: string, fileNameToSave: string, filePath: string,
 		saveAutomatically: boolean
 	) => {
-		const options = {
-			title: 'Save file',
-			defaultPath: filePath + '\\' + fileNameToSave + '.' + extencion,
-			buttonLabel: 'Save',
-			filters: [
-				{ name: encoder, extensions: [extencion] }
-			]
-		};
+		try {
+			const options = {
+				title: 'Save file',
+				defaultPath: filePath + '\\' + fileNameToSave + '.' + extencion,
+				buttonLabel: 'Save',
+				filters: [
+					{ name: encoder, extensions: [extencion] }
+				]
+			};
 
-		const save = ({ filePath }: any) => {
-			try {
-				if (filePath) {
-					if (fs.existsSync(filePath)) {
-						fs.rmSync(filePath, { force: true });
+			const save = ({ filePath }: any) => {
+				try {
+					if (filePath) {
+						if (fs.existsSync(filePath)) {
+							fs.rmSync(filePath, { force: true });
+						}
+						fs.copyFileSync(userData + '\\target.' + extencion, filePath);
+						mainWindow?.webContents.send('sliced-finalize-result-save', null, 'done, file successfully written', path.dirname(filePath));
+					} else {
+						mainWindow?.webContents.send('sliced-finalize-result-save', 'file to save not selected');
 					}
-					fs.copyFileSync(userData + '\\target.' + extencion, filePath);
-					mainWindow?.webContents.send('sliced-finalize-result-save', null, 'done, file successfully written', path.dirname(filePath));
-				} else {
-					mainWindow?.webContents.send('sliced-finalize-result-save', 'file to save not selected');
+				} catch (e) {
+					mainWindow?.webContents.send('sliced-finalize-result-save', 'save error: ' + e);
 				}
-			} catch (e) {
-				mainWindow?.webContents.send('sliced-finalize-result-save', 'save error: ' + e);
-			}
-		};
+			};
 
-		if (saveAutomatically && fs.existsSync(filePath))
-		{
-			save({
-				filePath: options.defaultPath
-			});
+			if (saveAutomatically && fs.existsSync(filePath))
+			{
+				save({
+					filePath: options.defaultPath
+				});
+			}
+			else {
+				dialog.showSaveDialog(mainWindow!, options).then(save as any);
+			}
 		}
-		else {
-			dialog.showSaveDialog(mainWindow!, options).then(save as any);
+		catch (e)
+		{
+			mainWindow?.webContents.send('sliced-finalize-result-save', 'finalize error: ' + e);
 		}
 	});
 

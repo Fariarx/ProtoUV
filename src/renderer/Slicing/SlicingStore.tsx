@@ -11,6 +11,9 @@ import { bridge } from '../Shared/Globals';
 export class SlicingStore {
 	constructor() {
 		makeAutoObservable(this);
+
+		setTimeout(() =>
+			this.registrationReceivers(), 500);
 	}
 
 	public isWorking = false;
@@ -32,55 +35,6 @@ export class SlicingStore {
 		Log('run prepare to slicing...');
 
 		bridge.ipcRenderer.send('prepare-to-slicing');
-
-		const store = AppStore.sceneStore;
-		const printer = AppStore.sceneStore.printer!;
-
-		bridge.ipcRenderer.receive('prepare-to-slicing', () => {
-			this.reset();
-			Log('prepare to slicing done!');
-			this.isWorking = true;
-			const maxObjectsPoint =  _.maxBy(store.objects, (x: SceneObject) => x.maxY.y);
-			this.sliceTo = Math.min(store.gridSize.y, maxObjectsPoint!.maxY.y);
-			this.sliceCountMax =  Math.ceil(this.sliceTo / (printer.PrintSettings.LayerHeight * 0.1));
-			this.sliceCount = 0;
-			this.gcode = `;fileName:${store.objects[0].name}
-;machineType:${store.printer?.Name}
-;estimatedPrintTime:${printer.PrintSettings.BottomExposureTime * printer.PrintSettings.BottomLayers
-      + printer.PrintSettings.ExposureTime * this.sliceCountMax
-      + printer.PrintSettings.DelayTime * this.sliceCountMax}
-;volume:1
-;resin:normal
-;weight:1
-;price:1
-;layerHeight:${printer.PrintSettings.LayerHeight}
-;resolutionX:${printer.Resolution.X}
-;resolutionY:${printer.Resolution.Y}
-;machineX:${printer.Workspace.SizeX}
-;machineY:${printer.Workspace.SizeY}
-;machineZ:${printer.Workspace.Height}
-;projectType:LCD_mirror
-;normalExposureTime:${printer.PrintSettings.ExposureTime}
-;bottomLayExposureTime:${printer.PrintSettings.BottomExposureTime}
-;bottomLayerExposureTime:${printer.PrintSettings.BottomExposureTime}
-;normalDropSpeed:${printer.PrintSettings.LiftingSpeed}
-;normalLayerLiftHeight:${printer.PrintSettings.LiftingHeight}
-;zSlowUpDistance:0
-;normalLayerLiftSpeed:${printer.PrintSettings.LiftingSpeed}
-;bottomLayCount:${printer.PrintSettings.BottomLayers}
-;bottomLayerCount:${printer.PrintSettings.BottomLayers}
-;mirror:1
-;totalLayer:${this.sliceCountMax}
-;bottomLayerLiftHeight:${printer.PrintSettings.LiftingHeight}
-;bottomLayerLiftSpeed:${printer.PrintSettings.LiftingSpeed}
-;bottomLightOffTime:0
-;lightOffTime:0`;
-			this.gcode += '\n\n;START_GCODE_BEGIN';
-			this.gcode += '\n' + AppStore.sceneStore.printer!.GCode.Start;
-			this.gcode += '\n;START_GCODE_END';
-			this.animate();
-			Log('slice layers max: ' + this.sliceCountMax);
-		});
 	};
 
 	public reset = () => {
@@ -96,7 +50,7 @@ export class SlicingStore {
 		this.imageLargestSize = 0;
 	};
 
-	public save = (saveAutomatically: boolean, isSave: boolean) => {
+	public finalize = (saveAutomatically: boolean, isSave: boolean) => {
 		bridge.ipcRenderer.send('sliced-finalize' + (isSave ? '-save': ''),
 			this.gcode, bridge.assetsPath() + config.pathToUVTools, AppStore.sceneStore.printer!.Export.Encoder,
       AppStore.sceneStore.printer!.Export.Extencion, AppStore.sceneStore.objects[0].name,
@@ -123,7 +77,7 @@ export class SlicingStore {
 				(this.sliceCount/this.sliceCountMax) * this.sliceTo / AppStore.sceneStore.gridSize.y,
 				this.sliceCount, SliceType.Normal);
 
-			Log('slice: ' + ((this.sliceCount/this.sliceCountMax)*100).toFixed(1) + '%');
+			Log('slice layer: ' + this.sliceCount + ' / ' + this.sliceCountMax);
 
 			const moveTo = (layerHeight * this.sliceCount)* 10;
 
@@ -192,35 +146,85 @@ export class SlicingStore {
 				(this.imageLargestLayer/this.sliceCountMax) * this.sliceTo / AppStore.sceneStore.gridSize.y,
 				this.imageLargestLayer, SliceType.PreviewCropping);
 
-			this.save(config.saveAutomatically, false);
-
-			bridge.ipcRenderer.receive('sliced-finalize-result-save', (error: string | null, success: string | null, filePath?: string) => {
-				if (error)
-				{
-					Log(error);
-				}
-				if (success)
-				{
-					config.pathToSave = filePath ?? config.pathToSave;
-					saveConfig();
-					Log(success + ' to: ' + filePath);
-					AppStore.changeState(Pages.Main);
-				}
-			});
-			bridge.ipcRenderer.receive('sliced-finalize-result', (error: string | null) => {
-				if (error)
-				{
-					Log(error);
-				}
-
-				Log('slicing done!');
-				this.isWorking = false;
-
-				if (config.saveAutomatically)
-				{
-					this.save(true, true);
-				}
-			});
+			this.finalize(false, false);
 		}
+	};
+
+	public registrationReceivers = () => {
+		const store = AppStore.sceneStore;
+		const printer = AppStore.sceneStore.printer!;
+
+		bridge.ipcRenderer.receive('prepare-to-slicing', () => {
+			this.reset();
+			Log('prepare to slicing done!');
+			this.isWorking = true;
+			const maxObjectsPoint =  _.maxBy(store.objects, (x: SceneObject) => x.maxY.y);
+			this.sliceTo = Math.min(store.gridSize.y, maxObjectsPoint!.maxY.y);
+			this.sliceCountMax =  Math.ceil(this.sliceTo / (printer.PrintSettings.LayerHeight * 0.1));
+			this.sliceCount = 0;
+			this.gcode = `;fileName:${store.objects[0].name}
+;machineType:${store.printer?.Name}
+;estimatedPrintTime:${printer.PrintSettings.BottomExposureTime * printer.PrintSettings.BottomLayers
+      + printer.PrintSettings.ExposureTime * this.sliceCountMax
+      + printer.PrintSettings.DelayTime * this.sliceCountMax}
+;volume:1
+;resin:normal
+;weight:1
+;price:1
+;layerHeight:${printer.PrintSettings.LayerHeight}
+;resolutionX:${printer.Resolution.X}
+;resolutionY:${printer.Resolution.Y}
+;machineX:${printer.Workspace.SizeX}
+;machineY:${printer.Workspace.SizeY}
+;machineZ:${printer.Workspace.Height}
+;projectType:LCD_mirror
+;normalExposureTime:${printer.PrintSettings.ExposureTime}
+;bottomLayExposureTime:${printer.PrintSettings.BottomExposureTime}
+;bottomLayerExposureTime:${printer.PrintSettings.BottomExposureTime}
+;normalDropSpeed:${printer.PrintSettings.LiftingSpeed}
+;normalLayerLiftHeight:${printer.PrintSettings.LiftingHeight}
+;zSlowUpDistance:0
+;normalLayerLiftSpeed:${printer.PrintSettings.LiftingSpeed}
+;bottomLayCount:${printer.PrintSettings.BottomLayers}
+;bottomLayerCount:${printer.PrintSettings.BottomLayers}
+;mirror:1
+;totalLayer:${this.sliceCountMax}
+;bottomLayerLiftHeight:${printer.PrintSettings.LiftingHeight}
+;bottomLayerLiftSpeed:${printer.PrintSettings.LiftingSpeed}
+;bottomLightOffTime:0
+;lightOffTime:0`;
+			this.gcode += '\n\n;START_GCODE_BEGIN';
+			this.gcode += '\n' + AppStore.sceneStore.printer!.GCode.Start;
+			this.gcode += '\n;START_GCODE_END';
+			this.animate();
+			Log('slice layers max: ' + this.sliceCountMax);
+		});
+		bridge.ipcRenderer.receive('sliced-finalize-result-save', (error: string | null, success: string | null, filePath?: string) => {
+			if (error)
+			{
+				Log(error);
+			}
+			if (success)
+			{
+				config.pathToSave = filePath ?? config.pathToSave;
+				saveConfig();
+				Log(success + ' to: ' + filePath);
+				AppStore.changeState(Pages.Main);
+			}
+		});
+		bridge.ipcRenderer.receive('sliced-finalize-result', (error: string | null) => {
+			if (error)
+			{
+				Log(error);
+			}
+
+			if (config.saveAutomatically)
+			{
+				this.finalize(true, true);
+			}
+
+			Log('slicing done!');
+			this.isWorking = false;
+		});
 	};
 }

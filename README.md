@@ -21,7 +21,13 @@ The software is actively development, refined and improved if there is a demand 
 ## Known printers
 
 So far, there are not so many configurations, but in the future it is planned to fix this.
-Most of the known formats for photopolymer printers are 😺**supported by the program**.
+Most of the known formats for photopolymer printers are 😺**supported by the program**. All formats are known from <a href="https://github.com/sn4k3/UVtools">uvtools page</a>, namely: 
+
+<details><summary>Known file formats (click me)</summary>
+<p>
+SL1 (PrusaSlicer), SL1S (PrusaSlicer), Zip (Chitubox), Photon (Chitubox), Photons (Chitubox), CBDDLP (Chitubox), CTB (Chitubox), PHZ (Chitubox), FDG (Voxelab), PWS (Photon Workshop), PW0 (Photon Workshop), PWX (Photon Workshop), DLP (Photon Workshop), DL2P (Photon Workshop), PWMO (Photon Workshop), PWMA (Photon Workshop), PWMS (Photon Workshop), PWMX (Photon Workshop), PMX2 (Photon Workshop), PWMB (Photon Workshop), PWSQ (Photon Workshop), PM3 (Photon Workshop), PM3M (Photon Workshop), PM3R (Photon Workshop), PWC (Photon Workshop), JXS (GKone Slicer), ZCode (UnizMaker), ZCodex (Z-Suite), CWS (NovaMaker), RGB.CWS (Nova Bene4 Mono / Elfin2 Mono SE), XML.CWS (Wanhao Workshop), MDLP (Makerbase MKS-DLP v1), GR1 (GR1 Workshop), CXDLP (Creality Box), LGS (Longer Orange 10), LGS30 (Longer Orange 30), LGS120 (Longer Orange 120), LGS4K (Longer Orange 4K & mono), Flashforge SVGX, Anet N4, Anet N7, ZIP (Generic / Phrozen Zip), VDA.ZIP (Voxeldance Additive), VDT (Voxeldance Tango), OSF (Vlare Open File Format), UVJ (Zip file format for manual manipulation), Image files (png, jpg, jpeg, jp2, tif, bmp, pbm, pgm, ras, sr)
+</p>
+</details>
 
 ## Deployment
 

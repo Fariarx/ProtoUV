@@ -6,7 +6,7 @@
 </p>
 <img src="assets/screen.png" width="100%" />
 
-[![License](https://img.shields.io/github/license/fariarx/ProtoUV?style=for-the-badge)](https://github.com/sn4k3/UVtools/blob/master/LICENSE)
+[![License](https://img.shields.io/github/license/fariarx/ProtoUV?style=for-the-badge)](https://github.com/Fariarx/ProtoUV/blob/main/LICENSE)
 [![GitHub repo size](https://img.shields.io/github/repo-size/fariarx/ProtoUV?style=for-the-badge)](#)
 [![Code size](https://img.shields.io/github/languages/code-size/fariarx/ProtoUV?style=for-the-badge)](#)
 [![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/fariarx/ProtoUV?include_prereleases&style=for-the-badge)](https://github.com/fariarx/ProtoUV/releases)

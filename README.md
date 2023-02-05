@@ -40,22 +40,9 @@ yarn install
 yarn run start
 ```
 
-## Donations
-
-**Donations will ensure the following:**
-
-- 🔨 Long term maintenance of the project
-- 🐛 Quick responses to bug reports and help requests
-
-All my work here is given for free (OpenSource), it took some long month to development, test and polish the program and the best solutions for him. If you're happy to contribute for a better program and for my work i will appreciate the tip.
-Use one of the following methods:
-
-2. [x] Dogecoin🐶 DNhTndaAoj99GwT1KksPVSdyG41c4gjbPJ
-1. [x] Paypal https://paypal.me/Fariarx
-
 ## Maintainer
 
-- [Chall4](https://github.com/fariarx) 
+- [Fariarx](https://github.com/fariarx) 
 
 ## License
 

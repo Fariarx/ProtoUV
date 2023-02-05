@@ -1,9 +1,10 @@
 import * as THREE from 'three';
 import { acceleratedRaycast, computeBoundsTree, disposeBoundsTree } from 'three-mesh-bvh';
+import { bridgeTypeOf } from '../../main/preload';
 
 //eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-export const bridge = window.electron.ipcRenderer.window;
+export const bridge = window.electron.ipcRenderer.window as typeof bridgeTypeOf.window;
 
 export const AppName = 'protouv';
 export const AppLink = 'https://github.com/Fariarx/ProtoUV';

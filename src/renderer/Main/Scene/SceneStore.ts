@@ -24,14 +24,19 @@ import { Printer } from '../Printer/Configs/Printer';
 export class SceneStore extends SceneInitializer {
 	public constructor() {
 		super();
-		this.setupPrinter();
+
+		if (!bridge.isWorker())
+		{
+			this.setupPrinter();
+		}
+
 		this.setup();
 		this.updateCameraLookPosition();
 		this.animate();
 		makeObservable(this);
 
 		setTimeout(() => {
-			if (bridge.isDebug())
+			if (bridge.isDebug() && !bridge.isWorker())
 			{
 				AppStore.sceneStore.handleLoadFile('C:\\Users\\admin\\Downloads\\Old\\V7_Infinity_Cube_Hinge.stl');
 			}
@@ -42,12 +47,10 @@ export class SceneStore extends SceneInitializer {
 		this.scene.add(this.decorations);
 	}
 
-	public setupPrinter() {
-		let printer;
-
+	public setupPrinter(printer?: Printer) {
 		if (this.printerName)
 		{
-			printer = Printer.LoadConfigFromFile(this.printerName);
+			printer = Printer.LoadConfigFromFile(this.printerName) ?? undefined;
 		}
 
 		if (printer)
@@ -170,5 +173,12 @@ export class SceneStore extends SceneInitializer {
 
 		this.animate();
 	}
+
+	public export = () => {
+		return JSON.stringify({
+			printer: JSON.stringify(this.printer),
+			sceneObjects: this.objects.map(x => x.ToJson()),
+		});
+	};
 }
 

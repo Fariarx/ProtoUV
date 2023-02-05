@@ -25,6 +25,7 @@ import {
 	Matrix4,
 	Mesh,
 	MeshBasicMaterial,
+	ObjectLoader,
 	Vector3
 } from 'three';
 import { mergeBufferGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils';
@@ -62,22 +63,31 @@ export class SceneObject {
 	private wasSelected: boolean;
 	public clippingSnapshot?: Matrix4;
 
-	constructor(geometry: BufferGeometry,
+	constructor(
+		geometryOrMesh: BufferGeometry | Mesh,
 		filePath: string,
-		selected = false,
-		sceneStore: SceneStore = AppStore.sceneStore)
+		selected = false)
 	{
-		geometry = geometry.deleteAttribute('color');
+		this.sceneStore = AppStore.sceneStore;
 
-		this.name = (filePath.split('\\').pop()?.split('.').shift() ?? 'undefined');
-		this.sceneStore = sceneStore;
-		this.geometry = geometry;
-		this.geometry.scale(0.1, 0.1, 0.1);
-		this.mesh = new Mesh(geometry.clone(), sceneStore.materialForObjects.select);
-		//this.mesh.renderOrder = 3;
-		//	this.mesh.receiveShadow = true;
-		this.mesh.castShadow = true;
+		if (geometryOrMesh.type === 'BufferGeometry')
+		{
+			const geometry = (geometryOrMesh as BufferGeometry).deleteAttribute('color');
+			this.name = (filePath.split('\\').pop()?.split('.').shift() ?? 'undefined');
+			this.geometry = geometry;
+			this.geometry.scale(0.1, 0.1, 0.1);
+			this.mesh = new Mesh(geometry.clone(), this.sceneStore.materialForObjects.select);
+			this.mesh.castShadow = true;
+		}
+		else {
+			const mesh = geometryOrMesh as Mesh;
+			this.name = filePath;
+			this.geometry = mesh.geometry.clone();
+			this.mesh = mesh;
+			this.mesh.castShadow = true;
+		}
 
+		this.sceneStore = AppStore.sceneStore;
 		this.minY = new Vector3();
 		this.maxY = new Vector3();
 		this.minX = new Vector3();
@@ -86,7 +96,8 @@ export class SceneObject {
 		this.maxZ = new Vector3();
 		this.center = new Vector3();
 
-		this.isSelected = this.wasSelected = selected;
+		this.isSelected = selected;
+		this.wasSelected = selected;
 		this.Update();
 
 		makeObservable(this);
@@ -345,6 +356,31 @@ export class SceneObject {
 			this.mesh.clear();
 		});
 	}
+
+	ToJson = () => {
+		return JSON.stringify({
+			mesh: this.mesh.toJSON(),
+			supports: this.supports?.map(x => {
+				return {
+					mesh: x.toJSON()
+				};
+			}),
+		});
+	};
+
+	static FromJson = (json: string) => {
+		const object = JSON.parse(json);
+		const loader = new ObjectLoader();
+		const mesh = loader.parse(object.mesh) as Mesh;
+		const sceneObject = new SceneObject(mesh, '', true);
+
+		sceneObject.supports = object.supports
+			? object.supports.map((x: { mesh: string, children: string[] }) =>
+          loader.parse(x.mesh) as Mesh)
+			: undefined;
+
+		return sceneObject;
+	};
 
 	static UpdateSupports(objs: SceneObject[], isVisible: boolean) {
 		objs.forEach(obj => obj.supports?.forEach(support => support.children[0].visible = isVisible));

@@ -101,11 +101,6 @@ export const App = () => <Router>
 Log('Application started');
 Log('Version: ' + AppVersion);
 
-bridge.ipcRenderer.receive('worker', (scene: string) => {
-	AppStore.sceneStore.scene.clear();
-	AppStore.sceneStore.scene = JSON.parse(scene) as Scene;
-});
-
 bridge.ipcRenderer.receive('version-info', (svg: string) => {
 	if (!svg.toLowerCase().includes(AppVersion.toLowerCase()))
 	{

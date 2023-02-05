@@ -14,6 +14,7 @@ const body = {
 		userData: () => ipcRenderer.sendSync('electron.userData'),
 		isDebug: () => ipcRenderer.sendSync('electron.isDebug'),
 		assetsPath: () => ipcRenderer.sendSync('electron.assetsPath'),
+		isWorker: () => ipcRenderer.sendSync('electron.isWorker'),
 		ipcRenderer: {
 			...ipcRenderer,
 			send: (channel: any, ...args: any) => {
@@ -23,8 +24,7 @@ const body = {
 				ipcRenderer.sendSync(channel, ...args);
 			},
 			receive: (channel: any, listener: any) => {
-				ipcRenderer.on(channel, (event, ...args) => {
-					console.log(args);
+				ipcRenderer.on(channel, (_, ...args) => {
 					listener(...args);
 				});
 			},

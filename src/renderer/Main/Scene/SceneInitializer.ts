@@ -1016,17 +1016,17 @@ export class SceneInitializer extends SceneBase {
 		switch (type)
 		{
 			case SliceType.Normal:
-				bridge.ipcRenderer.send('save-sliced-layer',
+				bridge.ipcRenderer.send('sliced-layer-save',
 					image.replace('data:image/png;base64,',''),
 					(layer + 1)+'.png');
 				break;
 			case SliceType.Preview:
-				bridge.ipcRenderer.send('save-sliced-layer',
+				bridge.ipcRenderer.send('sliced-layer-save',
 					image.replace('data:image/png;base64,',''),
 					'preview.png');
 				break;
 			case SliceType.PreviewCropping:
-				bridge.ipcRenderer.send('save-sliced-layer',
+				bridge.ipcRenderer.send('sliced-layer-save',
 					image.replace('data:image/png;base64,',''),
 					'preview_cropping.png');
 				break;

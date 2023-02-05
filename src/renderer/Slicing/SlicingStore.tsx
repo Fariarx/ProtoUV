@@ -31,9 +31,7 @@ export class SlicingStore {
 
 	public run = () => {
 		this.isWorking = true;
-
 		Log('run prepare to slicing...');
-
 		bridge.ipcRenderer.send('prepare-to-slicing');
 	};
 
@@ -69,16 +67,23 @@ export class SlicingStore {
 		const layerHeight = (AppStore.sceneStore.printer!.PrintSettings.LayerHeight * 0.1);
 		const printer = AppStore.sceneStore.printer!;
 
-		let rendersCount = 1;
+		let arrangeJobByWorker: { percent: number, layer: number }[] = [];
 
 		while (this.sliceCount <= this.sliceCountMax)
 		{
-			this.image = AppStore.sceneStore.sliceLayer(
-				(this.sliceCount/this.sliceCountMax) * this.sliceTo / AppStore.sceneStore.gridSize.y,
-				this.sliceCount, SliceType.Normal);
+			//Log('slice layer: ' + this.sliceCount + ' / ' + this.sliceCountMax);
 
-			Log('slice layer: ' + this.sliceCount + ' / ' + this.sliceCountMax);
+			arrangeJobByWorker.push({
+				percent: (this.sliceCount/this.sliceCountMax) * this.sliceTo / AppStore.sceneStore.gridSize.y,
+				layer: this.sliceCount
+			});
 
+			if (arrangeJobByWorker.length > this.sliceCountMax / config.workerCount)
+			{
+				bridge.ipcRenderer.send('prepare-to-slicing-run-worker',
+					AppStore.sceneStore.export(), JSON.stringify(arrangeJobByWorker));
+				arrangeJobByWorker = [];
+			}
 			const moveTo = (layerHeight * this.sliceCount)* 10;
 
 			this.gcode += '\n\n' + printer.GCode.ShowImage.replace('*x', (this.sliceCount + 1).toString());
@@ -108,26 +113,11 @@ export class SlicingStore {
 				AppStore.instance.progressPercent = (this.sliceCount/this.sliceCountMax);
 			}
 
-			rendersCount--;
-
-			if (rendersCount < 1)
-			{
-				break;
-			}
-
 			if (!this.isWorking)
 			{
 				Log('slicing cancelled!');
 				return;
 			}
-		}
-
-		if (this.image.length > this.imageLargestSize
-      && this.sliceCount > printer.PrintSettings.BottomLayers)
-		{
-			this.imageLargestLayer = this.sliceCount;
-			this.imageLargestSize = this.image.length;
-			this.imageLargest = this.image;
 		}
 
 		if (this.sliceCount <= this.sliceCountMax) {
@@ -154,19 +144,46 @@ export class SlicingStore {
 		const store = AppStore.sceneStore;
 		const printer = AppStore.sceneStore.printer!;
 
-		bridge.ipcRenderer.receive('prepare-to-slicing', () => {
-			this.reset();
-			Log('prepare to slicing done!');
-			this.isWorking = true;
-			const maxObjectsPoint =  _.maxBy(store.objects, (x: SceneObject) => x.maxY.y);
-			this.sliceTo = Math.min(store.gridSize.y, maxObjectsPoint!.maxY.y);
-			this.sliceCountMax =  Math.ceil(this.sliceTo / (printer.PrintSettings.LayerHeight * 0.1));
-			this.sliceCount = 0;
-			this.gcode = `;fileName:${store.objects[0].name}
+		if (bridge.isWorker()) {
+			bridge.ipcRenderer.send('prepare-to-slicing-worker-ready');
+			bridge.ipcRenderer.receive('prepare-to-slicing-worker-take-job', (json: string, workerJobs: { layer: number, percent: number }[]) => {
+				const obj = JSON.parse(json);
+
+				console.log(obj, workerJobs);
+
+				obj.sceneObjects.forEach((x: string) => {
+					const sceneObject = SceneObject.FromJson(x);
+					AppStore.sceneStore.objects.push(sceneObject);
+					AppStore.sceneStore.scene.add(sceneObject.mesh);
+					sceneObject.supports?.forEach(y => AppStore.sceneStore.scene.add(y));
+				});
+
+				AppStore.sceneStore.setupPrinter(JSON.parse(obj.printer));
+				AppStore.sceneStore.animate(true);
+
+				//while (jobs.length > 0)
+				//{
+				//	const job = workerJobs.shift()!;
+				//	this.image = AppStore.sceneStore.sliceLayer(job.percent,
+				//		job.layer, SliceType.Normal);
+				//}
+				//bridge.ipcRenderer.send('sliced-layer-worker-done');
+			});
+		}
+		else {
+			bridge.ipcRenderer.receive('prepare-to-slicing-ready', () => {
+				this.reset();
+				Log('prepare to slicing done!');
+				this.isWorking = true;
+				const maxObjectsPoint = _.maxBy(store.objects, (x: SceneObject) => x.maxY.y);
+				this.sliceTo = Math.min(store.gridSize.y, maxObjectsPoint!.maxY.y);
+				this.sliceCountMax = Math.ceil(this.sliceTo / (printer.PrintSettings.LayerHeight * 0.1));
+				this.sliceCount = 0;
+				this.gcode = `;fileName:${store.objects[0].name}
 ;machineType:${store.printer?.Name}
 ;estimatedPrintTime:${printer.PrintSettings.BottomExposureTime * printer.PrintSettings.BottomLayers
-      + printer.PrintSettings.ExposureTime * this.sliceCountMax
-      + printer.PrintSettings.DelayTime * this.sliceCountMax}
+        + printer.PrintSettings.ExposureTime * this.sliceCountMax
+        + printer.PrintSettings.DelayTime * this.sliceCountMax}
 ;volume:1
 ;resin:normal
 ;weight:1
@@ -193,38 +210,35 @@ export class SlicingStore {
 ;bottomLayerLiftSpeed:${printer.PrintSettings.LiftingSpeed}
 ;bottomLightOffTime:0
 ;lightOffTime:0`;
-			this.gcode += '\n\n;START_GCODE_BEGIN';
-			this.gcode += '\n' + AppStore.sceneStore.printer!.GCode.Start;
-			this.gcode += '\n;START_GCODE_END';
-			this.animate();
-			Log('slice layers max: ' + this.sliceCountMax);
-		});
-		bridge.ipcRenderer.receive('sliced-finalize-result-save', (error: string | null, success: string | null, filePath?: string) => {
-			if (error)
-			{
-				Log(error);
-			}
-			if (success)
-			{
-				config.pathToSave = filePath ?? config.pathToSave;
-				saveConfig();
-				Log(success + ' to: ' + filePath);
-				AppStore.changeState(Pages.Main);
-			}
-		});
-		bridge.ipcRenderer.receive('sliced-finalize-result', (error: string | null) => {
-			if (error)
-			{
-				Log(error);
-			}
+				this.gcode += '\n\n;START_GCODE_BEGIN';
+				this.gcode += '\n' + AppStore.sceneStore.printer!.GCode.Start;
+				this.gcode += '\n;START_GCODE_END';
+				this.animate();
+				Log('slice layers max: ' + this.sliceCountMax);
+			});
+			bridge.ipcRenderer.receive('sliced-finalize-result-save', (error: string | null, success: string | null, filePath?: string) => {
+				if (error) {
+					Log(error);
+				}
+				if (success) {
+					config.pathToSave = filePath ?? config.pathToSave;
+					saveConfig();
+					Log(success + ' to: ' + filePath);
+					AppStore.changeState(Pages.Main);
+				}
+			});
+			bridge.ipcRenderer.receive('sliced-finalize-result', (error: string | null) => {
+				if (error) {
+					Log(error);
+				}
 
-			if (config.saveAutomatically)
-			{
-				this.finalize(true, true);
-			}
+				if (config.saveAutomatically) {
+					this.finalize(true, true);
+				}
 
-			Log('slicing done!');
-			this.isWorking = false;
-		});
+				Log('slicing done!');
+				this.isWorking = false;
+			});
+		}
 	};
 }

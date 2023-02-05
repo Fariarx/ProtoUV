@@ -123,9 +123,9 @@ const objectAdd = (message: AppEvent, isReversed?: true, isRestored?: true) => {
 	const scene = AppStore.sceneStore;
 
 	const update = () => {
-		scene.updateSelectionChanged();
-		scene.updateTransformControls();
 		setTimeout(() => {
+			scene.updateSelectionChanged();
+			scene.updateTransformControls();
 			scene.clippingReset();
 			scene.animate();
 		});
@@ -175,9 +175,9 @@ const objectDelete = (message: AppEvent, isReversed?: true) => {
 	const scene = AppStore.sceneStore;
 
 	const update = () => {
-		scene.updateSelectionChanged();
-		scene.updateTransformControls();
 		setTimeout(() => {
+			scene.updateSelectionChanged();
+			scene.updateTransformControls();
 			scene.clippingReset();
 			scene.animate();
 		});

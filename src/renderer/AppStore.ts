@@ -5,6 +5,7 @@ import { HeaderStore } from './HeaderStore';
 import { TransformStore } from './Main/Components/ToolsLeft/Transform/TransformStore';
 import { PerformSupportsStore } from './Main/Components/ToolsRight/Supports/PerformSupportsStore';
 import { ConsoleStore } from './Main/Console/ConsoleStore';
+import { Printer } from './Main/Printer/Configs/Printer';
 import { SceneStore } from './Main/Scene/SceneStore';
 import { SlicingStore } from './Slicing/SlicingStore';
 
@@ -58,6 +59,7 @@ export class AppStore {
 	public projectFolder?: string;
 	public progressPercent = 0;
 	public newVersion = '';
+	public tempPrinter: Printer | undefined;
 }
 
 export enum Pages {

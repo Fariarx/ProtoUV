@@ -96,8 +96,8 @@ export class SlicingStore {
 		this.imageLargestSize = 0;
 	};
 
-	public save = (saveAutomatically: boolean) => {
-		bridge.ipcRenderer.send('sliced-finalize',
+	public save = (saveAutomatically: boolean, isSave: boolean) => {
+		bridge.ipcRenderer.send('sliced-finalize' + (isSave ? '-save': ''),
 			this.gcode, bridge.assetsPath() + config.pathToUVTools, AppStore.sceneStore.printer!.Export.Encoder,
       AppStore.sceneStore.printer!.Export.Extencion, AppStore.sceneStore.objects[0].name,
       config.pathToSave, saveAutomatically);
@@ -180,7 +180,6 @@ export class SlicingStore {
 			requestAnimationFrame(this.animate);
 		}
 		else {
-			this.isWorking = false;
 			this.gcode += '\n\n;END_GCODE_BEGIN';
 			this.gcode += '\n' + AppStore.sceneStore.printer!.GCode.End
 				.replace('*x', printer.Workspace.Height.toString());
@@ -193,13 +192,9 @@ export class SlicingStore {
 				(this.imageLargestLayer/this.sliceCountMax) * this.sliceTo / AppStore.sceneStore.gridSize.y,
 				this.imageLargestLayer, SliceType.PreviewCropping);
 
-			if (config.saveAutomatically)
-			{
-				console.log(config.saveAutomatically);
-				this.save(true);
-			}
+			this.save(config.saveAutomatically, false);
 
-			bridge.ipcRenderer.receive('sliced-finalize-result', (error: string | null, success: string | null, filePath?: string) => {
+			bridge.ipcRenderer.receive('sliced-finalize-result-save', (error: string | null, success: string | null, filePath?: string) => {
 				if (error)
 				{
 					Log(error);
@@ -212,8 +207,20 @@ export class SlicingStore {
 					AppStore.changeState(Pages.Main);
 				}
 			});
+			bridge.ipcRenderer.receive('sliced-finalize-result', (error: string | null) => {
+				if (error)
+				{
+					Log(error);
+				}
 
-			Log('slicing done!');
+				Log('slicing done!');
+				this.isWorking = false;
+
+				if (config.saveAutomatically)
+				{
+					this.save(true, true);
+				}
+			});
 		}
 	};
 }

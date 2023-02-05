@@ -88,7 +88,7 @@ const createWindow = async () => {
 	};
 
 	ipcMain.on('electron.assetsPath', (event: any) => {
-		event.returnValue = getAssetPath();
+		event.returnValue = RESOURCES_PATH;
 	});
 
 	mainWindow = new BrowserWindow({
@@ -162,9 +162,9 @@ const createWindow = async () => {
 	ipcMain.on('save-sliced-layer', (_, screenshot: string, path: string) => {
 		fs.writeFileSync(userData + '/slicing/' + path, atob(screenshot), 'binary' );
 	});
-	ipcMain.on('sliced-finalize', (_, gcode: string, pathToUVTools: string,
-		encoder: string, extencion: string, fileNameToSave: string, filePath: string,
-		saveAutomatically: boolean
+	ipcMain.on('sliced-finalize', (_,
+		gcode: string, pathToUVTools: string,
+		encoder: string, extencion: string
 	) => {
 		try {
 			fs.writeFileSync(userData + '/slicing/run.gcode', gcode);
@@ -189,40 +189,7 @@ const createWindow = async () => {
         });
         _process.on('close', (code) => {
         	if (code === 1) {
-        		const options = {
-        			title: 'Save file',
-        			defaultPath: filePath + '\\' + fileNameToSave + '.' + extencion,
-        			buttonLabel: 'Save',
-        			filters: [
-        				{ name: encoder, extensions: [extencion] }
-        			]
-        		};
-
-        		const save = ({ filePath }: any) => {
-        			try {
-        				if (filePath) {
-        					if (fs.existsSync(filePath)) {
-        						fs.rmSync(filePath, { force: true });
-        					}
-        					fs.copyFileSync(userData + '\\target.' + extencion, filePath);
-        					mainWindow?.webContents.send('sliced-finalize-result', null, 'done, file successfully written', path.dirname(filePath));
-        				} else {
-        					mainWindow?.webContents.send('sliced-finalize-result', 'file to save not selected');
-        				}
-        			} catch (e) {
-        				mainWindow?.webContents.send('sliced-finalize-result', 'save error: ' + e);
-        			}
-        		};
-
-        		if (saveAutomatically && fs.existsSync(filePath))
-        		{
-        			save({
-        				filePath: options.defaultPath
-        			});
-        		}
-        		else {
-        			dialog.showSaveDialog(mainWindow!, options).then(save as any);
-        		}
+        		mainWindow?.webContents.send('sliced-finalize-result', 'done');
         	}
         	else {
         		mainWindow?.webContents.send('sliced-finalize-result', 'error code from uvtools: ' + code);
@@ -233,6 +200,45 @@ const createWindow = async () => {
 		catch (e)
 		{
 			mainWindow?.webContents.send('sliced-finalize-result', 'finalize error: ' + e);
+		}
+	});
+	ipcMain.on('sliced-finalize-save', (_, __: string, ___: string,
+		encoder: string, extencion: string, fileNameToSave: string, filePath: string,
+		saveAutomatically: boolean
+	) => {
+		const options = {
+			title: 'Save file',
+			defaultPath: filePath + '\\' + fileNameToSave + '.' + extencion,
+			buttonLabel: 'Save',
+			filters: [
+				{ name: encoder, extensions: [extencion] }
+			]
+		};
+
+		const save = ({ filePath }: any) => {
+			try {
+				if (filePath) {
+					if (fs.existsSync(filePath)) {
+						fs.rmSync(filePath, { force: true });
+					}
+					fs.copyFileSync(userData + '\\target.' + extencion, filePath);
+					mainWindow?.webContents.send('sliced-finalize-result-save', null, 'done, file successfully written', path.dirname(filePath));
+				} else {
+					mainWindow?.webContents.send('sliced-finalize-result-save', 'file to save not selected');
+				}
+			} catch (e) {
+				mainWindow?.webContents.send('sliced-finalize-result-save', 'save error: ' + e);
+			}
+		};
+
+		if (saveAutomatically && fs.existsSync(filePath))
+		{
+			save({
+				filePath: options.defaultPath
+			});
+		}
+		else {
+			dialog.showSaveDialog(mainWindow!, options).then(save as any);
 		}
 	});
 

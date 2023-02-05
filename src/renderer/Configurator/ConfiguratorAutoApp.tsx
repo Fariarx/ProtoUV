@@ -13,7 +13,17 @@ export const ConfiguratorAutoApp = observer(() => {
 	const configs = Printer.ParseConfigFileNames();
 	const [hasFocus, setterFocus] = useState(true);
 	const [printerName, setterPrinterName] = useState('');
-	const isValidPrinter = () => configs?.default.includes(printerName) || configs?.changed.includes(printerName);
+
+	const isValidPrinter = () => {
+		const result = configs?.default.includes(printerName) || configs?.changed.includes(printerName);
+
+		if (result)
+		{
+			AppStore.instance.tempPrinter = Printer.LoadConfigFromFile(printerName) ?? undefined;
+		}
+
+		return result;
+	};
 
 	const save = () => {
 		const printer = Printer.LoadConfigFromFile(printerName);
@@ -23,7 +33,8 @@ export const ConfiguratorAutoApp = observer(() => {
 		}
 		else {
 			AppStore.sceneStore.printer = printer;
-			AppStore.sceneStore.printerName = config.printerName = printer.Name;
+			AppStore.sceneStore.printerName = printer.Name;
+			config.printerName = printer.Name;
 			AppStore.changeState(Pages.Main);
 			saveConfig();
 		}

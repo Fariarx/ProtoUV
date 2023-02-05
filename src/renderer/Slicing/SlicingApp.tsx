@@ -68,7 +68,7 @@ export const SlicingApp = observer(() => {
 					mr: '2px', position: 'unset',
 					border: '1px solid ' + colors.interact.success,
 				}} onClick={() => {
-					AppStore.slice.save(false);
+					AppStore.slice.save(false, true);
 				}}>
           Select path to save
 				</BigButton>

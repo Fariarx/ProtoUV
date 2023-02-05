@@ -1,18 +1,17 @@
-import { Box, Button, ButtonGroup, Divider, Grid, TextField, Typography } from '@mui/material';
+import { Box, Button, ButtonGroup, Divider } from '@mui/material';
 import { observer } from 'mobx-react';
-import { useState } from 'react';
+import { GridFields, StringFields } from './Shared/Edit';
 import { AppStore, Pages } from '../AppStore';
 import { Printer } from '../Main/Printer/Configs/Printer';
 import { config, saveConfig } from '../Shared/Config';
 import { colors } from '../Shared/Config';
 import { FlexBoxColumn, FlexBoxColumnFit, flexChildrenCenter } from '../Shared/Styled/FlexBox';
 import { Sizes } from '../Shared/Styled/Sizes';
-import { GridFields, StringFields } from './Shared/Edit';
-
-export let tempPrinter: Printer | undefined;
 
 export const ConfiguratorManuallyApp = observer(() => {
-	const printer = tempPrinter ? tempPrinter : Printer.LoadDefaultConfigFromFile();
+	const printer = AppStore.instance.tempPrinter
+		? AppStore.instance.tempPrinter
+		: Printer.LoadDefaultConfigFromFile();
 
 	if (!printer) {
 		AppStore.changeState(Pages.Configurator);
@@ -20,7 +19,8 @@ export const ConfiguratorManuallyApp = observer(() => {
 	}
 
 	const save = () => {
-		AppStore.sceneStore.printerName = config.printerName = printer.Name;
+		AppStore.sceneStore.printerName = printer.Name;
+		config.printerName = printer.Name;
 		Printer.SaveToFile(printer);
 		AppStore.sceneStore.printer = printer;
 		AppStore.changeState(Pages.Main);
@@ -28,14 +28,14 @@ export const ConfiguratorManuallyApp = observer(() => {
 	};
 
 	return <FlexBoxColumn sx={{
-    width: '100%',
-    height: '100%',
-    padding: Sizes.multiply(Sizes.twentyFour, 2),
-  }}>
+		width: '100%',
+		height: '100%',
+		padding: Sizes.multiply(Sizes.twentyFour, 2),
+	}}>
 		<FlexBoxColumn sx={{
 			width: '100%',
 			height: '100%',
-      overflow: 'auto',
+			overflow: 'auto',
 			flexGrow: 1,
 			...flexChildrenCenter
 		}}>
@@ -48,16 +48,16 @@ export const ConfiguratorManuallyApp = observer(() => {
 				<GridFields obj={printer.Workspace} name={'Workspace'}/>
 				<Divider sx={{ mt: Sizes.twelve, mb: Sizes.twelve, transform: 'translateY(12px)', borderColor: colors.background.heavy }}/>
 				<GridFields obj={printer.PrintSettings} name={'Print Settings'}/>
-        <StringFields  text={printer.Export.Encoder+', ' + printer.Export.Extencion} label={"Encoder, extension"} sx={{ mt: '12px' }}  setText={x => {
-          printer.Export.Encoder = x.split(',')[0].trim();
-          printer.Export.Extencion = x.split(',')[1].trim();
-        }}/>
+				<StringFields  text={printer.Export.Encoder+', ' + printer.Export.Extencion} label={'Encoder, extension'} sx={{ mt: '12px' }}  setText={x => {
+					printer.Export.Encoder = x.split(',')[0].trim();
+					printer.Export.Extencion = x.split(',')[1].trim();
+				}}/>
 				<ButtonGroup variant="outlined" sx={{
 					width: Sizes.multiply(Sizes.twentyFour, 12),
 					mt: Sizes.twentyFour
 				}}>
 					<Button onClick={() => {
-						tempPrinter = printer;
+						AppStore.instance.tempPrinter = printer;
 						AppStore.changeState(Pages.Configurator);
 					}} sx={{
 						width: '100%',

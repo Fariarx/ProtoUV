@@ -98,14 +98,6 @@ export class SlicingStore {
 
 			this.sliceCount += 1;
 
-			if (this.sliceCount > this.sliceCountMax) {
-				AppStore.instance.progressPercent = 1;
-				break;
-			}
-			else {
-				AppStore.instance.progressPercent = (this.sliceCount/this.sliceCountMax);
-			}
-
 			if (!this.isWorking)
 			{
 				Log('slicing cancelled!');
@@ -114,6 +106,9 @@ export class SlicingStore {
 		}
 
 		const created = SceneObject.CreateClipping(SceneObject.CalculateSceneGeometry()).group.toJSON();
+
+		let reportStateCount = 0;
+		const reportStateCountMax = this.sliceCountMax;
 
 		const workerSpawn = (layers: { i: number, percent: number }[]) => {
 			return new Promise(resolve => {
@@ -124,9 +119,18 @@ export class SlicingStore {
 					switch (e.data.type)
 					{
 						case SliceWorkerResultType.SliceResult:
+							reportStateCount++;
+
 							bridge.ipcRenderer.send('sliced-layer-save',
 								e.data.image.replace('data:image/png;base64,',''),
 								(e.data.layer.i + 1)+'.png');
+
+							if (reportStateCount >= reportStateCountMax) {
+								AppStore.instance.progressPercent = 1;
+							}
+							else {
+								AppStore.instance.progressPercent = (reportStateCount/reportStateCountMax);
+							}
 							return;
 						case SliceWorkerResultType.JobDone:
 							worker.terminate();
@@ -181,7 +185,6 @@ export class SlicingStore {
 
 	public registrationReceivers = () => {
 		const store = AppStore.sceneStore;
-		const printer = AppStore.sceneStore.printer!;
 
 		if (bridge.isWorker()) {
 			bridge.ipcRenderer.send('prepare-to-slicing-worker-ready');
@@ -215,6 +218,7 @@ export class SlicingStore {
 				Log('prepare to slicing done!');
 				this.isWorking = true;
 				const maxObjectsPoint = _.maxBy(store.objects, (x: SceneObject) => x.maxY.y);
+				const printer = AppStore.sceneStore.printer!;
 				this.sliceTo = Math.min(store.gridSize.y, maxObjectsPoint!.maxY.y);
 				this.sliceCountMax = Math.ceil(this.sliceTo / (printer.PrintSettings.LayerHeight * 0.1));
 				this.sliceCount = 0;

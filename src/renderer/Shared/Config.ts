@@ -1,7 +1,7 @@
 import { Restore } from './Libs/Restore';
 
 export const _default = {
-	version: 42,
+	version: 44,
 	versionPrinterConfigs: 0,
 	settings: {
 		ui: {
@@ -57,7 +57,7 @@ export const _default = {
 				main: '#5e48ff'
 			}
 		},
-		workerCount: 15,
+		workerCount: 30,
 		printerName: '',
 		pathToUVTools: '/uvtools/UVtoolsCmd.exe',
 		pathToSave: 'C:\\',

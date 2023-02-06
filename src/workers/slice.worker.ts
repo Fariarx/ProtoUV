@@ -1,127 +1,301 @@
-import fs from 'fs';
-import { Printer } from 'renderer/Main/Printer/Configs/Printer';
-import { BufferGeometryLoader, Raycaster } from 'three';
 import * as THREE from 'three';
-import { MeshBVH } from 'three-mesh-bvh';
-import { parentPort, workerData } from 'worker_threads';
-import * as zlib from 'zlib';
+import {
+	AlwaysStencilFunc,
+	BackSide, BufferAttribute, BufferGeometry, DecrementWrapStencilOp, DoubleSide, DynamicDrawUsage, FrontSide,
+	Group, IncrementWrapStencilOp, Line3, LineBasicMaterial, LineSegments, Matrix4,
+	Mesh, MeshBasicMaterial, MeshLambertMaterial,
+	ObjectLoader,
+	OrthographicCamera,
+	Plane,
+	Scene,
+	Vector2, Vector3,
+	WebGLRenderer
+} from 'three';
+import { LinearEncoding, NotEqualDepth } from 'three/src/constants';
+import { CONTAINED, MeshBVH } from 'three-mesh-bvh';
+import { SliceWorker } from '../renderer/Slicing/SlicingStore';
 
-const slice = async (printer: Printer, layer: number, mesh: MeshBVH, raycaster: Raycaster) => {
-	const voxelSizes = printer.workerData.voxelSize;
+const scene: Scene = new Scene();
+const reader = new FileReader();
+const clippingPlaneMin = new Plane();
+const clippingInnerColor = 0xFFFFFF;
+const clippingPlaneMeshMin = new THREE.Mesh( new THREE.PlaneBufferGeometry(),
+	new THREE.MeshBasicMaterial ({
+		color: clippingInnerColor,	side: BackSide,
+		transparent: true,
+		stencilWrite: true,
+		depthTest: true,
+		depthWrite: true,
+		depthFunc: NotEqualDepth,
+		reflectivity: 0,
+		stencilRef: 0,
+		stencilFunc: THREE.NotEqualStencilFunc,
+		stencilFail: THREE.ReplaceStencilOp,
+		stencilZFail: THREE.ReplaceStencilOp,
+		stencilZPass: THREE.ReplaceStencilOp,
+	}));
 
-	const startPixelPositionX = printer.workerData.gridSize.x / 2 - voxelSizes.voxelSizeX * printer.Resolution.X / 2;
-	const startPixelPositionY = layer * voxelSizes.voxelSizeY;
-	const startPixelPositionZ = printer.workerData.gridSize.z / 2 - .1 * printer.Workspace.SizeY / 2;
+clippingPlaneMeshMin.rotateX(Math.PI / 2);
+clippingPlaneMeshMin.renderOrder = 2;
+clippingPlaneMeshMin.scale.setScalar(1000000);
 
-	const imageBuffer = new Uint8Array(printer.Resolution.X * printer.Resolution.Y );
+onmessage = function (oEvent) {
+	const data = oEvent.data as SliceWorker;
+	const loader = new ObjectLoader();
+	const group = loader.parse(data.geometry) as Group;
 
-	imageBuffer.fill(0x00);
+	const sizeXZ = new Vector2(
+		data.printer.Workspace.SizeX * 0.1,
+		data.printer.Workspace.SizeY * 0.1);
 
-	let voxelDrawCount = 0;
-	let indexPixelX = 0;
+	const stencilRenderer: WebGLRenderer = new WebGLRenderer({
+		canvas: data.canvas
+	});
+	stencilRenderer.localClippingEnabled = true;
+	stencilRenderer.outputEncoding = LinearEncoding;
+	stencilRenderer.setClearColor(0x000000);
+	stencilRenderer.setSize(data.printer.Resolution.X,data.printer.Resolution.Y,false);
 
-	raycaster.ray.direction.set(0, 0, 1);
+	const sliceOrthographicCamera = new OrthographicCamera(
+		sizeXZ.x / - 2,
+		sizeXZ.x / 2,
+		sizeXZ.y / 2,
+		sizeXZ.y / - 2,
+		0.0001,
+	);
 
-	while (indexPixelX < printer.Resolution.X) {
-		const newPixelPositionX = startPixelPositionX + voxelSizes.voxelSizeX * indexPixelX;
+	const groupClipping = CreateClipping((group.children[0] as Mesh).geometry);
 
-		raycaster.ray.origin.set(newPixelPositionX, startPixelPositionY, startPixelPositionZ);
+	scene.add(groupClipping.group);
 
-		const intersection: any[] = mesh.raycast(raycaster.ray, THREE.DoubleSide);
+	const updateClipping = (clippingPercent: number) => {
+		const inverseMatrix= new Matrix4();
+		const localPlane= new Plane();
+		const tempLine=new  Line3();
+		const tempVector= new  Vector3();
+		const tempVector1= new  Vector3();
+		const tempVector2= new Vector3();
+		const tempVector3= new Vector3();
 
-		//DrawDirLine(raycaster.ray.origin, raycaster.ray.direction, sceneStore.scene)
+		clippingPlaneMeshMin.updateMatrixWorld(true);
+		clippingPlaneMeshMin.position.setY(clippingPercent * data.gridSize.y);
+		clippingPlaneMeshMin.updateMatrixWorld(true);
+		clippingPlaneMin.applyMatrix4(clippingPlaneMeshMin.matrixWorld );
+		clippingPlaneMeshMin.updateMatrixWorld(true);
 
-		intersection.sort((a, b) => {
-			return a.distance < b.distance ? -1 : 1;
-		});
+		clippingPlaneMin.constant = clippingPercent * data.gridSize.y;
+		clippingPlaneMin.normal.set( 0, -1, 0);
 
-		//console.log(intersection)
+		inverseMatrix.copy( groupClipping.colliderMesh!.matrixWorld ).invert();
+		localPlane.copy(clippingPlaneMin).applyMatrix4(inverseMatrix);
 
-		for (let i = 0; i < intersection.length; i++) {
+		let index = 0;
 
-			const isFrontFacing = intersection[i].face.normal.dot(raycaster.ray.direction) < 0;
+		const posAttr = groupClipping.outlineLines.geometry.attributes.position;
 
-			if (!isFrontFacing) {
-				continue;
-			}
+		groupClipping.colliderBvh.shapecast( {
+			intersectsBounds: () =>  CONTAINED,
+			intersectsTriangle: (tri: any) => {
+				let count = 0;
 
-			let numSolidsInside = 0;
-			let j = i + 1;
-
-			while (j < intersection.length) {
-				const isFrontFacing = intersection[j].face.normal.dot(raycaster.ray.direction) < 0;
-
-				if (!isFrontFacing) {
-					if (numSolidsInside === 0) {
-						// Found it
-						break;
-					}
-					numSolidsInside--;
-				} else {
-					numSolidsInside++;
+				tempLine.start.copy( tri.a );
+				tempLine.end.copy( tri.b );
+				if (localPlane.intersectLine( tempLine, tempVector )) {
+					posAttr.setXYZ( index, tempVector.x, tempVector.y, tempVector.z );
+					index ++;
+					count ++;
 				}
 
-				j++;
-			}
+				tempLine.start.copy( tri.b );
+				tempLine.end.copy( tri.c );
+				if (localPlane.intersectLine( tempLine, tempVector )) {
+					posAttr.setXYZ( index, tempVector.x, tempVector.y, tempVector.z );
+					count ++;
+					index ++;
+				}
 
-			if (j >= intersection.length) {
-				continue;
-			}
+				tempLine.start.copy( tri.c );
+				tempLine.end.copy( tri.a );
+				if (localPlane.intersectLine( tempLine, tempVector )) {
+					posAttr.setXYZ( index, tempVector.x, tempVector.y, tempVector.z );
+					count ++;
+					index ++;
+				}
 
-			const indexStartZ = Math.floor((intersection[i].point.z - (startPixelPositionZ)) / voxelSizes.voxelSizeZ);
-			const indexFinishZ = Math.ceil((intersection[j].point.z - (startPixelPositionZ)) / voxelSizes.voxelSizeZ);
-			const bufferStartIndexX = printer.Resolution.X * indexPixelX;
+				if ( count === 3 ) {
+					tempVector1.fromBufferAttribute( posAttr, index - 3 );
+					tempVector2.fromBufferAttribute( posAttr, index - 2 );
+					tempVector3.fromBufferAttribute( posAttr, index - 1 );
+					if ( tempVector3.equals( tempVector1 ) || tempVector3.equals( tempVector2 ) ) {
+						count --;
+						index --;
+					} else if ( tempVector1.equals( tempVector2 ) ) {
+						posAttr.setXYZ( index - 2, tempVector3.x, tempVector3.y, tempVector3.z );
+						count --;
+						index --;
+					}
+				}
 
-			voxelDrawCount += indexFinishZ - indexPixelX;
+				if ( count !== 2 ) {
+					index -= count;
+				}
+			},
+		});
 
-			imageBuffer.fill(0xff, bufferStartIndexX + indexStartZ, bufferStartIndexX +  indexFinishZ);
+    groupClipping.outlineLines!.geometry.setDrawRange( 0, index );
+    groupClipping.outlineLines!.position.copy(clippingPlaneMin.normal ).multiplyScalar( - 0.00001 );
 
-			i = j;
-		}
-
-		indexPixelX += 1;
-	}
-
-	fs.writeFileSync(userData +'/slice/' + layer +'.layer',  zlib.gzipSync(imageBuffer), 'binary');
-};
-
-export const sliceLayers = async (printerJson: string, numLayerFrom: number, numLayerTo: number) => {
-	const start = numLayerFrom;
-
-	const printer = JSON.parse(printerJson) as Printer;
-	const raycaster = new Raycaster();
-	const geometry = new BufferGeometryLoader().parse(printer.workerData.geometry);
-	const mesh = new MeshBVH(geometry, {
-		maxLeafTris: 20
-	});
-
-	const _w = printer.Resolution.X;
-	const _h = printer.Resolution.Y;
-
-	const _slice = (layer: number) => {
-		slice(printer, layer, mesh, raycaster);
+    posAttr.needsUpdate = true;
 	};
 
-	while (numLayerFrom <= numLayerTo) {
-		_slice(numLayerFrom);
+	const next = () => new Promise(resolve => {
+		const layer = data.layers.shift();
 
-		parentPort?.postMessage((numLayerFrom - start)/(numLayerTo - start));
+		if (!layer)
+		{
+			postMessage({
+				type: 1
+			});
+			resolve(true);
+			return;
+		}
 
-		numLayerFrom++;
-	}
+		updateClipping(layer.percent);
+
+		stencilRenderer.clearDepth();
+		sliceOrthographicCamera.position.set(data.gridSize.x/2, data.gridSize.y + 1, data.gridSize.z/2);
+		sliceOrthographicCamera.lookAt(data.gridSize.x/2, 0, data.gridSize.z/2);
+		stencilRenderer.render(scene, sliceOrthographicCamera);
+
+		(data.canvas as any).convertToBlob().then((blob: Blob) => {
+			reader.readAsDataURL(blob);
+			reader.onloadend = function() {
+				postMessage({
+					type: 0,
+					image: reader.result,
+					layer: layer,
+					reminder: data.layers.length
+				});
+				next().then(_ => {
+					resolve(false);
+				});
+			};
+		});
+	});
+
+	next().then();
 };
 
-const userData = workerData[3];
-
-if (fs.existsSync(userData +'/slice'))
-{
-	fs.rmSync(userData +'/slice', { recursive: true, force: true });
-}
-fs.mkdirSync(userData +'/slice');
-
-parentPort?.postMessage(userData);
-sliceLayers(workerData[0], workerData[1], workerData[2]).then(x => {
-	parentPort?.postMessage('slice finished from worker');
+const material = new MeshLambertMaterial( { color: '#98de9c', side: DoubleSide,
+	clippingPlanes: [clippingPlaneMin]
 });
 
-parentPort?.postMessage('slice started from worker');
+const CreateClipping = (geometry: BufferGeometry) => {
+	const frontSideModel = new Mesh(geometry);
+	frontSideModel.updateMatrixWorld( true );
+	const surfaceModel = frontSideModel.clone();
+	surfaceModel.material = material;
+	surfaceModel.material .transparent = true;
+	surfaceModel.material .opacity = 0;
+	surfaceModel.renderOrder = 1;
+
+	const lineGeometry = new BufferGeometry();
+	const linePosAttr = new BufferAttribute( new Float32Array( 300000 ), 3, false );
+	linePosAttr.setUsage( DynamicDrawUsage );
+	lineGeometry.setAttribute( 'position', linePosAttr );
+	const clippingLineMin = new  LineSegments( lineGeometry, new LineBasicMaterial() );
+	clippingLineMin.material.color.set( '#ffffff' ).convertSRGBToLinear();
+	clippingLineMin.frustumCulled = false;
+	clippingLineMin.renderOrder = 3;
+
+	clippingLineMin.scale.copy( frontSideModel.scale );
+	clippingLineMin.position.set( 0, 0, 0 );
+	clippingLineMin.quaternion.identity();
+
+	const matSet = new Set();
+	const materialMap = new Map();
+	frontSideModel.traverse((c: Mesh | any) => {
+		if ( materialMap.has( c.material ) ) {
+			c.material = materialMap.get( c.material );
+			return;
+		}
+
+		matSet.add( c.material );
+
+		const material = c.material.clone();
+		material.roughness = 1.0;
+		material.metalness = 0.1;
+		material.side = FrontSide;
+		material.stencilWrite = true;
+		material.stencilFail =  DecrementWrapStencilOp;
+		material.stencilZFail = DecrementWrapStencilOp;
+		material.stencilZPass =  DecrementWrapStencilOp;
+		material.depthWrite = false;
+		material.depthTest = false;
+		material.colorWrite = false;
+		material.stencilWrite = true;
+		material.stencilFunc = AlwaysStencilFunc;
+		material.clippingPlanes = [clippingPlaneMin];
+
+		materialMap.set( c.material, material );
+		c.material = material;
+	});
+
+	materialMap.clear();
+
+	const backSideModel = frontSideModel.clone();
+	backSideModel.traverse((c: Mesh | any) => {
+		if (c.isMesh) {
+			if ( materialMap.has( c.material ) ) {
+				c.material = materialMap.get( c.material );
+				return;
+			}
+
+			const material = c.material.clone();
+			material.side =  BackSide;
+			material.stencilFail = IncrementWrapStencilOp;
+			material.stencilZFail = IncrementWrapStencilOp;
+			material.stencilZPass = IncrementWrapStencilOp;
+			material.depthWrite = false;
+			material.depthTest = false;
+			material.colorWrite = false;
+			material.stencilWrite = true;
+			material.clippingPlanes = [clippingPlaneMin];
+
+			materialMap.set( c.material, material );
+			c.material = material;
+		}
+	});
+
+	const colliderBvh = new MeshBVH( frontSideModel.geometry, { maxLeafTris: 3 } );
+	frontSideModel.geometry.boundsTree = colliderBvh;
+
+	const colliderMesh = new Mesh( frontSideModel.geometry,  new MeshBasicMaterial( {
+		wireframe: true,
+		transparent: true,
+		opacity: 0.01,
+		depthWrite: false,
+	}));
+	colliderMesh.renderOrder = 2;
+	colliderMesh.position.copy( frontSideModel.position );
+	colliderMesh.rotation.copy( frontSideModel.rotation );
+	colliderMesh.scale.copy( frontSideModel.scale );
+
+	const group = new Group();
+
+	group.add(frontSideModel,
+		backSideModel,
+		surfaceModel,
+		colliderMesh,
+		clippingLineMin);
+
+	group.children[3].visible = false;
+	group.children[2].visible = false;
+
+	return {
+		group: group,
+		colliderMesh : colliderMesh,
+		outlineLines: clippingLineMin,
+		colliderBvh :colliderBvh
+	};
+};

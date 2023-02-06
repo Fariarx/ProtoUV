@@ -8,8 +8,8 @@ import {
 	DirectionalLight,
 	DoubleSide,
 	FrontSide,
-	Group,
-	Material,
+	Group, Line3, LineSegments,
+	Material, Matrix4, Mesh,
 	MeshLambertMaterial,
 	Object3D,
 	OrthographicCamera,
@@ -29,6 +29,7 @@ import { OutlineEffect } from 'three/examples/jsm/effects/OutlineEffect';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial';
 import { NotEqualDepth } from 'three/src/constants';
+import { MeshBVH } from 'three-mesh-bvh';
 
 import { SceneObject } from './Entities/SceneObject';
 import {
@@ -210,6 +211,26 @@ export abstract class SceneBase {
 				}
 		}`
 		});
+	};
+
+	public clippingBuffer = {
+		sceneGeometryCount: 0 as number,
+		sceneGeometryGrouped: null as null | Group,
+
+		intersectionMesh: {
+			colliderMesh : null as null | Mesh,
+			outlineLines: null as null | LineSegments,
+			colliderBvh : null as null | MeshBVH,
+		},
+
+		clippingPercent: 0,
+		inverseMatrix: new Matrix4(),
+		localPlane: new Plane(),
+		tempLine: new  Line3(),
+		tempVector: new  Vector3(),
+		tempVector1: new  Vector3(),
+		tempVector2: new Vector3(),
+		tempVector3: new Vector3()
 	};
 }
 

@@ -17,7 +17,6 @@ export class SceneApp extends Component<any, any> {
 	}
 
 	render() {
-
 		return (
 			<div
 				onWheel={(evt) =>

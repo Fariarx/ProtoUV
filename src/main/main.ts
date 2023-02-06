@@ -163,50 +163,8 @@ const createWindow = async () => {
 
 		mainWindow?.webContents.send('prepare-to-slicing-ready');
 	});
-	ipcMain.on('prepare-to-slicing-run-worker', (_, json: string, workerJobs: { layer: number, percent: number }[]) => {
-
-		console.log('create worker');
-
-		const createWorker = () => {
-			const worker = new BrowserWindow({
-				//show: false,
-				//titleBarStyle: 'hidden',
-				webPreferences: {
-					preload: app.isPackaged
-						? path.join(__dirname, 'preload.js')
-						: path.join(__dirname, '../../.erb/dll/preload.js'),
-					webSecurity: false,
-					sandbox: false,
-					nodeIntegration: true,
-					devTools: isDebug,
-					nodeIntegrationInWorker: true,
-					nodeIntegrationInSubFrames: true
-				}
-			});
-
-			workers.push(worker);
-
-			worker.loadURL(resolveHtmlPath('index.html'));
-
-			const listener = (_: any) => {
-        workers.find(x => _.sender === x.webContents)!
-        	.webContents.send('prepare-to-slicing-worker-take-job', json, workerJobs);
-        ipcMain.removeListener('prepare-to-slicing-worker-ready', listener);
-			};
-
-			ipcMain.on('prepare-to-slicing-worker-ready', listener);
-		};
-
-		createWorker();
-	});
 	ipcMain.on('sliced-layer-save', (_, screenshot: string, path: string) => {
 		fs.writeFileSync(userData + '/slicing/' + path, atob(screenshot), 'binary' );
-	});
-	ipcMain.on('sliced-layer-worker-done', (_) => {
-    workers.find(x => _.sender === x.webContents)!.close();
-	});
-	ipcMain.on('sliced-finalize-cancelled', _ => {
-
 	});
 	ipcMain.on('sliced-finalize-done', (_,
 		gcode: string, pathToUVTools: string,

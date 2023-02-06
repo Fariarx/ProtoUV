@@ -84,10 +84,6 @@ M18;`,
 		}
 	}
 
-	public ConstructGcodeStartAndEnd = () => {
-
-	};
-
 	static DEFAULT_CONFIG_NAME = 'Default Printer';
 	static CHANGED_DIR = '\\ChangedConfigsV';
 	static CONFIG_DIR = bridge.assetsPath() + '/defaultconfigs/';

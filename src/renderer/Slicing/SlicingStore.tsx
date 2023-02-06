@@ -1,9 +1,10 @@
 import _ from 'lodash';
 import { makeAutoObservable } from 'mobx';
 import { SceneObject } from 'renderer/Main/Scene/Entities/SceneObject';
+import { Vector3 } from 'three';
 import { singleton } from 'tsyringe';
 import { AppStore, Log, Pages } from '../AppStore';
-import { SliceType } from '../Main/Scene/SceneInitializer';
+import { PrinterConfig } from '../Main/Printer/Configs/Printer';
 import { config, saveConfig } from '../Shared/Config';
 import { bridge } from '../Shared/Globals';
 
@@ -67,23 +68,15 @@ export class SlicingStore {
 		const layerHeight = (AppStore.sceneStore.printer!.PrintSettings.LayerHeight * 0.1);
 		const printer = AppStore.sceneStore.printer!;
 
-		let arrangeJobByWorker: { percent: number, layer: number }[] = [];
+		const arrangeJobByWorker: { percent: number, i: number }[] = [];
 
 		while (this.sliceCount <= this.sliceCountMax)
 		{
-			//Log('slice layer: ' + this.sliceCount + ' / ' + this.sliceCountMax);
-
 			arrangeJobByWorker.push({
 				percent: (this.sliceCount/this.sliceCountMax) * this.sliceTo / AppStore.sceneStore.gridSize.y,
-				layer: this.sliceCount
+				i: this.sliceCount
 			});
 
-			if (arrangeJobByWorker.length > this.sliceCountMax / config.workerCount)
-			{
-				bridge.ipcRenderer.send('prepare-to-slicing-run-worker',
-					AppStore.sceneStore.export(), JSON.stringify(arrangeJobByWorker));
-				arrangeJobByWorker = [];
-			}
 			const moveTo = (layerHeight * this.sliceCount)* 10;
 
 			this.gcode += '\n\n' + printer.GCode.ShowImage.replace('*x', (this.sliceCount + 1).toString());
@@ -120,24 +113,70 @@ export class SlicingStore {
 			}
 		}
 
-		if (this.sliceCount <= this.sliceCountMax) {
-			requestAnimationFrame(this.animate);
-		}
-		else {
-			this.gcode += '\n\n;END_GCODE_BEGIN';
-			this.gcode += '\n' + AppStore.sceneStore.printer!.GCode.End
-				.replace('*x', printer.Workspace.Height.toString());
-			this.gcode += '\n;END_GCODE_END';
+		const created = SceneObject.CreateClipping(SceneObject.CalculateSceneGeometry()).group.toJSON();
 
-			AppStore.sceneStore.sliceLayer(
-				(this.imageLargestLayer/this.sliceCountMax) * this.sliceTo / AppStore.sceneStore.gridSize.y,
-				this.imageLargestLayer, SliceType.Preview);
-			AppStore.sceneStore.sliceLayer(
-				(this.imageLargestLayer/this.sliceCountMax) * this.sliceTo / AppStore.sceneStore.gridSize.y,
-				this.imageLargestLayer, SliceType.PreviewCropping);
+		const workerSpawn = (layers: { i: number, percent: number }[]) => {
+			return new Promise(resolve => {
+				const worker = new Worker(bridge.assetsPath() + '/workers/slice.worker.bundle.js');
+				const canvas = new OffscreenCanvas(256, 256);
 
-			this.finalize(false, false);
-		}
+				worker.onmessage = function (e) {
+					switch (e.data.type)
+					{
+						case SliceWorkerResultType.SliceResult:
+							bridge.ipcRenderer.send('sliced-layer-save',
+								e.data.image.replace('data:image/png;base64,',''),
+								(e.data.layer.i + 1)+'.png');
+							return;
+						case SliceWorkerResultType.JobDone:
+							worker.terminate();
+							resolve(true);
+							return;
+					}
+				};
+
+				worker.postMessage({
+					canvas: canvas,
+					gridSize: AppStore.sceneStore.gridSize,
+					printer: AppStore.sceneStore.printer!,
+					geometry: created,
+					layers: layers
+				} as SliceWorker, [canvas]);
+			});
+		};
+
+		const task = new Promise(resolve => {
+			let workersCountDone = 0;
+			let workerJob = [];
+			while (arrangeJobByWorker.length)
+			{
+				workerJob.push(arrangeJobByWorker.pop()!);
+
+				if (workerJob.length >= this.sliceCountMax / config.workerCount
+          || !arrangeJobByWorker.length)
+				{
+					workerSpawn(workerJob).then(() => {
+						workersCountDone++;
+						if (workersCountDone >= config.workerCount)
+						{
+							resolve(true);
+						}
+					});
+					workerJob = [];
+				}
+			}
+		});
+
+		task.then(() => {
+			console.log('job done');
+		});
+
+		this.gcode += '\n\n;END_GCODE_BEGIN';
+		this.gcode += '\n' + AppStore.sceneStore.printer!.GCode.End
+			.replace('*x', printer.Workspace.Height.toString());
+		this.gcode += '\n;END_GCODE_END';
+
+		//this.finalize(false, false);
 	};
 
 	public registrationReceivers = () => {
@@ -241,4 +280,28 @@ export class SlicingStore {
 			});
 		}
 	};
+}
+
+export interface SliceWorker {
+  canvas: OffscreenCanvas;
+  printer: PrinterConfig;
+  geometry: string;
+  gridSize: Vector3;
+  layers: {i: number, percent: number}[];
+}
+
+export enum SliceWorkerResultType {
+  SliceResult,
+  JobDone
+}
+
+export interface SliceWorkerLayerResult {
+  type: SliceWorkerResultType.SliceResult;
+  image: string;
+  percent: {i: number, percent: number};
+  remainder: number;
+}
+
+export interface SliceWorkerJobDone {
+  type: SliceWorkerResultType.JobDone;
 }

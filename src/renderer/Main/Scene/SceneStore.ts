@@ -25,11 +25,7 @@ export class SceneStore extends SceneInitializer {
 	public constructor() {
 		super();
 
-		if (!bridge.isWorker())
-		{
-			this.setupPrinter();
-		}
-
+		this.setupPrinter();
 		this.setup();
 		this.updateCameraLookPosition();
 		this.animate();
@@ -56,6 +52,7 @@ export class SceneStore extends SceneInitializer {
 		if (printer)
 		{
 			this.printer = printer;
+			console.log(this.printer);
 			this.updatePrinter();
 		}
 		else

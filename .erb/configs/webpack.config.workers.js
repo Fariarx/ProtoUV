@@ -9,12 +9,8 @@ module.exports = {
 	target: 'node',
 	entry: './src/workers/slice.worker.ts',
 	output: {
-		path: path.resolve(__dirname, '../../src/workers'),
+		path: path.resolve(__dirname, '../../assets/workers'),
 		filename: 'slice.worker.bundle.js',
-	},
-	externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
-	externalsPresets: {
-		node: true // in order to ignore built-in modules like path, fs, etc.
 	},
 	module: {
 		rules: [
@@ -28,7 +24,7 @@ module.exports = {
 							transpileOnly: true,
 							experimentalWatchApi: true,
 							allowTsInNodeModules: true,
-							onlyCompileBundledFiles: true,
+							onlyCompileBundledFiles: true
 						},
 					},
 				],

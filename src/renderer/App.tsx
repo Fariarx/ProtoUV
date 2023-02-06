@@ -7,7 +7,6 @@ import { observer } from 'mobx-react';
 import { SnackbarProvider } from 'notistack';
 import { Route, MemoryRouter as Router, Routes } from 'react-router-dom';
 import './AppStore';
-import { Scene } from 'three';
 import { AppStore, Log, Pages } from './AppStore';
 import { LineBottomApp } from './BottomApp';
 import { ConfiguratorAutoApp } from './Configurator/ConfiguratorAutoApp';

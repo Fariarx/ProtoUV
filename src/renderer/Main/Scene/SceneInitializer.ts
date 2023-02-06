@@ -3,19 +3,14 @@ import { runInAction } from 'mobx';
 import { WheelEvent } from 'React';
 import {
 	AmbientLight,
-	ArrowHelper,
 	BufferGeometry,
 	DirectionalLight,
 	Group,
-	Line3,
-	LineSegments,
 	MathUtils,
-	Matrix4,
 	Mesh,
 	Object3D,
 	OrthographicCamera,
 	PerspectiveCamera,
-	Plane,
 	Raycaster,
 	Vector3,
 	sRGBEncoding
@@ -24,7 +19,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader';
 import { LinearEncoding } from 'three/src/constants';
-import { CONTAINED, MeshBVH } from 'three-mesh-bvh';
+import { CONTAINED } from 'three-mesh-bvh';
 import { Key } from 'ts-keycode-enum';
 import { container } from 'tsyringe';
 import { SceneObject } from './Entities/SceneObject';
@@ -33,7 +28,6 @@ import { AppStore, Log, Pages } from '../../AppStore';
 import { APP_HEADER_HEIGHT } from '../../HeaderApp';
 import { config, saveConfig } from '../../Shared/Config';
 import { Dispatch } from '../../Shared/Events';
-import { bridge } from '../../Shared/Globals';
 import { EnumHelpers } from '../../Shared/Helpers/Enum';
 import * as OrientationHelper from '../../Shared/Helpers/OrientationHelper';
 import { SubscribersKeyPressed, isKeyPressed } from '../../Shared/Libs/Keys';
@@ -160,19 +154,6 @@ export class SceneInitializer extends SceneBase {
 		this.lightGroup.attach(this.lightShadow);
 
 		this.scene.add(this.lightGroup);
-	};
-	private setupAxes = () => {
-		const origin = new Vector3();
-		const size = 2;
-
-		const axesHelper = new Object3D();
-		axesHelper.add(new ArrowHelper(new Vector3(1, 0, 0), origin, size, '#b80808'));
-		axesHelper.add(new ArrowHelper(new Vector3(0, 1, 0), origin, size, '#09b111'));
-		axesHelper.add(new ArrowHelper(new Vector3(0, 0, 1), origin, size, '#091ab1'));
-		axesHelper.position.set(0.05,0.05,0.05);
-
-		this.scene.add(axesHelper);
-		this.axes = axesHelper;
 	};
 	private setupCameraRig = () => {
 		this.cameraRig = new Group();
@@ -965,99 +946,4 @@ export class SceneInitializer extends SceneBase {
 
 		requestAnimationFrame(_animate);
 	};
-
-	public sliceLayer = (percent: number, layer: number, type: SliceType) => {
-		this.clippingScenePercent = percent;
-
-		switch (type)
-		{
-			case SliceType.Normal:
-				this.stencilRenderer.setSize(this.printer!.Resolution.X,this.printer!.Resolution.Y);
-				break;
-			case SliceType.Preview:
-				this.stencilRenderer.setSize(386, 223);
-				break;
-			case SliceType.PreviewCropping:
-				this.stencilRenderer.setSize(259, 150);
-				break;
-		}
-
-		const _hide = (isShow: boolean) => {
-			this.clippingSceneWorking = !isShow;
-			this.lightGroup.visible = isShow;
-			this.lightFromCamera.visible = isShow;
-			this.decorations.visible = isShow;
-			this.transformControls.visible = isShow;
-			this.objects.forEach(x => {
-				x.mesh.visible = isShow;
-				x.supports?.forEach(y =>
-					y.visible = isShow);
-			});
-		};
-		const _hideLine = (isShow: boolean) => {
-			this.clippingBuffer.intersectionMesh.outlineLines?.material.color.set(isShow ? this.clippingLineColor :'#919191' ).convertSRGBToLinear();
-			this.clippingPlaneMeshMin.material.color.set(isShow ? this.clippingInnerColor : '#fff').convertSRGBToLinear();
-		};
-
-		_hide(false);
-		this.clippingSomeShit();
-		_hideLine(false);
-
-		this.stencilRenderer.clearDepth();
-		this.sliceOrthographicCamera.position.set(this.gridSize.x/2, this.gridSize.y + 1, this.gridSize.z/2);
-		this.sliceOrthographicCamera.lookAt(this.gridSize.x/2, 0, this.gridSize.z/2);
-		this.stencilRenderer.render(this.scene, this.sliceOrthographicCamera);
-		_hide(true);
-		_hideLine(true);
-
-		const image = this.stencilRenderer.domElement
-			.toDataURL('image/png');
-
-		switch (type)
-		{
-			case SliceType.Normal:
-				bridge.ipcRenderer.send('sliced-layer-save',
-					image.replace('data:image/png;base64,',''),
-					(layer + 1)+'.png');
-				break;
-			case SliceType.Preview:
-				bridge.ipcRenderer.send('sliced-layer-save',
-					image.replace('data:image/png;base64,',''),
-					'preview.png');
-				break;
-			case SliceType.PreviewCropping:
-				bridge.ipcRenderer.send('sliced-layer-save',
-					image.replace('data:image/png;base64,',''),
-					'preview_cropping.png');
-				break;
-		}
-
-		return image;
-	};
-
-	public clippingBuffer = {
-		sceneGeometryCount: 0 as number,
-		sceneGeometryGrouped: null as null | Group,
-
-		intersectionMesh: {
-			colliderMesh : null as null | Mesh,
-			outlineLines: null as null | LineSegments,
-			colliderBvh : null as null | MeshBVH,
-		},
-
-		clippingPercent: 0,
-		inverseMatrix: new Matrix4(),
-		localPlane: new Plane(),
-		tempLine: new  Line3(),
-		tempVector: new  Vector3(),
-		tempVector1: new  Vector3(),
-		tempVector2: new Vector3(),
-		tempVector3: new Vector3()
-	};
-}
-
-export enum SliceType {
-  Normal,
-  Preview,
-  PreviewCropping
 }

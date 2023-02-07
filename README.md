@@ -4,7 +4,17 @@
 <p>
   ProtoUV it's open-source slicer for a photopolymer 3d printers, written on TypeScript with base on Electron. Uses <a href="https://facebook.github.io/react/">React</a>, <a href="https://threejs.org/">ThreeJs</a>, <a href="https://github.com/gkjohnson/three-mesh-bvh">three-mesh-bvh</a>, <a href="https://www.electronjs.org/">Electron</a>, <a href="https://github.com/sn4k3/UVtools">uvtools</a> and many other deps. 
 </p>
-<img src="assets/screen.png" width="100%" />
+<img src="screenshots/img-2023-02-07-20-45-20.png" width="100%" />
+
+<details><summary>More screenshots (click me)</summary>
+<p>
+<img src="screenshots/screen.png" width="100%" />
+<img src="screenshots/img-2023-02-05-01-23-42.png" width="100%" />
+<img src="screenshots/img-2023-02-05-01-08-27.png" width="100%" />
+<img src="screenshots/img-2023-02-05-01-07-52.png" width="100%" />
+<img src="screenshots/img-2023-02-05-01-07-09.png" width="100%" />
+</p>
+</details>
 
 [![License](https://img.shields.io/github/license/fariarx/ProtoUV?style=for-the-badge)](https://github.com/Fariarx/ProtoUV/blob/main/LICENSE)
 [![GitHub repo size](https://img.shields.io/github/repo-size/fariarx/ProtoUV?style=for-the-badge)](#)

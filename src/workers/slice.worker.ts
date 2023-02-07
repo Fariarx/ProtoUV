@@ -1,14 +1,28 @@
 import * as THREE from 'three';
 import {
 	AlwaysStencilFunc,
-	BackSide, BufferAttribute, BufferGeometry, DecrementWrapStencilOp, DoubleSide, DynamicDrawUsage, FrontSide,
-	Group, IncrementWrapStencilOp, Line3, LineBasicMaterial, LineSegments, Matrix4,
-	Mesh, MeshBasicMaterial, MeshLambertMaterial,
+	BackSide,
+	BufferAttribute,
+	BufferGeometry,
+	DecrementWrapStencilOp,
+	DoubleSide,
+	DynamicDrawUsage,
+	FrontSide,
+	Group,
+	IncrementWrapStencilOp,
+	Line3,
+	LineBasicMaterial,
+	LineSegments,
+	Matrix4,
+	Mesh,
+	MeshBasicMaterial,
+	MeshLambertMaterial,
 	ObjectLoader,
 	OrthographicCamera,
 	Plane,
 	Scene,
-	Vector2, Vector3,
+	Vector2,
+	Vector3,
 	WebGLRenderer
 } from 'three';
 import { LinearEncoding, NotEqualDepth } from 'three/src/constants';
@@ -37,6 +51,8 @@ const clippingPlaneMeshMin = new THREE.Mesh( new THREE.PlaneBufferGeometry(),
 
 clippingPlaneMeshMin.rotateX(Math.PI / 2);
 clippingPlaneMeshMin.renderOrder = 2;
+scene.add(clippingPlaneMeshMin);
+clippingPlaneMeshMin.visible = true;
 clippingPlaneMeshMin.scale.setScalar(1000000);
 
 onmessage = function (oEvent) {

@@ -21,7 +21,7 @@
     {
       "Name": "Default",
       "ConnectionSphere": 0.4,
-      "Head": 0.35,
+      "Head": 0.3,
       "Body": 0.5,
       "Indent": 0.6,
       "Angle": 56,

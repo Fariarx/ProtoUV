@@ -7,7 +7,7 @@ import {
 	EventDispatcher,
 	Group,
 	Mesh,
-	MeshPhysicalMaterial,
+	MeshPhysicalMaterial, OrthographicCamera,
 	PerspectiveCamera,
 	Raycaster,
 	RingGeometry,
@@ -41,6 +41,7 @@ var OrientationHelper = function ( camera, controls, options, labels ) {
 		cameraNear: 1,
 		cameraFar: 1000,
 		cameraDistance: 150,
+    cameraOrthographicZoom: 0.8,
 		boxBackground: '#444',
 		boxColor: '#fff',
 		boxCanvasSide: 64,
@@ -150,7 +151,23 @@ var OrientationHelper = function ( camera, controls, options, labels ) {
 		scope._renderer.setSize( _options.width, _options.height );
 		scope._renderer.domElement.className = 'orientation-helper-scene ' + _options.className;
 
-		scope._camera = new PerspectiveCamera( _options.cameraFov, _options.width / _options.height, _options.cameraNear, _options.cameraFar );
+    const isPerspective = camera instanceof PerspectiveCamera;
+
+		scope._camera = isPerspective
+    ? new PerspectiveCamera( _options.cameraFov, _options.width / _options.height, _options.cameraNear, _options.cameraFar )
+    : new OrthographicCamera(
+        _options.width / - 2,
+        _options.width / 2,
+        _options.height / 2,
+        _options.height / - 2,
+      0.0001
+    );
+
+    if (!isPerspective)
+    {
+      scope._camera.zoom = _options.cameraOrthographicZoom;
+      scope._camera.updateProjectionMatrix();
+    }
 
 		scope._raycaster = new Raycaster();
 		scope._raycaster.layers.enable( 1 );

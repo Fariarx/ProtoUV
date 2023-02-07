@@ -11,15 +11,7 @@ const userData = electron.app.getPath('userData');
 
 let mainWindow: BrowserWindow | null = null;
 let mainWindowIsFocused: boolean | undefined;
-const workers = [] as BrowserWindow[];
 
-const RESOURCES_PATH = app.isPackaged
-	? path.join((process as any).resourcesPath, 'assets')
-	: path.join(__dirname, '../../assets');
-
-ipcMain.on('electron.assetsPath', (event: any) => {
-	event.returnValue = RESOURCES_PATH;
-});
 ipcMain.on('electron.userData', (event: any) => {
 	event.returnValue = userData;
 });
@@ -49,10 +41,6 @@ ipcMain.on('electron.openFileDialog', (event: any) => {
 			event.returnValue = result;
 		});
 	}
-});
-ipcMain.on('electron.isWorker', (_) => {
-	const worker = workers.find(x => _.sender === x.webContents);
-	_.returnValue = !!worker;
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -91,9 +79,17 @@ const createWindow = async () => {
 		await installExtensions();
 	}
 
+	const RESOURCES_PATH = app.isPackaged
+		? path.join((process as any).resourcesPath, 'assets')
+		: path.join(__dirname, '../../assets');
+
 	const getAssetPath = (...paths: string[]): string => {
 		return path.join(RESOURCES_PATH, ...paths);
 	};
+
+	ipcMain.on('electron.assetsPath', (event: any) => {
+		event.returnValue = RESOURCES_PATH;
+	});
 
 	mainWindow = new BrowserWindow({
 		show: false,
@@ -115,6 +111,7 @@ const createWindow = async () => {
 		},
 		titleBarStyle: 'hidden',
 	});
+
 	mainWindow.setMenu(null);
 	mainWindow.loadURL(resolveHtmlPath('index.html'));
 
@@ -143,6 +140,7 @@ const createWindow = async () => {
 				});
 		}
 	});
+
 	mainWindow.on('closed', () => {
 		mainWindow = null;
 	});
@@ -153,24 +151,21 @@ const createWindow = async () => {
 		return { action: 'deny' };
 	});
 
-	ipcMain.on('prepare-to-slicing', (_) => {
+	ipcMain.on('prepare-to-slicing', () => {
 		if (fs.existsSync(userData + '/slicing'))
 		{
 			fs.rmSync(userData + '/slicing', { recursive: true, force: true });
 		}
-
 		fs.mkdirSync(userData + '/slicing');
-
-		mainWindow?.webContents.send('prepare-to-slicing-ready');
+		mainWindow?.webContents.send('prepare-to-slicing');
 	});
 	ipcMain.on('sliced-layer-save', (_, screenshot: string, path: string) => {
 		fs.writeFileSync(userData + '/slicing/' + path, atob(screenshot), 'binary' );
 	});
-	ipcMain.on('sliced-finalize-done', (_,
+	ipcMain.on('sliced-finalize', (_,
 		gcode: string, pathToUVTools: string,
 		encoder: string, extencion: string
 	) => {
-
 		try {
 			fs.writeFileSync(userData + '/slicing/run.gcode', gcode);
 
@@ -185,8 +180,13 @@ const createWindow = async () => {
 
 				const _process = child(executablePath, parameters);
 
-        _process.stdout!.on('data', (data) => console.log(`stdout: ${data}`));
-        _process.stderr!.on('data', (data) => console.error(`stderr: ${data}`));
+        _process.stdout!.on('data', (data) => {
+        	console.log(`stdout: ${data}`);
+        });
+
+        _process.stderr!.on('data', (data) => {
+        	console.error(`stderr: ${data}`);
+        });
         _process.on('close', (code) => {
         	if (code === 1) {
         		mainWindow?.webContents.send('sliced-finalize-result', 'done');
@@ -247,6 +247,46 @@ const createWindow = async () => {
 			mainWindow?.webContents.send('sliced-finalize-result-save', 'finalize error: ' + e);
 		}
 	});
+
+	let workers: BrowserWindow[] = [];
+
+	ipcMain.on('worker', (_, scene: string) => {
+		console.log(123);
+		const worker = new BrowserWindow({
+			//show: false,
+			//titleBarStyle: 'hidden',
+			webPreferences: {
+				preload: app.isPackaged
+					? path.join(__dirname, 'preload.js')
+					: path.join(__dirname, '../../.erb/dll/preload.js'),
+				webSecurity: false,
+				sandbox: false,
+				nodeIntegration: true,
+				devTools: isDebug,
+				nodeIntegrationInWorker: true,
+				nodeIntegrationInSubFrames: true
+			},
+			titleBarStyle: 'hidden',
+		});
+		console.log(scene);
+		worker.loadURL(resolveHtmlPath('index.html'));
+		worker.webContents.send('worker', scene);
+		workers.push(worker);
+
+		const send = () => mainWindow?.webContents.send('worker-info', workers.length);
+		const interval = setInterval(() => {
+			send();
+			if (!workers.length) {
+				clearInterval(interval);
+			}
+		}, 500);
+
+		send();
+	});
+	ipcMain.on('worker-shutdown', (e) => {
+		workers = workers.filter(worker => worker.webContents !== e.sender);
+		e.sender.delete();
+	});
 };
 
 /**
@@ -261,7 +301,8 @@ app.on('window-all-closed', () => {
 	}
 });
 
-app.whenReady()
+app
+	.whenReady()
 	.then(() => {
 		createWindow();
 		app.on('activate', () => {

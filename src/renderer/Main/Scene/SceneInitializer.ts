@@ -920,12 +920,6 @@ export class SceneInitializer extends SceneBase {
 
 				if (this.activeCamera.position.y >= 0)
 				{
-					// this.renderer.setSize( 333, 333 );
-					// this.renderer.render( this.scene, this.activeCamera );
-					// const screenshot = this.renderer.domElement.toDataURL('image/png');
-					// console.log(screenshot);
-					// bridge.ipcRenderer.send('capture-page', screenshot.replace('data:image/png;base64,','')
-					// );
 					if (!this.clippingSceneWorking) {
 						this.outlineEffectRenderer.renderOutline(this.scene, this.activeCamera);
 					}

@@ -1,3 +1,4 @@
+import { observable } from 'mobx';
 import { Restore } from './Libs/Restore';
 
 export const _default = {
@@ -70,6 +71,9 @@ const storage = new Restore({
 	defaults: _default
 });
 
-export const saveConfig = () => storage.fullSave();
-export const config = storage.get('settings') as typeof _default.settings;
+export const saveConfig = () => {
+	storage.data.settings = config;
+	storage.fullSave();
+};
+export const config = observable(storage.get('settings')) as typeof _default.settings;
 export const colors = (storage.get('settings') as typeof _default.settings).colors;

@@ -111,7 +111,7 @@ const _supportCreator = (
 		const to = path[path.length-1].clone().setY(path[path.length-1].y + platformHeight);
 		mesh1.add(createCylinder(material, from, to, to.distanceTo(from), platformWidth * 0.75, platformWidth).mesh);
 	}
-	mesh1.add(createContactSphere(material, path[0], connectionSphere).mesh);
+	mesh1.add(createContactSphere(material, path[0], body).mesh);
 	mesh1.add(createCylinder(material, path[0], to, to.distanceTo(path[0]), body, head).mesh);
 	mesh1.add(createContactSphere(material, to, connectionSphere).mesh);
 

@@ -19,11 +19,12 @@ export class ConsoleStore {
 	public list: Array<{
     text: string;
     time: string;
+    color: ConsoleColors;
   }> = [];
 
 	private timerHide?: NodeJS.Timeout;
 
-	public Add = (text: string) => {
+	public Add = (text: string, color: ConsoleColors = 0) => {
 		const date = new Date()
 			.toISOString()
 			.replace(/T/, ' ')
@@ -31,7 +32,8 @@ export class ConsoleStore {
 			.split(' ')[1];
 		const log = {
 			text: text.toLowerCase(),
-			time: date
+			time: date,
+			color: color
 		};
 
 		if (this.timerHide)
@@ -52,4 +54,10 @@ export class ConsoleStore {
 			this.list.splice(0, 1);
 		}
 	};
+}
+
+export enum ConsoleColors {
+  Message,
+  Success,
+  Error,
 }

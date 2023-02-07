@@ -32,7 +32,7 @@ export class SceneStore extends SceneInitializer {
 		makeObservable(this);
 
 		setTimeout(() => {
-			if (bridge.isDebug() && !bridge.isWorker())
+			if (bridge.isDebug())
 			{
 				AppStore.sceneStore.handleLoadFile('C:\\Users\\admin\\Downloads\\Old\\V7_Infinity_Cube_Hinge.stl');
 			}

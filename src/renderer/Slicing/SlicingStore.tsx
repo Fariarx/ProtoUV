@@ -1,9 +1,10 @@
 import _ from 'lodash';
-import { makeAutoObservable } from 'mobx';
+import { makeAutoObservable, runInAction } from 'mobx';
 import { SceneObject } from 'renderer/Main/Scene/Entities/SceneObject';
-import { Vector3 } from 'three';
+import { Vector2, Vector3 } from 'three';
 import { singleton } from 'tsyringe';
 import { AppStore, Log, Pages } from '../AppStore';
+import { ConsoleColors } from '../Main/Console/ConsoleStore';
 import { PrinterConfig } from '../Main/Printer/Configs/Printer';
 import { config, saveConfig } from '../Shared/Config';
 import { bridge } from '../Shared/Globals';
@@ -64,6 +65,33 @@ export class SlicingStore {
 			return;
 		}
 
+		const rendererSize = AppStore.sceneStore.renderer.getSize(new Vector2());
+
+		AppStore.sceneStore.renderer.setSize(386, 223);
+		AppStore.sceneStore.renderer.render(AppStore.sceneStore.scene, AppStore.sceneStore.activeCamera);
+		const imagePreview = AppStore.sceneStore.renderer.domElement
+			.toDataURL('image/png');
+
+		bridge.ipcRenderer.send('sliced-layer-save',
+			imagePreview.replace('data:image/png;base64,',''),
+			'preview.png');
+
+		AppStore.sceneStore.renderer.setSize(259, 150);
+		AppStore.sceneStore.renderer.render(AppStore.sceneStore.scene, AppStore.sceneStore.activeCamera);
+		const imagePreviewCropping = AppStore.sceneStore.renderer.domElement
+			.toDataURL('image/png');
+
+		bridge.ipcRenderer.send('sliced-layer-save',
+			imagePreviewCropping.replace('data:image/png;base64,',''),
+			'preview_cropping.png');
+
+		AppStore.sceneStore.renderer.setSize(window.innerWidth, window.innerHeight);
+		AppStore.sceneStore.renderer.render(AppStore.sceneStore.scene, AppStore.sceneStore.activeCamera);
+		this.imageLargest = AppStore.sceneStore.renderer.domElement
+			.toDataURL('image/png');
+
+		AppStore.sceneStore.renderer.setSize(rendererSize.x, rendererSize.y);
+
 		const sharpness = config.scene.sharpness.toString().length - 2;
 		const layerHeight = (AppStore.sceneStore.printer!.PrintSettings.LayerHeight * 0.1);
 		const printer = AppStore.sceneStore.printer!;
@@ -109,13 +137,22 @@ export class SlicingStore {
 
 		let reportStateCount = 0;
 		const reportStateCountMax = this.sliceCountMax;
+		//eslint-disable-next-line @typescript-eslint/no-this-alias
+		const _this = this;
 
 		const workerSpawn = (layers: { i: number, percent: number }[]) => {
 			return new Promise(resolve => {
 				const worker = new Worker(bridge.assetsPath() + '/workers/slice.worker.bundle.js');
 				const canvas = new OffscreenCanvas(256, 256);
 
-				worker.onmessage = function (e) {
+				worker.onmessage = (e) => {
+					if (!_this.isWorking)
+					{
+						worker.terminate();
+						resolve(true);
+						return;
+					}
+
 					switch (e.data.type)
 					{
 						case SliceWorkerResultType.SliceResult:
@@ -125,12 +162,14 @@ export class SlicingStore {
 								e.data.image.replace('data:image/png;base64,',''),
 								(e.data.layer.i + 1)+'.png');
 
-							if (reportStateCount >= reportStateCountMax) {
-								AppStore.instance.progressPercent = 1;
-							}
-							else {
-								AppStore.instance.progressPercent = (reportStateCount/reportStateCountMax);
-							}
+							runInAction(() => {
+								if (reportStateCount >= reportStateCountMax) {
+									AppStore.instance.progressPercent = 1;
+								}
+								else {
+									AppStore.instance.progressPercent = (reportStateCount/reportStateCountMax);
+								}
+							});
 							return;
 						case SliceWorkerResultType.JobDone:
 							worker.terminate();
@@ -171,58 +210,32 @@ export class SlicingStore {
 			}
 		});
 
-		task.then(() => {
-			console.log('job done');
-		});
-
 		this.gcode += '\n\n;END_GCODE_BEGIN';
 		this.gcode += '\n' + AppStore.sceneStore.printer!.GCode.End
 			.replace('*x', printer.Workspace.Height.toString());
 		this.gcode += '\n;END_GCODE_END';
 
-		//this.finalize(false, false);
+		task.then(() => {
+			Log('slicing job done');
+			if (this.isWorking) {
+				this.finalize(false, false);
+			}
+		});
 	};
 
 	public registrationReceivers = () => {
 		const store = AppStore.sceneStore;
 
-		if (bridge.isWorker()) {
-			bridge.ipcRenderer.send('prepare-to-slicing-worker-ready');
-			bridge.ipcRenderer.receive('prepare-to-slicing-worker-take-job', (json: string, workerJobs: { layer: number, percent: number }[]) => {
-				const obj = JSON.parse(json);
-
-				console.log(obj, workerJobs);
-
-				obj.sceneObjects.forEach((x: string) => {
-					const sceneObject = SceneObject.FromJson(x);
-					AppStore.sceneStore.objects.push(sceneObject);
-					AppStore.sceneStore.scene.add(sceneObject.mesh);
-					sceneObject.supports?.forEach(y => AppStore.sceneStore.scene.add(y));
-				});
-
-				AppStore.sceneStore.setupPrinter(JSON.parse(obj.printer));
-				AppStore.sceneStore.animate(true);
-
-				//while (jobs.length > 0)
-				//{
-				//	const job = workerJobs.shift()!;
-				//	this.image = AppStore.sceneStore.sliceLayer(job.percent,
-				//		job.layer, SliceType.Normal);
-				//}
-				//bridge.ipcRenderer.send('sliced-layer-worker-done');
-			});
-		}
-		else {
-			bridge.ipcRenderer.receive('prepare-to-slicing-ready', () => {
-				this.reset();
-				Log('prepare to slicing done!');
-				this.isWorking = true;
-				const maxObjectsPoint = _.maxBy(store.objects, (x: SceneObject) => x.maxY.y);
-				const printer = AppStore.sceneStore.printer!;
-				this.sliceTo = Math.min(store.gridSize.y, maxObjectsPoint!.maxY.y);
-				this.sliceCountMax = Math.ceil(this.sliceTo / (printer.PrintSettings.LayerHeight * 0.1));
-				this.sliceCount = 0;
-				this.gcode = `;fileName:${store.objects[0].name}
+		bridge.ipcRenderer.receive('prepare-to-slicing', () => {
+			this.reset();
+			Log('prepare to slicing done!');
+			this.isWorking = true;
+			const maxObjectsPoint = _.maxBy(store.objects, (x: SceneObject) => x.maxY.y);
+			const printer = AppStore.sceneStore.printer!;
+			this.sliceTo = Math.min(store.gridSize.y, maxObjectsPoint!.maxY.y);
+			this.sliceCountMax = Math.ceil(this.sliceTo / (printer.PrintSettings.LayerHeight * 0.1));
+			this.sliceCount = 0;
+			this.gcode = `;fileName:${store.objects[0].name}
 ;machineType:${store.printer?.Name}
 ;estimatedPrintTime:${printer.PrintSettings.BottomExposureTime * printer.PrintSettings.BottomLayers
         + printer.PrintSettings.ExposureTime * this.sliceCountMax
@@ -253,36 +266,35 @@ export class SlicingStore {
 ;bottomLayerLiftSpeed:${printer.PrintSettings.LiftingSpeed}
 ;bottomLightOffTime:0
 ;lightOffTime:0`;
-				this.gcode += '\n\n;START_GCODE_BEGIN';
-				this.gcode += '\n' + AppStore.sceneStore.printer!.GCode.Start;
-				this.gcode += '\n;START_GCODE_END';
-				this.animate();
-				Log('slice layers max: ' + this.sliceCountMax);
-			});
-			bridge.ipcRenderer.receive('sliced-finalize-result-save', (error: string | null, success: string | null, filePath?: string) => {
-				if (error) {
-					Log(error);
-				}
-				if (success) {
-					config.pathToSave = filePath ?? config.pathToSave;
-					saveConfig();
-					Log(success + ' to: ' + filePath);
-					AppStore.changeState(Pages.Main);
-				}
-			});
-			bridge.ipcRenderer.receive('sliced-finalize-result', (error: string | null) => {
-				if (error) {
-					Log(error);
-				}
+			this.gcode += '\n\n;START_GCODE_BEGIN';
+			this.gcode += '\n' + AppStore.sceneStore.printer!.GCode.Start;
+			this.gcode += '\n;START_GCODE_END';
+			this.animate();
+			Log('slice layers max: ' + this.sliceCountMax);
+		});
+		bridge.ipcRenderer.receive('sliced-finalize-result-save', (error: string | null, success: string | null, filePath?: string) => {
+			if (error) {
+				Log(error, ConsoleColors.Error);
+			}
+			if (success) {
+				config.pathToSave = filePath ?? config.pathToSave;
+				saveConfig();
+				Log(success + ' to: ' + filePath, ConsoleColors.Success);
+				AppStore.changeState(Pages.Main);
+			}
+		});
+		bridge.ipcRenderer.receive('sliced-finalize-result', (error: string | null) => {
+			if (error && error !== 'done') {
+				Log(error, ConsoleColors.Error);
+			}
 
-				if (config.saveAutomatically) {
-					this.finalize(true, true);
-				}
+			if (config.saveAutomatically) {
+				this.finalize(true, true);
+			}
 
-				Log('slicing done!');
-				this.isWorking = false;
-			});
-		}
+			Log('slicing done!');
+			this.isWorking = false;
+		});
 	};
 }
 

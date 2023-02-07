@@ -10,10 +10,8 @@ export const SlicingApp = observer(() => {
 	const isSliced = AppStore.slice.sliceCount > AppStore.slice.sliceCountMax;
 
 	return <FlexBoxColumn>
-		{AppStore.slice.image !== '' && <img
-			src={AppStore.slice.isWorking
-				? AppStore.slice.image
-				: AppStore.slice.imageLargest}
+		{AppStore.slice.imageLargest !== '' && <img
+			src={AppStore.slice.imageLargest}
 			style={{
 				width: '100%',
 				height: '100%'
@@ -27,17 +25,18 @@ export const SlicingApp = observer(() => {
 			right: '4px',
 			gap: '4px'
 		}}>
-			{!isSliced && <Tooltip title={'Autosave to last folder' + (config.pathToSave ? ': ' + config.pathToSave : '')} arrow placement={'top'}>
+			<Tooltip title={'Autosave to last folder' + (config.pathToSave ? ': ' + config.pathToSave : '')} arrow placement={'top'}>
 				<ToggleButton value="check" selected={config.saveAutomatically} onChange={() => {
 					config.saveAutomatically = !config.saveAutomatically;
 					saveConfig();
 				}} sx={{
 					height: '36px',
 					width: '36px',
+					marginRight: '2px'
 				}}>
 					<FiSave />
 				</ToggleButton>
-			</Tooltip>}
+			</Tooltip>
 			<BigButton sx={{
 				opacity: 0.8,
 				':hover':{
@@ -55,7 +54,7 @@ export const SlicingApp = observer(() => {
 			}}>
         Cancel
 			</BigButton>
-			{isSliced && <>
+			{isSliced && !AppStore.slice.isWorking && <>
 				<BigButton sx={{
 					opacity: 0.8,
 					':hover':{

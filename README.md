@@ -2,7 +2,7 @@
 ## About
 
 <p>
-  ProtoUV it's open-source slicer for an photopolymer 3d printers, written on TypeScript with base on Electron. Uses <a href="https://facebook.github.io/react/">React</a>, <a href="https://threejs.org/">ThreeJs</a>, <a href="https://github.com/gkjohnson/three-mesh-bvh">three-mesh-bvh</a>, <a href="https://www.electronjs.org/">Electron</a>, <a href="https://github.com/sn4k3/UVtools">uvtools</a> and many other deps. 
+  ProtoUV is an open-source slicer for photopolymer 3d printers, written on TypeScript with base on Electron. Uses <a href="https://facebook.github.io/react/">React</a>, <a href="https://threejs.org/">ThreeJs</a>, <a href="https://github.com/gkjohnson/three-mesh-bvh">three-mesh-bvh</a>, <a href="https://www.electronjs.org/">Electron</a>, <a href="https://github.com/sn4k3/UVtools">uvtools</a> and many other deps. 
 </p>
 <img src="screenshots/img-2023-02-07-20-45-20.png" width="100%" />
 

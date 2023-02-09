@@ -11,8 +11,8 @@
 <img src="screenshots/screen.png" width="100%" />
 <img src="screenshots/img-2023-02-05-01-23-42.png" width="100%" />
 <img src="screenshots/img-2023-02-05-01-08-27.png" width="100%" />
-<img src="screenshots/img-2023-02-05-01-07-52.png" width="100%" />
-<img src="screenshots/img-2023-02-05-01-07-09.png" width="100%" />
+<img src="screenshots/alpha0.03/img-1.png" width="100%" />
+<img src="screenshots/alpha0.03/img-2.png" width="100%" />
 </p>
 </details>
 

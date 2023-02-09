@@ -9,7 +9,7 @@ export const bridge = window.electron.ipcRenderer.window as typeof bridgeTypeOf.
 export const AppName = 'protouv';
 export const AppLink = 'https://github.com/Fariarx/ProtoUV';
 export const AppLinkReleases = 'https://github.com/Fariarx/ProtoUV/releases';
-export const AppVersion = 'alpha0.02';
+export const AppVersion = 'alpha0.03';
 
 THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
 THREE.BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;

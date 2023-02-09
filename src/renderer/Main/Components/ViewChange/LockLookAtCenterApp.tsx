@@ -9,7 +9,7 @@ import { colors } from '../../../Shared/Config';
 export const LockLookAtCenterApp = observer(() => {
 	AppStore.sceneStore.orbitControls.enablePan = !config.scene.isFixedCenter;
 
-	return <Tooltip title={'look at center. use doubleclick to lock change'} arrow placement="bottom"
+	return <Tooltip title={<span style={{ whiteSpace: 'pre-line' }}>{'look at center\nuse doubleclick to lock change'}</span>} arrow placement="bottom"
 		PopperProps={{ sx: { userSelect: 'none' } }}>
 		<IconButton
 			size='small'

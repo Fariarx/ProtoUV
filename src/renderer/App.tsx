@@ -15,6 +15,7 @@ import { HeaderApp } from './HeaderApp';
 import { DragAndDropApp } from './Main/Components/DragAndDrop/DragAndDropApp';
 import { ToolsLeftApp } from './Main/Components/ToolsLeft/ToolsLeftApp';
 import { ToolsRightApp } from './Main/Components/ToolsRight/ToolsRightApp';
+import { FlyModeDescriptionApp } from './Main/Components/ViewChange/FlyModeApp';
 import { ViewChangeApp } from './Main/Components/ViewChange/ViewChangeApp';
 import { ConsoleApp } from './Main/Console/ConsoleApp';
 import { SceneApp } from './Main/Scene/SceneApp';
@@ -46,6 +47,7 @@ const Main = observer(() => {
 
 				<AnimationFade in={AppStore.getState() === Pages.Main}>
 					<FlexBoxRow>
+						<FlyModeDescriptionApp/>
 						<FlexBoxRow>
 							<SceneApp/>
 							<ToolsRightApp/>

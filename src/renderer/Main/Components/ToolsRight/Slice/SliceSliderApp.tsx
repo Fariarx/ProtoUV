@@ -1,9 +1,10 @@
-import { Box, Slider } from '@mui/material';
+import { Box } from '@mui/material';
 import _ from 'lodash';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { AppStore } from '../../../../AppStore';
 import { config } from '../../../../Shared/Config';
+import { SliceSlider } from '../../../../Shared/Styled/Slider';
 import { SceneObject } from '../../../Scene/Entities/SceneObject';
 
 export const SliceSliderApp = observer(() => {
@@ -19,7 +20,7 @@ export const SliceSliderApp = observer(() => {
 		flexGrow: 1,
 		ml: 1, mt: 4
 	}}>
-		<Slider
+		<SliceSlider
 			sx={{
 				height:'100%',
 				opacity: 0.4,
@@ -33,7 +34,7 @@ export const SliceSliderApp = observer(() => {
 			}}
 			orientation="vertical"
 			valueLabelDisplay="off"
-			min={-1}
+			min={0}
 			max={100001}
 			value={100000 * ((AppStore.sceneStore.clippingScenePercent * AppStore.sceneStore.gridSize.y) / sliceTo)}
 			onChange={(_e,n: number & any) => {

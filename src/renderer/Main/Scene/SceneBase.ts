@@ -4,7 +4,7 @@ import {
 } from 'mobx';
 import * as THREE from 'three';
 import {
-	BackSide,
+	BackSide, Clock,
 	DirectionalLight,
 	DoubleSide,
 	FrontSide,
@@ -21,6 +21,7 @@ import {
 	Vector3,
 	WebGLRenderer
 } from 'three';
+import { FlyControls } from 'three/examples/jsm/controls/FlyControls';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import {
 	TransformControls,
@@ -165,39 +166,44 @@ export abstract class SceneBase {
 	public lightShadow!: DirectionalLight;
 	public lightFromCamera!: DirectionalLight;
 	public orbitControls!: OrbitControls;
+	public flyControlsPerspective!: FlyControls;
 	public transformControls!: TransformControls;
 	public transformControlsUpdate!: () => void;
 	public transformControlsDragging!: (event: { value: boolean } | any) => void;
 	public orientationHelperPerspective: any;
 	public orientationHelperOrthographic: any;
+	public clock = new Clock();
 
 	public cameraRig!: Group;
 	public axes!: Object3D;
 
-	public static CreatePlaneMaterial = (paddingX: number, paddingY: number) => {
-		return new ShaderMaterial({
-			uniforms: {
-				//eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				//@ts-ignore
-				u_color: { type: 'v3', value: new Vector3(...toNormalizedRGBArray(colors.scene.workingPlaneColor)) },
-				//eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				//@ts-ignore
-				u_color_limit: { type: 'v3', value: new Vector3(...toNormalizedRGBArray(colors.scene.workingPlaneLimitColor)) },
-				//eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				//@ts-ignore
-				u_padding_x: { type: 'f', value: paddingX },
-				//eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				//@ts-ignore
-				u_padding_y: { type: 'f', value: paddingY }
-			},
-			vertexShader: `varying vec2 vUv;
+  @observable
+	public controlsTypeFlyEnabled = false;
+
+  public static CreatePlaneMaterial = (paddingX: number, paddingY: number) => {
+  	return new ShaderMaterial({
+  		uniforms: {
+  			//eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  			//@ts-ignore
+  			u_color: { type: 'v3', value: new Vector3(...toNormalizedRGBArray(colors.scene.workingPlaneColor)) },
+  			//eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  			//@ts-ignore
+  			u_color_limit: { type: 'v3', value: new Vector3(...toNormalizedRGBArray(colors.scene.workingPlaneLimitColor)) },
+  			//eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  			//@ts-ignore
+  			u_padding_x: { type: 'f', value: paddingX },
+  			//eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  			//@ts-ignore
+  			u_padding_y: { type: 'f', value: paddingY }
+  		},
+  		vertexShader: `varying vec2 vUv;
 
 		void main() {
 				vUv = uv;
 
 				gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 		}`,
-			fragmentShader: `varying vec2 vUv;
+  		fragmentShader: `varying vec2 vUv;
 		uniform vec3 u_color;
 		uniform vec3 u_color_limit;
 		uniform float u_padding_x;
@@ -210,28 +216,28 @@ export abstract class SceneBase {
 						gl_FragColor = vec4(u_color, 1.0);
 				}
 		}`
-		});
-	};
+  	});
+  };
 
-	public clippingBuffer = {
-		sceneGeometryCount: 0 as number,
-		sceneGeometryGrouped: null as null | Group,
+  public clippingBuffer = {
+  	sceneGeometryCount: 0 as number,
+  	sceneGeometryGrouped: null as null | Group,
 
-		intersectionMesh: {
-			colliderMesh : null as null | Mesh,
-			outlineLines: null as null | LineSegments,
-			colliderBvh : null as null | MeshBVH,
-		},
+  	intersectionMesh: {
+  		colliderMesh : null as null | Mesh,
+  		outlineLines: null as null | LineSegments,
+  		colliderBvh : null as null | MeshBVH,
+  	},
 
-		clippingPercent: 0,
-		inverseMatrix: new Matrix4(),
-		localPlane: new Plane(),
-		tempLine: new  Line3(),
-		tempVector: new  Vector3(),
-		tempVector1: new  Vector3(),
-		tempVector2: new Vector3(),
-		tempVector3: new Vector3()
-	};
+  	clippingPercent: 0,
+  	inverseMatrix: new Matrix4(),
+  	localPlane: new Plane(),
+  	tempLine: new  Line3(),
+  	tempVector: new  Vector3(),
+  	tempVector1: new  Vector3(),
+  	tempVector2: new Vector3(),
+  	tempVector3: new Vector3()
+  };
 }
 
 export type SceneGrid = {

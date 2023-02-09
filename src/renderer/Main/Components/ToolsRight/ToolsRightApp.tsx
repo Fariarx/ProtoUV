@@ -53,7 +53,6 @@ export const ToolsRightApp = observer(() => {
 		sx={{
 			width: store.width + 'px',
 			height: 'fit-content',
-			opacity: config.ui.opacity,
 			position: 'absolute',
 			top: APP_HEADER_HEIGHT_PX,
 			bottom: APP_BOTTOM_HEIGHT_PX,

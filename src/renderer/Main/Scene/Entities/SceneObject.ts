@@ -233,20 +233,22 @@ export class SceneObject {
 	};
 
 	AlignToPlaneY = (deletedSupportsDisabled?: boolean) => {
-		this.mesh.position.setY(0);
-		this.UpdateSize();
+		if (AppStore.transform.alignToPlane) {
+			this.mesh.position.setY(0);
+			this.UpdateSize();
 
-		Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
-			from: this.mesh.position.clone(),
-			to: this.mesh.position.clone().setY(this.supports !== undefined && this.sceneStore.printer
-				? -this.minY.y + toUnits(this.sceneStore.printer.SupportPreset.Lifting)
-				: -this.minY.y),
-			sceneObject: this as SceneObject,
-			instrument: TransformEnum.Move,
-			supportsDisabled: deletedSupportsDisabled
-		} as AppEventMoveObject);
+			Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
+				from: this.mesh.position.clone(),
+				to: this.mesh.position.clone().setY(this.supports !== undefined && this.sceneStore.printer
+					? -this.minY.y + toUnits(this.sceneStore.printer.SupportPreset.Lifting)
+					: -this.minY.y),
+				sceneObject: this as SceneObject,
+				instrument: TransformEnum.Move,
+				supportsDisabled: deletedSupportsDisabled
+			} as AppEventMoveObject);
 
-		this.UpdateSize();
+			this.UpdateSize();
+		}
 	};
 
 	AlignToPlaneXZ = (gridVec: Vector3) => {
@@ -575,6 +577,8 @@ export class SceneObject {
 				[...support.children.flatMap((y: Mesh & any) =>
 					y.geometry.clone().applyMatrix4(y.matrixWorld).applyMatrix4(support.matrixWorld)),
 				support.geometry.clone().applyMatrix4(support.matrixWorld)]));
+
+		console.log(supportsGeometries);
 
 		const geometry = mergeBufferGeometries(objGeometries.concat(supportsGeometries?.filter(x => !!x) ?? []));
 

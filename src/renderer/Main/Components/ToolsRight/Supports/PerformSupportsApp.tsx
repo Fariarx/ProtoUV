@@ -29,7 +29,7 @@ export const PerformSupportsApp = observer(() => {
 			gap: 0.5,
 		}}>
 			<ToolButton
-				text='add support tool. press R to randomize'
+				text={'add support tool\npress R to randomize'}
 				isActive={AppStore.performSupports.state === SupportsEnum.Add}
 				onClick={() => AppStore.performSupports.changeState(  SupportsEnum.Add)}>
 				<MdAddCircleOutline transform='scale(1.1)' color={colors.background.light}/>

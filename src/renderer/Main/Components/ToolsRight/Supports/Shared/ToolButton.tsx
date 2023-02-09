@@ -4,13 +4,13 @@ import { colors } from 'renderer/Shared/Config';
 
 export const ToolButton = (props: {
   children: ReactElement;
-  isActive: boolean;
+  isActive?: boolean;
   onClick: () => void;
   text: string;
   placement?: string | any;
 }) => {
 
-	return <Tooltip title={props.text} arrow placement={props.placement ?? 'bottom'}>
+	return <Tooltip title={<span style={{ whiteSpace: 'pre-line' }}>{props.text}</span>} arrow placement={props.placement ?? 'bottom'}>
 		<Box
 			onClick={props.onClick}
 			sx={{

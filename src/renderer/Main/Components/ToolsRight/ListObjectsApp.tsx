@@ -1,9 +1,8 @@
-import { IconButton, Stack, Tooltip, Typography } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import { RiCheckboxIndeterminateLine } from '@react-icons/all-files/ri/RiCheckboxIndeterminateLine';
 import { RiCheckboxLine } from '@react-icons/all-files/ri/RiCheckboxLine';
 import { RiDeleteBinLine } from '@react-icons/all-files/ri/RiDeleteBinLine';
 import { observer } from 'mobx-react-lite';
-import { ReactChild } from 'react';
 import { AppStore } from 'renderer/AppStore';
 import { SceneObject } from 'renderer/Main/Scene/Entities/SceneObject';
 import { colors, config, saveConfig } from 'renderer/Shared/Config';
@@ -11,22 +10,42 @@ import { isKeyPressed } from 'renderer/Shared/Libs/Keys';
 import { FlexBox, FlexBoxRow, RisizibleFlexBox, flexChildrenCenter, flexSelfCenter } from 'renderer/Shared/Styled/FlexBox';
 import { Sizes } from 'renderer/Shared/Styled/Sizes';
 import { Key } from 'ts-keycode-enum';
+import { ToolButton } from './Supports/Shared/ToolButton';
 
 export const ListObjects = observer(() => {
 
 	return <>
 		<SceneItems/>
 		<Stack direction='row' sx={{
-			p: Sizes.four,
+			p: Sizes.eight,
 			backgroundColor: colors.background.heavy,
 			flexWrap: 'wrap',
 			borderRadius: '0 0 0 4px',
 			borderLeft: '1px solid ' + colors.background.black,
 			borderBottom: '1px solid ' + colors.background.black
 		}}>
-			<Button text='Select all' action={() => SceneObject.SelectAllObjects()} icon={<RiCheckboxLine color={colors.background.light}/>}/>
-			<Button text='Clear select' action={() => SceneObject.DeselectAllObjects()} icon={<RiCheckboxIndeterminateLine color={colors.background.light}/>}/>
-			<Button text='Delete' action={() => SceneObject.SelectObjsDelete()} icon={<RiDeleteBinLine color={colors.background.light}/>}/>
+			<Box sx={{
+				display: 'flex',
+				gap: 0.5,
+			}}>
+				<ToolButton
+					text='Select all'
+					onClick={() => SceneObject.SelectAllObjects()}>
+					<RiCheckboxLine color={colors.background.light}/>
+				</ToolButton>
+
+				<ToolButton
+					text='Clear select'
+					onClick={() => SceneObject.DeselectAllObjects()}>
+					<RiCheckboxIndeterminateLine color={colors.background.light}/>
+				</ToolButton>
+
+				<ToolButton
+					text='Delete selected'
+					onClick={() => SceneObject.SelectObjsDelete()}>
+					<RiDeleteBinLine color={colors.background.light}/>
+				</ToolButton>
+			</Box>
 		</Stack>
 	</>;
 });
@@ -122,16 +141,3 @@ const SceneItems = observer(() => {
 		})}
 	</RisizibleFlexBox>;
 });
-
-const Button = (props: {
-  text: string;
-  action: () => void;
-  icon: ReactChild;
-}) => {
-	return <Tooltip title={props.text} arrow placement="bottom"
-		PopperProps={{ sx: { userSelect: 'none' } }}>
-		<IconButton size='small' aria-label={props.text} onClick={props.action}>
-			{props.icon}
-		</IconButton>
-	</Tooltip>;
-};

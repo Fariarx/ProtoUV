@@ -1,7 +1,12 @@
-import { Box,Divider,Grow,Input,Popper,Typography, capitalize } from '@mui/material';
+import { Box,Grow,Popper,Typography, capitalize } from '@mui/material';
+import { AiOutlineVerticalAlignBottom } from '@react-icons/all-files/ai/AiOutlineVerticalAlignBottom';
+import { BiReset } from '@react-icons/all-files/bi/BiReset';
 import { BsArrowsMove } from '@react-icons/all-files/bs/BsArrowsMove';
 import { FiCode } from '@react-icons/all-files/fi/FiCode';
 import { Md3DRotation } from '@react-icons/all-files/md/Md3DRotation';
+import { MdLockOpen } from '@react-icons/all-files/md/MdLockOpen';
+import { MdLockOutline } from '@react-icons/all-files/md/MdLockOutline';
+import { runInAction } from 'mobx';
 import { observer } from 'mobx-react';
 import { createRef, useState } from 'react';
 import { SceneObject } from 'renderer/Main/Scene/Entities/SceneObject';
@@ -11,12 +16,13 @@ import { Dispatch } from 'renderer/Shared/Events';
 import { EnumHelpers } from 'renderer/Shared/Helpers/Enum';
 import { flexChildrenCenter } from 'renderer/Shared/Styled/FlexBox';
 import { Sizes } from 'renderer/Shared/Styled/Sizes';
-import { MathUtils } from 'three';
+import { MathUtils, Vector3 } from 'three';
 import { Key } from 'ts-keycode-enum';
 import { container } from 'tsyringe';
-import { AppEventEnum, AppEventMoveObject, TransformEnum } from '../../../../Shared/Libs/Types';
-import { ToolButtonStyled } from '../Shared/ToolButton';
 import { TransformStore } from './TransformStore';
+import { AppEventEnum, AppEventMoveObject, TransformEnum } from '../../../../Shared/Libs/Types';
+import { ToolButton } from '../../ToolsRight/Supports/Shared/ToolButton';
+import { ToolButtonStyled } from '../Shared/ToolButton';
 
 const scale = 'scale(1.1)';
 
@@ -51,7 +57,8 @@ export const TransformApp = observer(() => {
 			sx={{ borderRadius: store.state === TransformEnum.Scale ? '0px 4px 4px 0px' : '0px 0px 2px 0px' }}>
 			<FiCode transform={scale}/>
 		</ToolButtonStyled>
-		<Popper open={!!store.anchorElement && store.state !== TransformEnum.None} anchorEl={store.anchorElement} placement='right-start'>
+		<Popper open={!!store.anchorElement && store.state !== TransformEnum.None} anchorEl={store.anchorElement}
+			placement='right-start' onResize={undefined} onResizeCapture={undefined}>
 			<Grow in>
 				<Box sx={{
 					borderRadius: Sizes.four,
@@ -143,6 +150,42 @@ const TransformPopperContent = observer(() => {
 						scene.transformControlsUpdate();
 						scene.transformControlsDragging({ value: false });
 					}}/>
+
+				<Box sx={{
+					display: 'flex',
+					gap: 0.5,
+					mt: '8px',
+				}}>
+					<ToolButton
+						text='auto align to plane'
+						isActive={store.alignToPlane}
+						onClick={() => {
+							runInAction(() => {
+								store.alignToPlane = !store.alignToPlane;
+							});
+						}}>
+						<AiOutlineVerticalAlignBottom color={colors.background.light}/>
+					</ToolButton>
+
+					<ToolButton
+						text='reset'
+						onClick={() => {
+							scene.transformControlsDragging({ value: true });
+
+							for (const sceneObject of scene.groupSelected) {
+								Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
+									from: sceneObject.mesh.position.clone(),
+									to: new Vector3(0, 0, 0),
+									sceneObject: sceneObject
+								} as AppEventMoveObject);
+							}
+
+							scene.transformControlsUpdate();
+							scene.transformControlsDragging({ value: false });
+						}}>
+						<BiReset color={colors.background.light}/>
+					</ToolButton>
+				</Box>
 			</>;
 			break;
 
@@ -205,6 +248,42 @@ const TransformPopperContent = observer(() => {
 						scene.transformControlsUpdate();
 						scene.transformControlsDragging({ value: false });
 					}}/>
+
+				<Box sx={{
+					display: 'flex',
+					gap: 0.5,
+					mt: '8px',
+				}}>
+					<ToolButton
+						text='auto align to plane'
+						isActive={store.alignToPlane}
+						onClick={() => {
+							runInAction(() => {
+								store.alignToPlane = !store.alignToPlane;
+							});
+						}}>
+						<AiOutlineVerticalAlignBottom color={colors.background.light}/>
+					</ToolButton>
+
+					<ToolButton
+						text='reset'
+						onClick={() => {
+							scene.transformControlsDragging({ value: true });
+
+							for (const sceneObject of scene.groupSelected) {
+								Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
+									from: sceneObject.mesh.rotation.clone(),
+									to: new Vector3(0, 0, 0),
+									sceneObject: sceneObject
+								} as AppEventMoveObject);
+							}
+
+							scene.transformControlsUpdate();
+							scene.transformControlsDragging({ value: false });
+						}}>
+						<BiReset color={colors.background.light}/>
+					</ToolButton>
+				</Box>
 			</>;
 			break;
 
@@ -271,6 +350,58 @@ const TransformPopperContent = observer(() => {
 						scene.transformControlsUpdate();
 						scene.transformControlsDragging({ value: false });
 					}}/>
+
+				<Box sx={{
+					display: 'flex',
+					gap: 0.5,
+					mt: '8px',
+				}}>
+					<ToolButton
+						text='fixed'
+						isActive={store.fixedScale}
+						onClick={() => {
+							runInAction(() => {
+								store.fixedScale = !store.fixedScale;
+							});
+						}}>
+						{store.fixedScale
+							? <MdLockOutline color={colors.background.light}/>
+							: <MdLockOpen color={colors.background.light}/>}
+					</ToolButton>
+
+					<ToolButton
+						text='auto align to plane'
+						isActive={store.alignToPlane}
+						onClick={() => {
+							runInAction(() => {
+								store.alignToPlane = !store.alignToPlane;
+							});
+						}}>
+						<AiOutlineVerticalAlignBottom color={colors.background.light}/>
+					</ToolButton>
+
+					<ToolButton
+						text='reset'
+						onClick={() => {
+							scene.transformControlsDragging({ value: true });
+
+							const mesh = scene.groupSelectedLast?.mesh;
+
+							const lock = store.fixedScale;
+							store.fixedScale = false;
+							Dispatch(AppEventEnum.TRANSFORM_OBJECT, {
+								from: mesh.scale.clone(),
+								to: new Vector3(1, 1, 1),
+								sceneObject: scene.groupSelectedLast
+							} as AppEventMoveObject);
+							store.fixedScale = lock;
+
+							scene.transformControlsUpdate();
+							scene.transformControlsDragging({ value: false });
+						}}>
+						<BiReset color={colors.background.light}/>
+					</ToolButton>
+				</Box>
 			</>;
 			break;
 	}
@@ -305,7 +436,8 @@ const TransformNumberValue = observer((props: {
 		display: 'flex',
 		justifyContent: 'space-between',
 		overflow: 'hidden',
-		marginTop: props.marginTop ? Sizes.four : 'unset'
+		marginTop: props.marginTop ? Sizes.four : 'unset',
+		backgroundColor: colors.background.dark,
 	}}>
 		<Box sx={{
 			width: Sizes.twentyFour,
@@ -339,6 +471,7 @@ const TransformNumberValue = observer((props: {
 				border: 'unset',
 				outline: 'unset',
 				marginLeft: '2px',
+				backgroundColor: colors.background.dark,
 			}}
 			ref={reference}
 			onChange={(e) => {

@@ -150,8 +150,9 @@ const createContactSphere = (
 		.deleteAttribute('uv')
 		.toNonIndexed();
 
-	const mesh = new Mesh( geometry, material );
+	const mesh = new Mesh(geometry, material);
 
+	mesh.frustumCulled = false;
 	mesh.position.set(positionStart.x, positionStart.y, positionStart.z);
 
 	return {

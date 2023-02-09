@@ -1,4 +1,4 @@
-import { Euler, Matrix4, Mesh, Vector3 } from 'three';
+import { Euler, Mesh, Vector3 } from 'three';
 import { SceneObject } from '../../Main/Scene/Entities/SceneObject';
 
 export enum AppEventEnum {

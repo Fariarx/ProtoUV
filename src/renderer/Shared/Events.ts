@@ -270,6 +270,17 @@ const objectTransform = (message: AppEvent, isReversed?: true) => {
 						mesh.scale.add(event.to as Vector3);
 					}
 					else {
+						if (AppStore.transform.fixedScale)
+						{
+							const change = (event.to.x - mesh.scale.x) +
+                (event.to.y - mesh.scale.y) +
+                (event.to.z - mesh.scale.z);
+
+							event.to.set(mesh.scale.x + change,
+								mesh.scale.y + change,
+								mesh.scale.z + change);
+						}
+
 						mesh.scale.set(event.to.x, event.to.y, event.to.z);
 					}
 					break;

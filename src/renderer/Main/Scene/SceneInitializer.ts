@@ -10,11 +10,12 @@ import {
 	Mesh,
 	Object3D,
 	OrthographicCamera,
+	PCFSoftShadowMap,
 	PerspectiveCamera,
 	Raycaster,
-	Vector3,
-	sRGBEncoding
+	Vector3, sRGBEncoding
 } from 'three';
+import { FlyControls } from 'three/examples/jsm/controls/FlyControls';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader';
@@ -65,6 +66,7 @@ export class SceneInitializer extends SceneBase {
 
 		this.renderer.localClippingEnabled = true;
 		this.renderer.shadowMap.enabled = true;
+		this.renderer.shadowMap.type = PCFSoftShadowMap;
 		this.renderer.outputEncoding = sRGBEncoding;
 
 		this.clippingPlaneMeshMin.rotateX(Math.PI / 2);
@@ -77,6 +79,7 @@ export class SceneInitializer extends SceneBase {
 		this.setupOrbitController();
 		this.setupTransformControls();
 		this.updateCameraType(config.scene.setStartupPerspectiveCamera, true);
+		this.setupFlyController();
 		this.updateWindowResize();
 		this.setupDropFile();
 		this.setupMouse();
@@ -138,7 +141,7 @@ export class SceneInitializer extends SceneBase {
 		this.lightFromCamera.castShadow = false;
 		this.lightGroup.attach( this.lightFromCamera );
 
-		const light1 = new AmbientLight( 0xffffff , 0.1); // soft white light
+		const light1 = new AmbientLight( 0xffffff , 0.2); // soft white light
 		this.lightGroup.attach( light1 );
 
 		this.lightShadow = new DirectionalLight(0xffffff, 0.3);
@@ -204,6 +207,54 @@ export class SceneInitializer extends SceneBase {
 		this.orbitControls.dampingFactor = 0.2;
 		this.orbitControls.update();
 		this.orbitControls.addEventListener( 'change', () => {
+			this.temp.wasChangeLook = true;
+			this.animate();
+		});
+	};
+	public setupFlyController = () => {
+		this.temp.wasChangeLook = false;
+
+		this.flyControlsPerspective = new FlyControls(this.perspectiveCamera, this.renderer.domElement);
+		this.flyControlsPerspective.movementSpeed = 5;
+		this.flyControlsPerspective.domElement = this.renderer.domElement;
+		this.flyControlsPerspective.rollSpeed = Math.PI / 12;
+		this.flyControlsPerspective.autoForward = false;
+		this.flyControlsPerspective.dragToLook = false;
+
+		this.flyControlsPerspective.addEventListener('change', () => {
+			this.temp.wasChangeLook = true;
+			this.animate();
+		});
+
+		SubscribersKeyPressed.push(() => {
+			if (isKeyPressed(Key.Tab))
+			{
+				this.controlsTypeFlyEnabled = !this.controlsTypeFlyEnabled;
+				this.animate();
+			}
+
+			if (!this.controlsTypeFlyEnabled)
+			{
+				return;
+			}
+			this.temp.wasChangeLook = true;
+			this.animate();
+		});
+		SubscribersMouseMove.push(() => {
+			if (!this.controlsTypeFlyEnabled)
+			{
+				return;
+			}
+
+			this.temp.wasChangeLook = true;
+			this.animate();
+		});
+		SubscribersMouseDown.push(() => {
+			if (!this.controlsTypeFlyEnabled)
+			{
+				return;
+			}
+
 			this.temp.wasChangeLook = true;
 			this.animate();
 		});
@@ -714,8 +765,8 @@ export class SceneInitializer extends SceneBase {
 	public clippingSomeShit = () => {
 		if (!this.clippingSceneWorking)
 		{
-			this.clippingReset();
 			this.clippingPlaneMeshMin.visible = false;
+			this.clippingReset();
 			this.materialsForScene.default.select.clippingPlanes = [];
 			this.materialsForScene.default.normal.clippingPlanes = [];
 			this.materialForSupports.normal.clippingPlanes = [];
@@ -723,7 +774,7 @@ export class SceneInitializer extends SceneBase {
 			return;
 		}
 		else {
-			this.clippingPlaneMeshMin.visible = true;
+			this.clippingPlaneMeshMin.visible = this.activeCamera instanceof OrthographicCamera;
 			this.materialsForScene.default.select.clippingPlanes = [this.clippingPlaneMin];
 			this.materialsForScene.default.normal.clippingPlanes = [this.clippingPlaneMin];
 			this.materialForSupports.normal.clippingPlanes = [this.clippingPlaneMin];
@@ -864,8 +915,26 @@ export class SceneInitializer extends SceneBase {
 
 			this.clippingSomeShit();
 
-			// if dumping enabled
-			this.orbitControls.update();
+			const delta = this.clock.getDelta();
+
+			if (this.controlsTypeFlyEnabled) {
+				this.orbitControls.enabled = false;
+				if (delta < 0.2) {
+					if (this.activeCamera instanceof OrthographicCamera)
+					{
+						AppStore.sceneStore.updateCameraType(true);
+					}
+
+					this.flyControlsPerspective.update(delta);
+				}
+			}
+			else {
+				this.orbitControls.enabled = true;
+				this.orbitControls.target.setY(0);
+
+				/*if dumping enabled*/
+				this.orbitControls.update();
+			}
 
 			if (this.orientationHelperOrthographic && this.orientationHelperPerspective)
 			{

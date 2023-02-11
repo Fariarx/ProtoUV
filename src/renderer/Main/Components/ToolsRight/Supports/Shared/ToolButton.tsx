@@ -8,6 +8,7 @@ export const ToolButton = (props: {
   onClick: () => void;
   text: string;
   placement?: string | any;
+  borderColor?: string;
 }) => {
 
 	return <Tooltip title={<span style={{ whiteSpace: 'pre-line' }}>{props.text}</span>} arrow placement={props.placement ?? 'bottom'}>
@@ -22,6 +23,7 @@ export const ToolButton = (props: {
 				justifyContent: 'center',
 				alignItems: 'center',
 				transition: 'all 0.4',
+				border: props.borderColor ? '1px solid ' + props.borderColor : 'unset',
 				':hover': {
 					backgroundColor: colors.background.darkest
 				},

@@ -1,4 +1,4 @@
-import { Autocomplete, IconButton, InputAdornment, Link, TextField } from '@mui/material';
+import { Autocomplete, IconButton, InputAdornment, TextField } from '@mui/material';
 import { MdNavigateNext } from '@react-icons/all-files/md/MdNavigateNext';
 import { observer } from 'mobx-react';
 import { useState } from 'react';
@@ -72,12 +72,7 @@ export const ConfiguratorAutoApp = observer(() => {
 								onBlur={() => setterFocus(false)}
 								error={!isValidPrinter() && !hasFocus}
 								helperText={<>
-                  Please select your printer or{' '}
-									<Link sx={{ cursor: 'pointer' }} onClick={() =>
-										AppStore.changeState(Pages.ConfiguratorManually)
-									}>
-                    create a new configuration
-									</Link>
+                  Please select your printer or select default configuration
 								</>}
 								InputProps={{
 									style: {

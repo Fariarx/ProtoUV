@@ -58,7 +58,8 @@ M18;`,
 				BottomExposureTime: 0,
 				LiftingHeight: 0,
 				LiftingSpeed: 0,
-				DelayTime: 0
+				DelayTime: 0,
+				BottomLiftingHeight: 0
 			};
 			this.SupportPreset = SupportPreset.Default();
 			this.SupportPresets = [this.SupportPreset];
@@ -108,7 +109,7 @@ M18;`,
 			}
 
 			bridge.fs.writeFileSync(bridge.userData() + Printer.CHANGED_DIR +
-        _default.versionPrinterConfigs + '\\' + config.Name + '.json',
+        _default.versionPrinterConfigs + '\\' + config.Name + ' Manually.json',
 			JSON.stringify(config),{ encoding:'utf8',flag:'w' });
 			return true;
 		}
@@ -164,21 +165,21 @@ M18;`,
 		let _changed;
 
 		try {
-			_changed = filesNormalize(bridge.fs.readdirSync(Printer.CONFIG_DIR));
+			_changed = filesNormalize(bridge.fs.readdirSync(bridge.userData() + Printer.CHANGED_DIR + _default.versionPrinterConfigs));
 		} catch (e) {
 			Log('Error read config files: ' + e);
 		}
 
-		let _default;
+		let _default2;
 
 		try {
-			_default = filesNormalize(bridge.fs.readdirSync(Printer.CONFIG_DIR));
+			_default2 = filesNormalize(bridge.fs.readdirSync(Printer.CONFIG_DIR));
 		} catch (e) {
 			Log('Error read config files: ' + e);
 		}
 
 		return {
-			default: _default ?? [],
+			default: _default2 ?? [],
 			changed: _changed ?? []
 		};
 	};
@@ -208,6 +209,7 @@ export type PrintSettings = {
   ExposureTime: number;
   ExposureIndent: number;
   BottomExposureTime: number;
+  BottomLiftingHeight: number;
   LiftingHeight: number;
   LiftingSpeed: number;
   DelayTime: number;

@@ -1,12 +1,11 @@
 import { Box, Grid, Grow, Tooltip, Typography } from '@mui/material';
-import _, { debounce } from 'lodash';
 import { observer } from 'mobx-react';
 import { createRef, useState } from 'react';
-import { AppStore } from '../../../AppStore';
-import { colors, config } from '../../../Shared/Config';
-import { flexChildrenCenter } from '../../../Shared/Styled/FlexBox';
-import { Sizes } from '../../../Shared/Styled/Sizes';
-import { Printer } from '../../Printer/Configs/Printer';
+import { AppStore } from '../../../../AppStore';
+import { colors, config } from '../../../../Shared/Config';
+import { flexChildrenCenter } from '../../../../Shared/Styled/FlexBox';
+import { Sizes } from '../../../../Shared/Styled/Sizes';
+import { Printer } from '../../../Printer/Configs/Printer';
 
 export const SupportEditorApp = observer(() => {
 	if (!AppStore.sceneStore.isOpenSupportEditor)
@@ -16,10 +15,9 @@ export const SupportEditorApp = observer(() => {
 
 	const printer = AppStore.sceneStore.printer!;
 	const preset = printer.SupportPreset;
-	const save = debounce(() => Printer.SaveToFile(printer), 5000);
 	const close = () => {
 		AppStore.sceneStore.isOpenSupportEditor = false;
-		save();
+		Printer.SaveToFile(printer);
 	};
 
 	return <Box onClick={close} sx={{
@@ -102,13 +100,13 @@ export const Value = observer((props: {
   value: number | string;
   updateValue: (value: number | string) => void;
 }) => {
-	const isValueAsString = props.description.type !== 'string';
+	const isValueAsString = props.description.type === 'string';
 	const reference = useState(createRef<HTMLInputElement>())[0];
 	const sharpness = Math.log10(config.scene.sharpness) * -1;
 
-	const defaultValue = isValueAsString
+	const defaultValue = isValueAsString === false
 		? props.description.type === 'int'
-			? props.value.toString()
+			? parseInt(props.value + '').toString()
 			: parseFloat(props.value + '').toFixed(sharpness)
 		: props.value as string;
 
@@ -157,17 +155,15 @@ export const Value = observer((props: {
 				}}
 				ref={reference}
 				onChange={(e) => {
+					console.log(e.target.value, props, 2, isValueAsString, props.description.type !== 'string');
 					if (isValueAsString)
 					{
 						setChanging(e.target.value);
 						props.updateValue(e.target.value);
+						console.log(e.target.value, 1);
 					}
 					else {
-						let value = e.target.value.replace(',', '.');
-						if (!value.includes('.'))
-						{
-							value += '.0';
-						}
+						const value = e.target.value.replace(',', '.');
 
 						let number = props.description.type === 'int'
 							? Math.round(parseInt(value))
@@ -200,7 +196,7 @@ export const Value = observer((props: {
 					}
 				}}/>
 			{props.description.textend && <Box sx={{
-				width: Sizes.sum(Sizes.twentyFour, Sizes.eight),
+				width: 'fit-content', pl: 0.75, pr: 0.75,
 				backgroundColor: props.color,
 				display: 'flex',
 				...flexChildrenCenter
@@ -334,7 +330,7 @@ public Name: string,
   public Lifting: number,
 */
 
-type DescriptionRow = {
+export type DescriptionRow = {
   name: string;
   textend?: string;
   description?: string;

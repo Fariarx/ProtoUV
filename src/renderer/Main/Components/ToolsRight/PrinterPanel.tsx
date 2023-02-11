@@ -1,4 +1,5 @@
 import { Box, Typography } from '@mui/material';
+import { HiSwitchHorizontal } from '@react-icons/all-files/hi/HiSwitchHorizontal';
 import { MdEdit } from '@react-icons/all-files/md/MdEdit';
 import { observer } from 'mobx-react-lite';
 import { AppStore, Pages } from 'renderer/AppStore';
@@ -34,9 +35,17 @@ export const PrinterPanel = observer(() => {
 			<ToolButton
 				text='edit printer'
 				isActive={false}
-				placement='left'
-				onClick={() => AppStore.changeState(Pages.Configurator)}>
+				placement='bottom'
+				borderColor={AppStore.sceneStore.printer?.Name === 'Default Printer' ? colors.interact.warning : undefined}
+				onClick={() => AppStore.sceneStore.isOpenPrinterEditor = true}>
 				<MdEdit transform='scale(1.1)' color={colors.background.light}/>
+			</ToolButton>
+			<ToolButton
+				text='change printer'
+				isActive={false}
+				placement='bottom'
+				onClick={() => AppStore.changeState(Pages.Configurator)}>
+				<HiSwitchHorizontal transform='scale(1.1)' color={colors.background.light}/>
 			</ToolButton>
 		</Box>
 	</Box>;

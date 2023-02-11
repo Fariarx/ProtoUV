@@ -13,6 +13,7 @@
     "BottomLayers": 6,
     "ExposureIndent": 0,
     "ExposureTime": 7,
+    "BottomLiftingHeight": 5,
     "BottomExposureTime": 75,
     "AdditionalExposureOn": true,
     "AdditionalExposureTime": 20,

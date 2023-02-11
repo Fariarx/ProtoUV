@@ -2,7 +2,7 @@ import { observable } from 'mobx';
 import { Restore } from './Libs/Restore';
 
 export const _default = {
-	version: 44,
+	version: 50,
 	versionPrinterConfigs: 0,
 	settings: {
 		ui: {

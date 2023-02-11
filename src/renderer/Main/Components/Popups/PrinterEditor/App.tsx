@@ -15,9 +15,14 @@ export const PrinterEditorApp = observer(() => {
 	const printer = AppStore.sceneStore.printer!;
 
 	const close = () => {
+		if (!AppStore.sceneStore.printerName.includes('Manually'))
+		{
+			AppStore.sceneStore.printerName += ' Manually';
+      AppStore.sceneStore.printer!.Name += ' Manually';
+		}
+		config.printerName = AppStore.sceneStore.printerName;
 		AppStore.sceneStore.isOpenPrinterEditor = false;
 		Printer.SaveToFile(printer);
-		config.printerName = AppStore.sceneStore.printerName;
 		saveConfig();
 	};
 

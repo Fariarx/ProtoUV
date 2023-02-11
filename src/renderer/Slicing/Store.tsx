@@ -50,6 +50,7 @@ export class SlicingStore {
 	};
 
 	public finalize = (saveAutomatically: boolean, isSave: boolean) => {
+		console.log('finalize');
 		bridge.ipcRenderer.send('sliced-finalize' + (isSave ? '-save': ''),
 			this.gcode, bridge.assetsPath() + config.pathToUVTools, AppStore.sceneStore.printer!.Export.Encoder,
       AppStore.sceneStore.printer!.Export.Extencion, AppStore.sceneStore.objects[0].name,
@@ -198,6 +199,7 @@ export class SlicingStore {
 		};
 
 		const task = new Promise(resolve => {
+			let workersCount = 0;
 			let workersCountDone = 0;
 			let workerJob = [];
 			while (arrangeJobByWorker.length)
@@ -209,12 +211,13 @@ export class SlicingStore {
 				{
 					workerSpawn(workerJob).then(() => {
 						workersCountDone++;
-						if (workersCountDone >= config.workerCount)
+						if (workersCountDone >= workersCount)
 						{
 							resolve(true);
 						}
 					});
 					workerJob = [];
+					workersCount++;
 				}
 			}
 		});

@@ -166,8 +166,10 @@ const createWindow = async () => {
 		gcode: string, pathToUVTools: string,
 		encoder: string, extencion: string
 	) => {
+		console.log(1);
 		setTimeout(() => {
 			try {
+				console.log(2);
 				zip.addFile('run.gcode', gcode, 'utf8');
 
 				if (fs.existsSync(userData + '/target.zip'))
@@ -179,12 +181,14 @@ const createWindow = async () => {
 					fs.rmSync(userData + '\\target.' + extencion);
 				}
 
+				console.log(3);
 				zip.writeZip(userData + '/target.zip');
 
 				const child = child_process.execFile;
 				const executablePath = pathToUVTools;
 				const parameters = ['convert', userData + '\\target.zip', encoder, userData + '\\target.' + extencion];
 
+				console.log(4);
 				const _process = child(executablePath, parameters);
 
         _process.stdout!.on('data', (data) => {
@@ -195,6 +199,7 @@ const createWindow = async () => {
         	console.error(`stderr: ${data}`);
         });
         _process.on('close', (code) => {
+        	console.log(5);
         	if (code === 1) {
         		mainWindow?.webContents.send('sliced-finalize-result', 'done');
         	}
@@ -205,9 +210,11 @@ const createWindow = async () => {
 			}
 			catch (e)
 			{
+				console.log(6);
 				mainWindow?.webContents.send('sliced-finalize-result', 'finalize error: ' + e);
 			}
 		}, 5000);
+		console.log(7);
 	});
 	ipcMain.on('sliced-finalize-save', (_, __: string, ___: string,
 		encoder: string, extencion: string, fileNameToSave: string, filePath: string,

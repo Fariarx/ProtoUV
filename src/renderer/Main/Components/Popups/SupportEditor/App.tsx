@@ -161,16 +161,13 @@ export const Value = observer((props: {
 						props.updateValue(e.target.value);
 					}
 					else {
-						console.log(1);
 						const value = e.target.value.replace(',', '.');
 
 						let number = props.description.type === 'int'
 							? Math.round(parseInt(value))
 							: parseFloat(value);
 
-						console.log(2, number);
 						if (number || number === 0) {
-							console.log(3);
 							if (props.description.maxNumber !== undefined)
 							{
 								if (number > props.description.maxNumber)

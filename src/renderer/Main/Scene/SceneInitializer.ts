@@ -137,7 +137,7 @@ export class SceneInitializer extends SceneBase {
 	};
 	private setupLight = () => {
 		this.lightGroup = new Group();
-		this.lightFromCamera = new DirectionalLight('#0xffffff', 0.6);
+		this.lightFromCamera = new DirectionalLight('#0xffffff', 0.5);
 		this.lightFromCamera.castShadow = false;
 		this.lightGroup.attach( this.lightFromCamera );
 

@@ -41,7 +41,7 @@ export const HeaderApp = observer(() => {
 		}}>
 			<FlexBoxRowFit>
 				<Typography variant={'subtitle2'} sx={{
-					marginTop: Sizes.three,
+					marginTop: '2.5px',
 					marginLeft: Sizes.eight,
 					color: colors.background.white,
 					textShadow: '1px 1px 2px ' + colors.logo.main

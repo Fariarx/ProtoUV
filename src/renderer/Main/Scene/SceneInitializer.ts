@@ -137,7 +137,7 @@ export class SceneInitializer extends SceneBase {
 	};
 	private setupLight = () => {
 		this.lightGroup = new Group();
-		this.lightFromCamera = new DirectionalLight('#0xffffff', 0.7);
+		this.lightFromCamera = new DirectionalLight('#0xffffff', 0.6);
 		this.lightFromCamera.castShadow = false;
 		this.lightGroup.attach( this.lightFromCamera );
 
@@ -960,7 +960,7 @@ export class SceneInitializer extends SceneBase {
 
 			if (lookAt)
 			{
-				this.lightFromCamera.lookAt(lookAt.center);
+				this.lightFromCamera.target.position.set(lookAt.center.x, lookAt.center.y, lookAt.center.z);
 			}
 
 			if (this.activeCamera.position.y >= 0)

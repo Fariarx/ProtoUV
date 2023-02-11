@@ -155,7 +155,6 @@ export const Value = observer((props: {
 				}}
 				ref={reference}
 				onChange={(e) => {
-					console.log(e.target.value, props, 2, isValueAsString, props.description.type !== 'string');
 					if (isValueAsString)
 					{
 						setChanging(e.target.value);

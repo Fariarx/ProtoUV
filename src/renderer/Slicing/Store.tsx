@@ -110,9 +110,13 @@ export class SlicingStore {
 					isAdditionalLight: true
 				});
 
+				const isBottomLayer = printer.PrintSettings.BottomLayers >= this.sliceCount / 2;
+
 				this.gcode += '\n\n' + printer.GCode.ShowImage.replace('*x', (this.sliceCount + 1).toString());
 				this.gcode += '\n' + printer.GCode.MoveTo
-					.replace('*x', (moveTo + printer.PrintSettings.LiftingHeight).toFixed(sharpness))
+					.replace('*x', (moveTo + (isBottomLayer
+						? printer.PrintSettings.BottomLiftingHeight
+						: printer.PrintSettings.LiftingHeight)).toFixed(sharpness))
 					.replace('*y', printer.PrintSettings.LiftingSpeed.toString());
 				this.gcode += '\n' + printer.GCode.MoveTo
 					.replace('*x', (moveTo).toFixed(sharpness))
@@ -121,7 +125,7 @@ export class SlicingStore {
 					.replace('*x', (printer.PrintSettings.DelayTime*1000).toString());
 				this.gcode += '\n' + printer.GCode.LightOn;
 				this.gcode += '\n' + printer.GCode.Delay
-					.replace('*x', (printer.PrintSettings.BottomLayers >= this.sliceCount / 2
+					.replace('*x', ( isBottomLayer
 						? printer.PrintSettings.BottomExposureTime * 1000
 						: printer.PrintSettings.ExposureTime * 1000)
 						.toString());

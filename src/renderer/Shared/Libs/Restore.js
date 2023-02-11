@@ -41,9 +41,7 @@ const parseDataFile = (filePath, defaults) => {
 		if(defaults.version && parsed.version !== defaults.version)
 		{
 			return {
-				...defaults,
-				...parsed,
-				version: defaults.version
+				...defaults
 			};
 		}
 

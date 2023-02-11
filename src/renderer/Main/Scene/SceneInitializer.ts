@@ -930,7 +930,6 @@ export class SceneInitializer extends SceneBase {
 			}
 			else {
 				this.orbitControls.enabled = true;
-				this.orbitControls.target.setY(0);
 
 				/*if dumping enabled*/
 				this.orbitControls.update();

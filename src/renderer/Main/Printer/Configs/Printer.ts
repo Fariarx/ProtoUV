@@ -54,6 +54,7 @@ M18;`,
 				LayerHeight: 0,
 				BottomLayers: 0,
 				ExposureTime: 0,
+				ExposureIndent: 0,
 				BottomExposureTime: 0,
 				LiftingHeight: 0,
 				LiftingSpeed: 0,
@@ -205,6 +206,7 @@ export type PrintSettings = {
   LayerHeight: number;
   BottomLayers: number;
   ExposureTime: number;
+  ExposureIndent: number;
   BottomExposureTime: number;
   LiftingHeight: number;
   LiftingSpeed: number;

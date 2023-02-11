@@ -11,6 +11,7 @@
   "PrintSettings": {
     "LayerHeight": 0.04,
     "BottomLayers": 6,
+    "ExposureIndent": 0,
     "ExposureTime": 7,
     "BottomExposureTime": 75,
     "LiftingHeight": 3.5,

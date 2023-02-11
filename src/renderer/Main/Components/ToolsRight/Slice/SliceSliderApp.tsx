@@ -23,7 +23,7 @@ export const SliceSliderApp = observer(() => {
 		<SliceSlider
 			sx={{
 				height:'100%',
-				opacity: 0.4,
+				opacity: 0.2,
 				transition: '1s all',
 				':active': {
 					opacity: config.ui.opacity

@@ -25,7 +25,10 @@ import {
 	Vector3,
 	WebGLRenderer
 } from 'three';
-import { LinearEncoding, NotEqualDepth } from 'three/src/constants';
+import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial';
+import { LineSegments2 } from 'three/examples/jsm/lines/LineSegments2';
+import { LineSegmentsGeometry } from 'three/examples/jsm/lines/LineSegmentsGeometry';
+import { LinearEncoding } from 'three/src/constants';
 import { CONTAINED, MeshBVH } from 'three-mesh-bvh';
 import { SliceWorker } from '../renderer/Slicing/SlicingStore';
 
@@ -38,11 +41,6 @@ const clippingPlaneMeshMin = new THREE.Mesh( new THREE.PlaneBufferGeometry(),
 		color: clippingInnerColor,	side: BackSide,
 		transparent: true,
 		stencilWrite: true,
-		depthTest: true,
-		depthWrite: true,
-		depthFunc: NotEqualDepth,
-		reflectivity: 0,
-		stencilRef: 0,
 		stencilFunc: THREE.NotEqualStencilFunc,
 		stencilFail: THREE.ReplaceStencilOp,
 		stencilZFail: THREE.ReplaceStencilOp,
@@ -50,10 +48,11 @@ const clippingPlaneMeshMin = new THREE.Mesh( new THREE.PlaneBufferGeometry(),
 	}));
 
 clippingPlaneMeshMin.rotateX(Math.PI / 2);
-clippingPlaneMeshMin.renderOrder = 2;
 scene.add(clippingPlaneMeshMin);
 clippingPlaneMeshMin.visible = true;
 clippingPlaneMeshMin.scale.setScalar(1000000);
+
+const geometry = new LineSegmentsGeometry();
 
 onmessage = function (oEvent) {
 	const data = oEvent.data as SliceWorker;
@@ -72,6 +71,11 @@ onmessage = function (oEvent) {
 	stencilRenderer.setClearColor(0x000000);
 	stencilRenderer.setSize(data.printer.Resolution.X,data.printer.Resolution.Y,false);
 
+	stencilRenderer.autoClear = false;
+	stencilRenderer.autoClearColor = false;
+	stencilRenderer.autoClearDepth = false;
+	stencilRenderer.autoClearStencil = false;
+
 	const sliceOrthographicCamera = new OrthographicCamera(
 		sizeXZ.x / - 2,
 		sizeXZ.x / 2,
@@ -79,9 +83,19 @@ onmessage = function (oEvent) {
 		sizeXZ.y / - 2,
 		0.0001,
 	);
+	sliceOrthographicCamera.layers.enable(1);
+
+	const matLine = new LineMaterial( {
+		color: 0x0,
+		linewidth: data.printer.PrintSettings.ExposureIndent / 1000,
+		depthTest: false
+	});
+
+	const line = new LineSegments2( geometry, matLine );
+	line.layers.set(1);
+	scene.add( line );
 
 	const groupClipping = CreateClipping((group.children[0] as Mesh).geometry);
-
 	scene.add(groupClipping.group);
 
 	const updateClipping = (clippingPercent: number) => {
@@ -162,6 +176,10 @@ onmessage = function (oEvent) {
     groupClipping.outlineLines!.position.copy(clippingPlaneMin.normal ).multiplyScalar( - 0.00001 );
 
     posAttr.needsUpdate = true;
+
+    geometry.fromLineSegments(groupClipping.outlineLines!);
+    geometry   .setDrawRange( 0, index );
+
 	};
 
 	const next = () => new Promise(resolve => {
@@ -179,9 +197,20 @@ onmessage = function (oEvent) {
 		updateClipping(layer.percent);
 
 		stencilRenderer.clearDepth();
+		stencilRenderer.clearColor();
+		stencilRenderer.clearStencil();
+
 		sliceOrthographicCamera.position.set(data.gridSize.x/2, data.gridSize.y + 1, data.gridSize.z/2);
 		sliceOrthographicCamera.lookAt(data.gridSize.x/2, 0, data.gridSize.z/2);
+
+		clippingPlaneMeshMin.visible = true;
 		stencilRenderer.render(scene, sliceOrthographicCamera);
+
+		if (layer.isAdditionalLight && data.printer.PrintSettings.ExposureIndent > 0)
+		{
+			clippingPlaneMeshMin.visible = false;
+			stencilRenderer.render(scene, sliceOrthographicCamera);
+		}
 
 		(data.canvas as any).convertToBlob().then((blob: Blob) => {
 			reader.readAsDataURL(blob);
@@ -192,6 +221,7 @@ onmessage = function (oEvent) {
 					layer: layer,
 					reminder: data.layers.length
 				});
+
 				next().then(_ => {
 					resolve(false);
 				});
@@ -220,9 +250,7 @@ const CreateClipping = (geometry: BufferGeometry) => {
 	linePosAttr.setUsage( DynamicDrawUsage );
 	lineGeometry.setAttribute( 'position', linePosAttr );
 	const clippingLineMin = new  LineSegments( lineGeometry, new LineBasicMaterial() );
-	clippingLineMin.material.color.set( '#ffffff' ).convertSRGBToLinear();
-	clippingLineMin.frustumCulled = false;
-	clippingLineMin.renderOrder = 3;
+	clippingLineMin.visible = false;
 
 	clippingLineMin.scale.copy( frontSideModel.scale );
 	clippingLineMin.position.set( 0, 0, 0 );

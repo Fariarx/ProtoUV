@@ -1,3 +1,4 @@
+import AdmZip from 'adm-zip';
 import archiver from 'archiver';
 import axios from 'axios';
 import child_process from 'child_process';
@@ -151,29 +152,35 @@ const createWindow = async () => {
 		return { action: 'deny' };
 	});
 
+	let zip: AdmZip | undefined;
+
 	ipcMain.on('prepare-to-slicing', () => {
-		if (fs.existsSync(userData + '/slicing'))
-		{
-			fs.rmSync(userData + '/slicing', { recursive: true, force: true });
-		}
-		fs.mkdirSync(userData + '/slicing');
+		zip = new AdmZip();
+
 		mainWindow?.webContents.send('prepare-to-slicing');
 	});
 	ipcMain.on('sliced-layer-save', (_, screenshot: string, path: string) => {
-		fs.writeFileSync(userData + '/slicing/' + path, atob(screenshot), 'binary' );
+		zip.addFile(path, Buffer.from(atob(screenshot), 'ascii'));
 	});
 	ipcMain.on('sliced-finalize', (_,
 		gcode: string, pathToUVTools: string,
 		encoder: string, extencion: string
 	) => {
-		try {
-			fs.writeFileSync(userData + '/slicing/run.gcode', gcode);
+		setTimeout(() => {
+			try {
+				zip.addFile('run.gcode', gcode, 'utf8');
 
-			const output = fs.createWriteStream(userData + '/target.zip');
-			const archive = archiver('zip');
-			archive.pipe(output);
-			archive.directory(userData + '/slicing', false);
-			archive.finalize().then(() => {
+				if (fs.existsSync(userData + '/target.zip'))
+				{
+					fs.rmSync(userData + '/target.zip');
+				}
+				if (fs.existsSync(userData + '\\target.' + extencion))
+				{
+					fs.rmSync(userData + '\\target.' + extencion);
+				}
+
+				zip.writeZip(userData + '/target.zip');
+
 				const child = child_process.execFile;
 				const executablePath = pathToUVTools;
 				const parameters = ['convert', userData + '\\target.zip', encoder, userData + '\\target.' + extencion];
@@ -195,12 +202,12 @@ const createWindow = async () => {
         		mainWindow?.webContents.send('sliced-finalize-result', 'error code from uvtools: ' + code);
         	}
         });
-			});
-		}
-		catch (e)
-		{
-			mainWindow?.webContents.send('sliced-finalize-result', 'finalize error: ' + e);
-		}
+			}
+			catch (e)
+			{
+				mainWindow?.webContents.send('sliced-finalize-result', 'finalize error: ' + e);
+			}
+		}, 5000);
 	});
 	ipcMain.on('sliced-finalize-save', (_, __: string, ___: string,
 		encoder: string, extencion: string, fileNameToSave: string, filePath: string,

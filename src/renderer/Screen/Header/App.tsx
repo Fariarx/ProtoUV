@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { Box, ButtonGroup, Divider, IconButton, MenuItem, SvgIcon, Typography, styled } from '@mui/material';
+import { Box, ButtonGroup, IconButton, MenuItem, Typography, styled } from '@mui/material';
 import { VscChromeClose } from '@react-icons/all-files/vsc/VscChromeClose';
 import { VscChromeMaximize } from '@react-icons/all-files/vsc/VscChromeMaximize';
 import { VscChromeMinimize } from '@react-icons/all-files/vsc/VscChromeMinimize';
@@ -9,7 +9,7 @@ import { container } from 'tsyringe';
 import { BindItem, HeaderStore } from './Store';
 import { AppStore, Pages } from '../../AppStore';
 import { colors } from '../../Shared/Config';
-import { AppLink, AppVersion, bridge } from '../../Shared/Globals';
+import { AppLink, bridge } from '../../Shared/Globals';
 import logo1 from '../../Shared/Image/uv128_v1.png';
 import { linearGenerator } from '../../Shared/Libs/Tools';
 import { AnimationGrow } from '../../Shared/Styled/Animation';
@@ -28,7 +28,8 @@ export const HeaderApp = observer(() => {
 		height: APP_HEADER_HEIGHT_PX,
 		background: colors.background.dark,
 		position: 'absolute',
-		borderBottom: '1px solid ' + colors.background.darkest
+		borderBottom: '1px solid ' + colors.background.darkest,
+		zIndex: '999999999'
 	}}>
 		<Box sx={{
 			width: '100%',

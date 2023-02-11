@@ -138,11 +138,14 @@ export abstract class SceneBase {
 
 	public stats = Stats();
 
+  @observable
 	public printerName: string = config.printerName;
-	public printer?: Printer;
+
+  @observable
+  public printer?: Printer;
 
 	@observable
-	public scene: Scene = new Scene();
+  public scene: Scene = new Scene();
 
 	@observable
 	public groupSelected: SceneObject[] = [];
@@ -179,6 +182,7 @@ export abstract class SceneBase {
 
   @observable
 	public controlsTypeFlyEnabled = false;
+
   @observable
   public isOpenSupportEditor = false;
 

@@ -76,7 +76,9 @@ export const App = observer(() => {
 			<ToolButton
 				text='edit supports preset'
 				isActive={false}
-				onClick={() => AppStore.changeState( Pages.ConfiguratorSupports)}>
+				onClick={() => {
+					AppStore.sceneStore.isOpenSupportEditor = true;
+				}}>
 				<BiEditAlt transform='scale(1.1)' color={colors.background.light}/>
 			</ToolButton>
 		</Box>

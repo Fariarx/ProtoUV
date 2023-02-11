@@ -12,6 +12,7 @@ import { ConfiguratorManuallyApp } from './Configurator/AppManually';
 import { DragAndDropApp } from './Main/Components/DragAndDrop/App';
 import { FlyModeDescriptionApp } from './Main/Components/Shared/FlyModeDescriptionApp';
 import { SliceButton } from './Main/Components/Slice/SliceButton';
+import { SupportEditorApp } from './Main/Components/SupportEditor/App';
 import { ToolsLeftApp } from './Main/Components/ToolsLeft/App';
 import { ToolsRightApp } from './Main/Components/ToolsRight/App';
 import { SupportsRemoveCircleApp } from './Main/Components/ToolsRight/Supports/Shared/SupportsRemoveCircleApp';
@@ -44,6 +45,7 @@ const Main = observer(() => {
 
 			<AnimationFade in={AppStore.getState() === Pages.Main}>
 				<FlexBoxRow>
+					<SupportEditorApp/>
 					<FlyModeDescriptionApp/>
 					<FlexBoxRow>
 						<SceneApp/>

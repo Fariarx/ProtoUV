@@ -54,7 +54,7 @@ const SceneItems = observer(() => {
 	return <RisizibleFlexBox flexBoxProps={{
 		sx: {
 			width: '100%',
-			minHeight: '150px',
+			minHeight: '100px',
 			maxHeight: '40%',
 			height: config.ui.sizes.sceneItemList + 'px',
 			backgroundColor: colors.background.dark,

@@ -42,7 +42,8 @@ export const RisizibleFlexBox = (props: {
 		(ref?.current as any).addEventListener('resize', (event: any) => props.onResize(event.detail.width, event.detail.height));
 		const observer = new MutationObserver(checkResize);
 		observer.observe(ref?.current as any, { attributes: true, attributeOldValue: true, attributeFilter: ['style'] });
-	}, [ref]);
+	}, []);
+
 	const checkResize = (mutations: any) => {
 		const el = mutations[0].target;
 		const w = el.clientWidth;

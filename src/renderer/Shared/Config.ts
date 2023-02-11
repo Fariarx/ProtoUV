@@ -9,7 +9,7 @@ export const _default = {
 			opacity: 0.8,
 			sizes: {
 				toolsTab: 200,
-				sceneItemList: 200
+				sceneItemList: 150
 			}
 		},
 		scene:{

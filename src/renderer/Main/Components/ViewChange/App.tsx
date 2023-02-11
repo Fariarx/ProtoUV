@@ -1,12 +1,12 @@
 import { Box } from '@mui/material';
 import { observer } from 'mobx-react-lite';
 import { container } from 'tsyringe';
-import { CameraTypeApp } from './CameraTypeApp';
-import { FlyModeApp } from './FlyModeApp';
-import { LockLookAtCenterApp } from './LockLookAtCenterApp';
-import { APP_HEADER_HEIGHT_PX } from '../../../HeaderApp';
+import { CameraTypeApp } from './CameraType/App';
+import { LockLookAtCenterApp } from './LockLookAtCenter/App';
+import { APP_HEADER_HEIGHT_PX } from '../../../Screen/Header/App';
 import { Sizes } from '../../../Shared/Styled/Sizes';
-import { ToolsRightStore } from '../ToolsRight/ToolsRightStore';
+import { FlyModeDescriptionApp } from '../Shared/FlyModeDescriptionApp';
+import { ToolsRightStore } from '../ToolsRight/Store';
 
 export const ViewChangeApp = observer(() => {
 	return <Box sx={{
@@ -15,7 +15,7 @@ export const ViewChangeApp = observer(() => {
 		position: 'absolute',
 	}}>
 		<LockLookAtCenterApp/>
-		<FlyModeApp/>
+		<FlyModeDescriptionApp/>
 		<CameraTypeApp/>
 	</Box>;
 });

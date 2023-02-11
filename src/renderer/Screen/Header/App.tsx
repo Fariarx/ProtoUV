@@ -6,16 +6,16 @@ import { VscChromeMinimize } from '@react-icons/all-files/vsc/VscChromeMinimize'
 import { observer } from 'mobx-react';
 import React from 'react';
 import { container } from 'tsyringe';
-import { AppStore, Pages } from './AppStore';
-import { BindItem, HeaderStore } from './HeaderStore';
-import { colors } from './Shared/Config';
-import { AppLink, AppVersion, bridge } from './Shared/Globals';
-import logo1 from './Shared/Image/uv128_v1.png';
-import { linearGenerator } from './Shared/Libs/Tools';
-import { AnimationGrow } from './Shared/Styled/Animation';
-import { FlexBoxRow, FlexBoxRowFit } from './Shared/Styled/FlexBox';
-import { Sizes } from './Shared/Styled/Sizes';
-import { StyledMenu } from './Shared/Styled/StyledMenu';
+import { BindItem, HeaderStore } from './Store';
+import { AppStore, Pages } from '../../AppStore';
+import { colors } from '../../Shared/Config';
+import { AppLink, AppVersion, bridge } from '../../Shared/Globals';
+import logo1 from '../../Shared/Image/uv128_v1.png';
+import { linearGenerator } from '../../Shared/Libs/Tools';
+import { AnimationGrow } from '../../Shared/Styled/Animation';
+import { FlexBoxRow, FlexBoxRowFit } from '../../Shared/Styled/FlexBox';
+import { Sizes } from '../../Shared/Styled/Sizes';
+import { StyledMenu } from '../../Shared/Styled/StyledMenu';
 
 export const APP_HEADER_HEIGHT = 26;
 export const APP_HEADER_HEIGHT_PX = APP_HEADER_HEIGHT + 'px';

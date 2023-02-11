@@ -33,7 +33,7 @@ import { MeshBVH } from 'three-mesh-bvh';
 
 import { AppStore } from '../../../AppStore';
 import { Dispatch } from '../../../Shared/Events';
-import { SceneStore } from '../SceneStore';
+import { SceneStore } from '../Store';
 
 export class SceneObject {
 	name: string;

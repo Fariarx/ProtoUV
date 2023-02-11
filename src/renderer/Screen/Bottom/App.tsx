@@ -1,11 +1,11 @@
 import { Box, Tooltip, Typography } from '@mui/material';
 import { observer } from 'mobx-react';
 import React from 'react';
-import { AppStore } from './AppStore';
-import { colors } from './Shared/Config';
-import {  AppLinkReleases, AppVersion, bridge } from './Shared/Globals';
-import { FlexBoxColumn, FlexBoxRow } from './Shared/Styled/FlexBox';
-import { Sizes } from './Shared/Styled/Sizes';
+import { AppStore } from '../../AppStore';
+import { colors } from '../../Shared/Config';
+import {  AppLinkReleases, AppVersion, bridge } from '../../Shared/Globals';
+import { FlexBoxColumn, FlexBoxRow } from '../../Shared/Styled/FlexBox';
+import { Sizes } from '../../Shared/Styled/Sizes';
 
 export const APP_BOTTOM_HEIGHT = 24;
 export const APP_BOTTOM_HEIGHT_PX =  Sizes.twentyFour;
@@ -49,16 +49,15 @@ export const LineBottomApp = observer(() => {
 			borderTop: '1px solid ' + colors.background.darkest
 		}}>
 			{!!AppStore.instance.newVersion && !AppStore.instance.newVersion.includes(AppVersion) &&
-      <img src={`data:image/svg+xml;base64,${
-      	btoa(unescape(encodeURIComponent(AppStore.instance.newVersion)))}`
-      } alt="" style={{
-      	height: '18px',
-      	alignSelf: 'center',
-      	justifySelf: 'center',
-      	marginRight: '12px',
-      	marginBottom: '2px'
-      }}
-      onClick={() => bridge.shell.openExternal(AppLinkReleases)}/>}
+      <img src={`data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(AppStore.instance.newVersion)))}`} alt=""
+      	style={{
+				  height: '18px',
+				  alignSelf: 'center',
+				  justifySelf: 'center',
+				  marginRight: '12px',
+				  marginBottom: '2px'
+      	}}
+      	onClick={() => bridge.shell.openExternal(AppLinkReleases)}/>}
 			<Text>
 				Version: { AppVersion }
 			</Text>

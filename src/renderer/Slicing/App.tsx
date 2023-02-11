@@ -2,7 +2,7 @@ import { ToggleButton, Tooltip } from '@mui/material';
 import { FiSave } from '@react-icons/all-files/fi/FiSave';
 import { observer } from 'mobx-react-lite';
 import { AppStore, Pages } from '../AppStore';
-import { BigButton } from '../Main/Components/ToolsRight/Slice/SliceButtonApp';
+import { BigButton } from '../Main/Components/Slice/SliceButton';
 import { colors, config, saveConfig } from '../Shared/Config';
 import { FlexBoxColumn, FlexBoxRow } from '../Shared/Styled/FlexBox';
 

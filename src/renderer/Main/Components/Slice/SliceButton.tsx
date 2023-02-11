@@ -1,11 +1,11 @@
 import { Box, styled } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { observer } from 'mobx-react-lite';
-import { AppStore, Log, Pages } from '../../../../AppStore';
-import { colors } from '../../../../Shared/Config';
-import { Sizes } from '../../../../Shared/Styled/Sizes';
+import { AppStore, Log, Pages } from '../../../AppStore';
+import { colors } from '../../../Shared/Config';
+import { Sizes } from '../../../Shared/Styled/Sizes';
 
-export const SliceButtonApp = observer(() => {
+export const SliceButton = observer(() => {
 	return <BigButton sx={{
 		display: AppStore.sceneStore.objects.length > 0 ? 'flex' : 'none',
 		border: '1px solid ' + colors.interact.touch1,

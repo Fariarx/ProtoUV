@@ -26,7 +26,7 @@ import { container } from 'tsyringe';
 import { SceneObject } from './Entities/SceneObject';
 import { SceneBase } from './SceneBase';
 import { AppStore, Log, Pages } from '../../AppStore';
-import { APP_HEADER_HEIGHT } from '../../HeaderApp';
+import { APP_HEADER_HEIGHT } from '../../Screen/Header/App';
 import { config, saveConfig } from '../../Shared/Config';
 import { Dispatch } from '../../Shared/Events';
 import { EnumHelpers } from '../../Shared/Helpers/Enum';
@@ -46,8 +46,8 @@ import {
 	SupportsEnum,
 	TransformEnum
 } from '../../Shared/Libs/Types';
+import { ToolsRightStore } from '../Components/ToolsRight/Store';
 import { clearSupportCreateBuffer } from '../Components/ToolsRight/Supports/Shared/SupportsGen';
-import { ToolsRightStore } from '../Components/ToolsRight/ToolsRightStore';
 
 export class SceneInitializer extends SceneBase {
 	private temp: any = {};

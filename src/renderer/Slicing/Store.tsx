@@ -4,7 +4,7 @@ import { SceneObject } from 'renderer/Main/Scene/Entities/SceneObject';
 import { Vector2, Vector3 } from 'three';
 import { singleton } from 'tsyringe';
 import { AppStore, Log, Pages } from '../AppStore';
-import { ConsoleColors } from '../Main/Console/ConsoleStore';
+import { ConsoleColors } from '../Main/Console/Store';
 import { PrinterConfig } from '../Main/Printer/Configs/Printer';
 import { config, saveConfig } from '../Shared/Config';
 import { bridge } from '../Shared/Globals';

@@ -2,10 +2,10 @@ import { Box } from '@mui/material';
 import _ from 'lodash';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { AppStore } from '../../../../AppStore';
-import { config } from '../../../../Shared/Config';
-import { SliceSlider } from '../../../../Shared/Styled/Slider';
-import { SceneObject } from '../../../Scene/Entities/SceneObject';
+import { AppStore } from '../../../AppStore';
+import { config } from '../../../Shared/Config';
+import { SliceSlider } from '../../../Shared/Styled/Slider';
+import { SceneObject } from '../../Scene/Entities/SceneObject';
 
 export const SliceSliderApp = observer(() => {
 	if (AppStore.sceneStore.objects.length === 0)
@@ -23,7 +23,7 @@ export const SliceSliderApp = observer(() => {
 		<SliceSlider
 			sx={{
 				height:'100%',
-				opacity: 0.2,
+				opacity: 0.25,
 				transition: '1s all',
 				':active': {
 					opacity: config.ui.opacity

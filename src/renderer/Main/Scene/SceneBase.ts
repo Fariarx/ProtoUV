@@ -179,6 +179,8 @@ export abstract class SceneBase {
 
   @observable
 	public controlsTypeFlyEnabled = false;
+  @observable
+  public isOpenSupportEditor = false;
 
   public static CreatePlaneMaterial = (paddingX: number, paddingY: number) => {
   	return new ShaderMaterial({

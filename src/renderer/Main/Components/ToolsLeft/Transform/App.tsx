@@ -10,7 +10,6 @@ import { runInAction } from 'mobx';
 import { observer } from 'mobx-react';
 import { createRef, useState } from 'react';
 import { SceneObject } from 'renderer/Main/Scene/Entities/SceneObject';
-import { SceneStore } from 'renderer/Main/Scene/SceneStore';
 import { colors, config } from 'renderer/Shared/Config';
 import { Dispatch } from 'renderer/Shared/Events';
 import { EnumHelpers } from 'renderer/Shared/Helpers/Enum';
@@ -19,8 +18,9 @@ import { Sizes } from 'renderer/Shared/Styled/Sizes';
 import { MathUtils, Vector3 } from 'three';
 import { Key } from 'ts-keycode-enum';
 import { container } from 'tsyringe';
-import { TransformStore } from './TransformStore';
+import { TransformStore } from './Store';
 import { AppEventEnum, AppEventMoveObject, TransformEnum } from '../../../../Shared/Libs/Types';
+import { SceneStore } from '../../../Scene/Store';
 import { ToolButton } from '../../ToolsRight/Supports/Shared/ToolButton';
 import { ToolButtonStyled } from '../Shared/ToolButton';
 

@@ -12,7 +12,7 @@ import { Sizes } from 'renderer/Shared/Styled/Sizes';
 import { SupportsGenerator } from './Shared/SupportsGen';
 import { ToolButton } from './Shared/ToolButton';
 
-export const PerformSupportsApp = observer(() => {
+export const App = observer(() => {
 
 	return <Box sx={{
 		width: '100%',

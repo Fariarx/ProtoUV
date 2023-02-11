@@ -1,7 +1,7 @@
 import { Box, Fade, Typography } from '@mui/material';
 import { observer } from 'mobx-react';
 import { useState } from 'react';
-import { ConsoleColors } from './ConsoleStore';
+import { ConsoleColors } from './Store';
 import { AppStore } from '../../AppStore';
 import { colors } from '../../Shared/Config';
 import { linearGenerator } from '../../Shared/Libs/Tools';

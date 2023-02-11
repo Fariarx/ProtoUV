@@ -2,9 +2,9 @@ import { IconButton, Tooltip } from '@mui/material';
 import { MdCenterFocusStrong } from '@react-icons/all-files/md/MdCenterFocusStrong';
 import { MdCenterFocusWeak } from '@react-icons/all-files/md/MdCenterFocusWeak';
 import { observer } from 'mobx-react';
-import { AppStore } from '../../../AppStore';
-import { config, saveConfig } from '../../../Shared/Config';
-import { colors } from '../../../Shared/Config';
+import { AppStore } from '../../../../AppStore';
+import { config, saveConfig } from '../../../../Shared/Config';
+import { colors } from '../../../../Shared/Config';
 
 export const LockLookAtCenterApp = observer(() => {
 	AppStore.sceneStore.orbitControls.enablePan = !config.scene.isFixedCenter;

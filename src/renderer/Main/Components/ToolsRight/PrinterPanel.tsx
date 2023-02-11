@@ -6,7 +6,7 @@ import { colors } from 'renderer/Shared/Config';
 import { Sizes } from 'renderer/Shared/Styled/Sizes';
 import { ToolButton } from './Supports/Shared/ToolButton';
 
-export const PrinterApp = observer(() => {
+export const PrinterPanel = observer(() => {
 
 	return <Box sx={{
 		width: '100%',

@@ -1,13 +1,13 @@
 import 'reflect-metadata';
 import { makeAutoObservable } from 'mobx';
 import { container, singleton } from 'tsyringe';
-import { HeaderStore } from './HeaderStore';
-import { TransformStore } from './Main/Components/ToolsLeft/Transform/TransformStore';
-import { PerformSupportsStore } from './Main/Components/ToolsRight/Supports/PerformSupportsStore';
-import { ConsoleStore } from './Main/Console/ConsoleStore';
+import { TransformStore } from './Main/Components/ToolsLeft/Transform/Store';
+import { PerformSupportsStore } from './Main/Components/ToolsRight/Supports/Store';
+import { ConsoleStore } from './Main/Console/Store';
 import { Printer } from './Main/Printer/Configs/Printer';
-import { SceneStore } from './Main/Scene/SceneStore';
-import { SlicingStore } from './Slicing/SlicingStore';
+import { SceneStore } from './Main/Scene/Store';
+import { HeaderStore } from './Screen/Header/Store';
+import { SlicingStore } from './Slicing/Store';
 
 export const Log = container.resolve(ConsoleStore).Add;
 
@@ -67,6 +67,5 @@ export enum Pages {
 	Main,
 	Configurator,
 	ConfiguratorManually,
-  ConfiguratorSupports,
   Slice
 }

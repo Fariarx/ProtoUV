@@ -30,7 +30,7 @@ import { LineSegments2 } from 'three/examples/jsm/lines/LineSegments2';
 import { LineSegmentsGeometry } from 'three/examples/jsm/lines/LineSegmentsGeometry';
 import { LinearEncoding } from 'three/src/constants';
 import { CONTAINED, MeshBVH } from 'three-mesh-bvh';
-import { SliceWorker } from '../renderer/Slicing/SlicingStore';
+import { SliceWorker } from '../renderer/Slicing/Store';
 
 const scene: Scene = new Scene();
 const reader = new FileReader();

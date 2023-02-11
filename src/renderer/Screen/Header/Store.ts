@@ -1,6 +1,6 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 import { singleton } from 'tsyringe';
-import { SubscribersMouseClick } from './Shared/Libs/Listerners';
+import { SubscribersMouseClick } from '../../Shared/Libs/Listerners';
 
 @singleton()
 export class HeaderStore {

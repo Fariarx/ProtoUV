@@ -2,18 +2,18 @@ import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import { AppStore } from 'renderer/AppStore';
-import { APP_BOTTOM_HEIGHT_PX } from 'renderer/BottomApp';
 import { container } from 'tsyringe';
-import { ListObjects } from './ListObjectsApp';
-import { PrinterApp } from './PrinterApp';
-import { SliceButtonApp } from './Slice/SliceButtonApp';
-import { PerformSupportsApp } from './Supports/PerformSupportsApp';
-import { ToolsRightStore } from './ToolsRightStore';
-import { APP_HEADER_HEIGHT_PX } from '../../../HeaderApp';
+import { ListObjects } from './ListObjects';
+import { PrinterPanel } from './PrinterPanel';
+import { ToolsRightStore } from './Store';
+import { App } from './Supports/App';
+import { APP_BOTTOM_HEIGHT_PX } from '../../../Screen/Bottom/App';
+import { APP_HEADER_HEIGHT_PX } from '../../../Screen/Header/App';
 import { colors, config, saveConfig } from '../../../Shared/Config';
 import { SubscribersMouseMove, SubscribersMouseUp } from '../../../Shared/Libs/Listerners';
 import { FlexBoxColumn, FlexBoxRow } from '../../../Shared/Styled/FlexBox';
 import { Sizes } from '../../../Shared/Styled/Sizes';
+import { SliceButton } from '../Slice/SliceButton';
 
 export const TOOLS_TAB_MIN_SIZE = 150;
 export const TOOLS_TAB_MAX_SIZE = 400;
@@ -63,10 +63,10 @@ export const ToolsRightApp = observer(() => {
 		<FlexBoxColumn sx={{
 			pointerEvents: 'auto',
 		}}>
-			<PrinterApp/>
+			<PrinterPanel/>
 			<ListObjects/>
-			<PerformSupportsApp/>
-			<SliceButtonApp/>
+			<App/>
+			<SliceButton/>
 		</FlexBoxColumn>
 	</FlexBoxRow>;
 });

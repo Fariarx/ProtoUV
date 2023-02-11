@@ -30,6 +30,7 @@ import { LineSegments2 } from 'three/examples/jsm/lines/LineSegments2';
 import { LineSegmentsGeometry } from 'three/examples/jsm/lines/LineSegmentsGeometry';
 import { LinearEncoding } from 'three/src/constants';
 import { CONTAINED, MeshBVH } from 'three-mesh-bvh';
+import { Printer } from '../renderer/Main/Printer/Configs/Printer';
 import { SliceWorker } from '../renderer/Slicing/Store';
 
 const scene: Scene = new Scene();
@@ -58,10 +59,10 @@ onmessage = function (oEvent) {
 	const data = oEvent.data as SliceWorker;
 	const loader = new ObjectLoader();
 	const group = loader.parse(data.geometry) as Group;
-
+	const printer = JSON.parse(data.printer) as Printer;
 	const sizeXZ = new Vector2(
-		data.printer.Workspace.SizeX * 0.1,
-		data.printer.Workspace.SizeY * 0.1);
+		printer.Workspace.SizeX * 0.1,
+		printer.Workspace.SizeY * 0.1);
 
 	const stencilRenderer: WebGLRenderer = new WebGLRenderer({
 		canvas: data.canvas
@@ -69,7 +70,7 @@ onmessage = function (oEvent) {
 	stencilRenderer.localClippingEnabled = true;
 	stencilRenderer.outputEncoding = LinearEncoding;
 	stencilRenderer.setClearColor(0x000000);
-	stencilRenderer.setSize(data.printer.Resolution.X,data.printer.Resolution.Y,false);
+	stencilRenderer.setSize(printer.Resolution.X,printer.Resolution.Y,false);
 
 	stencilRenderer.autoClear = false;
 	stencilRenderer.autoClearColor = false;
@@ -87,7 +88,7 @@ onmessage = function (oEvent) {
 
 	const matLine = new LineMaterial( {
 		color: 0x0,
-		linewidth: data.printer.PrintSettings.ExposureIndent / 1000,
+		linewidth: printer.PrintSettings.ExposureIndent / 1000,
 		depthTest: false
 	});
 
@@ -206,7 +207,7 @@ onmessage = function (oEvent) {
 		clippingPlaneMeshMin.visible = true;
 		stencilRenderer.render(scene, sliceOrthographicCamera);
 
-		if (layer.isAdditionalLight && data.printer.PrintSettings.ExposureIndent > 0)
+		if (layer.isAdditionalLight && printer.PrintSettings.ExposureIndent > 0)
 		{
 			clippingPlaneMeshMin.visible = false;
 			stencilRenderer.render(scene, sliceOrthographicCamera);

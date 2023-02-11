@@ -1,8 +1,7 @@
 import { Box, Grid, Grow, Typography } from '@mui/material';
-import { runInAction } from 'mobx';
 import { observer } from 'mobx-react';
 import { AppStore } from '../../../../AppStore';
-import { colors, config } from '../../../../Shared/Config';
+import { colors, config, saveConfig } from '../../../../Shared/Config';
 import { Sizes } from '../../../../Shared/Styled/Sizes';
 import { Printer } from '../../../Printer/Configs/Printer';
 import { DescriptionRow, Value } from '../SupportEditor/App';
@@ -18,6 +17,8 @@ export const PrinterEditorApp = observer(() => {
 	const close = () => {
 		AppStore.sceneStore.isOpenPrinterEditor = false;
 		Printer.SaveToFile(printer);
+		config.printerName = AppStore.sceneStore.printerName;
+		saveConfig();
 	};
 
 	const gridItem = (item: [string, string | number], onChange: (value: string | number) => void) => {
@@ -31,16 +32,14 @@ export const PrinterEditorApp = observer(() => {
 				description={description}
 				value={value}
 				updateValue={newValue => {
-					runInAction(() => {
-						onChange(newValue);
-						AppStore.sceneStore.printer =
-              { ...AppStore.sceneStore.printer } as Printer;
-					});
+					onChange(newValue);
+					AppStore.sceneStore.printer =
+            { ...AppStore.sceneStore.printer } as Printer;
 				}}/>
 		</Grid>;
 	};
 
-	return <Box onClick={close} sx={{
+	return <Box onMouseDown={close} sx={{
 		width: '100%',
 		height: '100%',
 		backgroundColor: 'rgba(114,114,114,0.47)',
@@ -51,7 +50,7 @@ export const PrinterEditorApp = observer(() => {
 		justifyContent: 'center'
 	}}>
 		<Grow in>
-			<Box onClick={(e) => e.stopPropagation()} sx={{
+			<Box onMouseDown={(e) => e.stopPropagation()} sx={{
 				borderRadius: Sizes.four,
 				border: '1px solid ' + colors.background.darkest,
 				p: 1, pt: 0.5, minWidth: '120px',
@@ -105,6 +104,13 @@ export const PrinterEditorApp = observer(() => {
 					{gridItem(['BottomLayers', printer.PrintSettings.BottomLayers], (v: string | any) => printer.PrintSettings.BottomLayers = v)}
 					{gridItem(['BottomExposureTime', printer.PrintSettings.BottomExposureTime], (v: string | any) => printer.PrintSettings.BottomExposureTime = v)}
 					{gridItem(['BottomLiftingHeight', printer.PrintSettings.BottomLiftingHeight], (v: string | any) => printer.PrintSettings.BottomLiftingHeight = v)}
+					<Grid item  xs={12}>
+						<Typography variant='body2' alignSelf={'start'}>
+              File export format
+						</Typography>
+					</Grid>
+					{gridItem(['FileExportFormatEncoder', printer.Export.Encoder], (v: string | any) => printer.Export.Encoder = v)}
+					{gridItem(['FileExportFormatExt', printer.Export.Extencion], (v: string | any) => printer.Export.Extencion = v)}
 				</Grid>
 				<Box onClick={close} sx={{
 					width: 'fit-content',
@@ -217,7 +223,7 @@ const Description = (name: string) => {
 
 		case 'BottomExposureTime':
 			return {
-				name: 'Exposure time bottom',
+				name: 'Bottom exposure time',
 				description: 'Exposure time for bottom layer',
 				type: 'float',
 				textend: 'seconds',
@@ -236,7 +242,7 @@ const Description = (name: string) => {
 
 		case 'BottomLiftingHeight':
 			return {
-				name: 'Lifting height bottom',
+				name: 'Bottom lifting height',
 				description: 'Lifting distance of the print platform after exposure bottom layer.',
 				type: 'float',
 				textend: 'cm',
@@ -262,6 +268,20 @@ const Description = (name: string) => {
 				maxNumber: 10000
 			};
 
+		case 'FileExportFormatEncoder':
+			return {
+				name: 'Encoder',
+				type: 'string',
+				description: 'Please, check our github main page. Paragraph "Known formats"'
+			};
+
+		case 'FileExportFormatExt':
+			return {
+				name: 'Extencion',
+				type: 'string',
+				description: 'Please, check our github main page. Paragraph "Known formats"'
+			};
+
 		default:
 			return {
 				name: 'Unknown',
@@ -269,4 +289,3 @@ const Description = (name: string) => {
 			} as DescriptionRow;
 	}
 };
-

@@ -5,7 +5,6 @@ import { Vector2, Vector3 } from 'three';
 import { singleton } from 'tsyringe';
 import { AppStore, Log, Pages } from '../AppStore';
 import { ConsoleColors } from '../Main/Console/Store';
-import { PrinterConfig } from '../Main/Printer/Configs/Printer';
 import { config, saveConfig } from '../Shared/Config';
 import { bridge } from '../Shared/Globals';
 
@@ -102,6 +101,7 @@ export class SlicingStore {
 		{
 			const percent = (this.sliceCount/this.sliceCountMax) * this.sliceTo / AppStore.sceneStore.gridSize.y;
 			const moveTo = (layerHeight * this.sliceCount)* 10;
+			const isBottomLayer = printer.PrintSettings.BottomLayers >= this.sliceCount;
 
 			const slice = () => {
 				arrangeJobByWorker.push({
@@ -109,8 +109,6 @@ export class SlicingStore {
 					i: this.sliceCount,
 					isAdditionalLight: true
 				});
-
-				const isBottomLayer = printer.PrintSettings.BottomLayers >= this.sliceCount / 2;
 
 				this.gcode += '\n\n' + printer.GCode.ShowImage.replace('*x', (this.sliceCount + 1).toString());
 				this.gcode += '\n' + printer.GCode.MoveTo
@@ -192,7 +190,7 @@ export class SlicingStore {
 				worker.postMessage({
 					canvas: canvas,
 					gridSize: AppStore.sceneStore.gridSize,
-					printer: AppStore.sceneStore.printer!,
+					printer: JSON.stringify(AppStore.sceneStore.printer!),
 					geometry: created,
 					layers: layers
 				} as SliceWorker, [canvas]);
@@ -249,8 +247,8 @@ export class SlicingStore {
 			this.gcode = `;fileName:${store.objects[0].name}
 ;machineType:${store.printer?.Name}
 ;estimatedPrintTime:${printer.PrintSettings.BottomExposureTime * printer.PrintSettings.BottomLayers
-        + printer.PrintSettings.ExposureTime * this.sliceCountMax * 2
-        + printer.PrintSettings.DelayTime * this.sliceCountMax * 2}
+        + printer.PrintSettings.ExposureTime * this.sliceCountMax
+        + printer.PrintSettings.DelayTime * this.sliceCountMax}
 ;volume:1
 ;resin:normal
 ;weight:1
@@ -272,7 +270,7 @@ export class SlicingStore {
 ;bottomLayCount:${printer.PrintSettings.BottomLayers}
 ;bottomLayerCount:${printer.PrintSettings.BottomLayers}
 ;mirror:1
-;totalLayer:${this.sliceCountMax * 2}
+;totalLayer:${this.sliceCountMax}
 ;bottomLayerLiftHeight:${printer.PrintSettings.LiftingHeight}
 ;bottomLayerLiftSpeed:${printer.PrintSettings.LiftingSpeed}
 ;bottomLightOffTime:0
@@ -281,7 +279,7 @@ export class SlicingStore {
 			this.gcode += '\n' + AppStore.sceneStore.printer!.GCode.Start;
 			this.gcode += '\n;START_GCODE_END';
 			this.animate();
-			Log('slice layers max: ' + this.sliceCountMax * 2);
+			Log('slice layers max: ' + this.sliceCountMax);
 		});
 		bridge.ipcRenderer.receive('sliced-finalize-result-save', (error: string | null, success: string | null, filePath?: string) => {
 			if (error) {
@@ -311,7 +309,7 @@ export class SlicingStore {
 
 export interface SliceWorker {
   canvas: OffscreenCanvas;
-  printer: PrinterConfig;
+  printer: string;
   geometry: string;
   gridSize: Vector3;
   layers: {i: number, percent: number, isAdditionalLight: boolean}[];

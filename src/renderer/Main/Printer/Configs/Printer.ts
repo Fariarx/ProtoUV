@@ -109,7 +109,7 @@ M18;`,
 			}
 
 			bridge.fs.writeFileSync(bridge.userData() + Printer.CHANGED_DIR +
-        _default.versionPrinterConfigs + '\\' + config.Name + ' Manually.json',
+        _default.versionPrinterConfigs + '\\' + config.Name + (config.Name.includes('Manually') ? '' : ' Manually') + '.json',
 			JSON.stringify(config),{ encoding:'utf8',flag:'w' });
 			return true;
 		}

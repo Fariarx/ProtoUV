@@ -20,7 +20,7 @@ export const SupportEditorApp = observer(() => {
 		Printer.SaveToFile(printer);
 	};
 
-	return <Box onClick={close} sx={{
+	return <Box onMouseDown={close} sx={{
 		width: '100%',
 		height: '100%',
 		backgroundColor: 'rgba(114,114,114,0.47)',
@@ -31,7 +31,7 @@ export const SupportEditorApp = observer(() => {
 		justifyContent: 'center'
 	}}>
 		<Grow in>
-			<Box onClick={(e) => e.stopPropagation()} sx={{
+			<Box onMouseDown={(e) => e.stopPropagation()} sx={{
 				borderRadius: Sizes.four,
 				border: '1px solid ' + colors.background.darkest,
 				p: 1, pt: 0.5, minWidth: '120px',
@@ -159,16 +159,18 @@ export const Value = observer((props: {
 					{
 						setChanging(e.target.value);
 						props.updateValue(e.target.value);
-						console.log(e.target.value, 1);
 					}
 					else {
+						console.log(1);
 						const value = e.target.value.replace(',', '.');
 
 						let number = props.description.type === 'int'
 							? Math.round(parseInt(value))
 							: parseFloat(value);
 
-						if (number as any instanceof Number) {
+						console.log(2, number);
+						if (number || number === 0) {
+							console.log(3);
 							if (props.description.maxNumber !== undefined)
 							{
 								if (number > props.description.maxNumber)
@@ -183,6 +185,7 @@ export const Value = observer((props: {
 									number = props.description.minNumber;
 								}
 							}
+							console.log(4);
 
 							setChanging(number);
 							props.updateValue(number);

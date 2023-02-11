@@ -10,6 +10,8 @@ import { BindItem, HeaderStore } from './Store';
 import { AppStore, Pages } from '../../AppStore';
 import { colors } from '../../Shared/Config';
 import { AppLink, bridge } from '../../Shared/Globals';
+//eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//@ts-ignore
 import logo1 from '../../Shared/Image/uv128_v1.png';
 import { linearGenerator } from '../../Shared/Libs/Tools';
 import { AnimationGrow } from '../../Shared/Styled/Animation';

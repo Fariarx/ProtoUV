@@ -79,7 +79,9 @@ const ResizePanel = (props: { store: ToolsRightStore }) => {
 		sx={{
 			pointerEvents: 'auto',
 			marginLeft: Sizes.negative(Sizes.four),
-			width: '6px',
+			width: '5px',
+			marginTop: '8px',
+			borderRadius: '3px',
 			transition: '0.5s ease-out',
 			cursor: 'col-resize',
 			position: 'absolute',

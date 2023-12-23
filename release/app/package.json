@@ -1,6 +1,6 @@
 {
   "name": "protouv",
-  "version":"1.0.0",
+  "version": "1.0.0",
   "description": "A foundation for scalable desktop apps",
   "main": "./dist/main/main.js",
   "author": {
@@ -13,6 +13,5 @@
     "link-modules": "node -r ts-node/register ../../.erb/scripts/link-modules.ts",
     "postinstall": "npm run electron-rebuild && npm run link-modules"
   },
-  "dependencies": {},
   "license": "MIT"
 }

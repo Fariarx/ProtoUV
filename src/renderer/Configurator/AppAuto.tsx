@@ -14,6 +14,8 @@ export const ConfiguratorAutoApp = observer(() => {
 	const [hasFocus, setterFocus] = useState(true);
 	const [printerName, setterPrinterName] = useState('');
 
+	console.log(123)
+
 	const isValidPrinter = () => {
 		const result = configs?.default.includes(printerName) || configs?.changed.includes(printerName);
 
